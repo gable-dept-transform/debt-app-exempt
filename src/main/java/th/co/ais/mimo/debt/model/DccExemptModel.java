@@ -41,21 +41,9 @@ import java.util.Calendar;
                         @ColumnResult(name = "sent_interface_flag")
                 }))
 public class DccExemptModel {
+
     @Id
-    @Column(name = "CUST_ACC_NUM")
-    private String custAccNum;
-
-    @Column(name = "BILLING_ACC_NUM")
-    private String billingAccNum;
-
-    @Column(name = "MOBILE_NUM")
-    private String mobileNum;
-
-    @Column(name = "MODE_ID")
-    private String modeId;
-
-    @Column(name = "EXEMPT_LEVEL")
-    private String exemptLevel;
+    private DccExemptModelId id;
 
     @Column(name = "MODULE_CODE")
     private String moduleCode;
