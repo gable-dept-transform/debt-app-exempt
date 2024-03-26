@@ -16,4 +16,16 @@ public class QueryExemptRequest {
     private String billingAccNum;
 
     private String mobileNum;
+
+    private String effectiveDate;
+
+    private String endDate;
+
+    private String expireDate;
+
+    private String mobileStatus;
+
+    private String exemptAction;
+
+    private String mode;
 }
