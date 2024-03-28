@@ -16,8 +16,8 @@ import th.co.ais.mimo.debt.exception.ExemptException;
 import th.co.ais.mimo.debt.service.QueryExemptService;
 
 @RestController
-@RequestMapping("${api.path}")
-public class QueryExemptController {
+@RequestMapping("${api.path}/transaction/dmsem003")
+public class DMSEM003QueryExemptController {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
@@ -26,13 +26,14 @@ public class QueryExemptController {
 
 
 
-	@PostMapping(value = "/list-query-exempt",produces = "application/json")
-	public ResponseEntity<QueryExemptResponse> queryExempt(@RequestBody QueryExemptRequest queryExemptRequest){
+	@PostMapping(value = "/search-data",produces = "application/json")
+	public ResponseEntity<QueryExemptResponse> searchData(@RequestBody QueryExemptRequest queryExemptRequest){
 
 		String errorMsg = null;
 		QueryExemptResponse response = QueryExemptResponse.builder().build();
 		try {
-			response.setCurrentDataList(queryExemptService.queryExempt(queryExemptRequest));
+			//response.setResultCurrentList(this.queryExemptService.queryExempt(queryExemptRequest));
+			response.setResultHistoryList(this.queryExemptService.queryExemptHistory(queryExemptRequest));
 			response.setStatus(AppConstant.SUCCESS);
 		} catch (ExemptException e) {
 			log.error("Exception queryExempt : {}", e.getMessage(), e);

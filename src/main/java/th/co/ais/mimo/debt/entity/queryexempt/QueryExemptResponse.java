@@ -16,5 +16,6 @@ public class QueryExemptResponse {
     private String status;
     private String message;
 
-    private List<DcExemptDto> currentDataList;
+    private List<DcExemptDto> resultCurrentList;
+    private List<DcExemptDto> resultHistoryList;
 }
