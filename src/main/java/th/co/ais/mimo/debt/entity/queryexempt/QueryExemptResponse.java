@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import th.co.ais.mimo.debt.dto.DcExempHistoryDto;
 import th.co.ais.mimo.debt.dto.DcExemptDto;
 
 import java.util.List;
@@ -17,5 +18,5 @@ public class QueryExemptResponse {
     private String message;
 
     private List<DcExemptDto> resultCurrentList;
-    private List<DcExemptDto> resultHistoryList;
+    private List<DcExempHistoryDto> resultHistoryList;
 }

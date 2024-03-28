@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import th.co.ais.mimo.debt.constant.AppConstant;
+import th.co.ais.mimo.debt.dto.DcExempHistoryDto;
 import th.co.ais.mimo.debt.dto.DcExemptDto;
 import th.co.ais.mimo.debt.entity.queryexempt.QueryExemptRequest;
 import th.co.ais.mimo.debt.exception.ExemptException;
@@ -310,7 +311,7 @@ public class QueryExemptServiceImpl implements QueryExemptService {
     }
 
     @Override
-    public List<DcExemptDto> queryExemptHistory(QueryExemptRequest request) throws ExemptException {
+    public List<DcExempHistoryDto> queryExemptHistory(QueryExemptRequest request) throws ExemptException {
         try{
             String sql = "";
             HashMap<String ,Object> mapParam = new HashMap<>();
@@ -468,7 +469,7 @@ public class QueryExemptServiceImpl implements QueryExemptService {
                             "    and e.billing_acc_num = mb.bill_accnt_num  " +
                             "    and e.mobile_num = mb.service_num  " +
                             "    and (:inDccExemptActionList = 'ALL' or DCCU_UTIL.FIND_LIST(:inDccExemptActionList,e.action_type) > 0 )  " +
-                            "    and (:inDccMobileStatusList = 'ALL' or DCCU_UTIL.FIND_LIST(:inDccMobileStatusList,status_cd) > 0 or DCCU_UTIL.FIND_LIST(:in_DCC_MOBILE_STAUTS_LIST,MB.STATUS_CD || '/' || trim(mb.x_suspend_type)) > 0)  " +
+                            "    and (:inDccMobileStatusList = 'ALL' or DCCU_UTIL.FIND_LIST(:inDccMobileStatusList,status_cd) > 0 or DCCU_UTIL.FIND_LIST(:inDccMobileStatusList,MB.STATUS_CD || '/' || trim(mb.x_suspend_type)) > 0)  " +
                             " UNION  " +
                             " select cust_acc_num,  " +
                             "    :billingAccNum as  billing_acc_num, " +
@@ -506,7 +507,7 @@ public class QueryExemptServiceImpl implements QueryExemptService {
                     return null;
                 }
 
-                Query query = entityManager.createNativeQuery(sql, "dcExemptDtoMapping");
+                Query query = entityManager.createNativeQuery(sql, "dcExemptHistoryDtoMapping");
                 if (!mapParam.isEmpty()) {
                     mapParam.forEach(query::setParameter);
                 }
