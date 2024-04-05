@@ -1,4 +1,4 @@
-package th.co.ais.mimo.debt.model;
+package th.co.ais.mimo.debt.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,7 +8,8 @@ import th.co.ais.mimo.debt.dto.DcExempHistoryDto;
 import th.co.ais.mimo.debt.dto.DcExemptDto;
 
 import javax.persistence.*;
-import java.util.Calendar;
+import java.util.Date;
+
 
 @Data
 @NoArgsConstructor
@@ -79,14 +80,17 @@ public class DccExemptModel {
     private String moduleCode;
 
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "EFFECTIVE_DAT")
-    private Calendar effectiveDate;
+    private Date effectiveDate;
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "END_DAT")
-    private Calendar endDate;
+    private Date endDate;
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "EXPIRE_DAT")
-    private Calendar expireDate;
+    private Date expireDate;
 
     @Column(name = "CATE_CODE")
     private String cateCode;
@@ -117,8 +121,10 @@ public class DccExemptModel {
     @Column(name = "LAST_UPDATE_BY")
     private String lastUpdateBy;
 
+
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "LAST_UPDATE_DTM")
-    private Calendar lastUpdateDtm;
+    private Date lastUpdateDtm;
 
     @Column(name = "SENT_BOS_FLAG")
     private String sentBosFlag;

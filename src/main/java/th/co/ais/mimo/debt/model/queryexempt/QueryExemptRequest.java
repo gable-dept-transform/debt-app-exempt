@@ -1,4 +1,4 @@
-package th.co.ais.mimo.debt.entity.queryexempt;
+package th.co.ais.mimo.debt.model.queryexempt;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,11 +33,11 @@ public class QueryExemptRequest {
 
     private String exemptAction;
 
-    private String mode;
-
     private Integer startRow;
 
     private Integer endRow;
 
     private String effectiveDateLast;
+
+    private String selectType;
 }

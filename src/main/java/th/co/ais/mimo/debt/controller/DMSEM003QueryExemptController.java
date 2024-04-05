@@ -1,5 +1,6 @@
 package th.co.ais.mimo.debt.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +10,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import th.co.ais.mimo.debt.constant.AppConstant;
-import th.co.ais.mimo.debt.entity.queryexempt.QueryExemptRequest;
-import th.co.ais.mimo.debt.entity.queryexempt.QueryExemptResponse;
 import th.co.ais.mimo.debt.exception.ExemptException;
+import th.co.ais.mimo.debt.model.queryexempt.GetBillingRequest;
+import th.co.ais.mimo.debt.model.queryexempt.GetBillingResponse;
+import th.co.ais.mimo.debt.model.queryexempt.QueryExemptRequest;
+import th.co.ais.mimo.debt.model.queryexempt.QueryExemptResponse;
 import th.co.ais.mimo.debt.service.QueryExemptService;
 
 @RestController
@@ -32,15 +34,35 @@ public class DMSEM003QueryExemptController {
 		String errorMsg = null;
 		QueryExemptResponse response = QueryExemptResponse.builder().build();
 		try {
-			//response.setResultCurrentList(this.queryExemptService.queryExempt(queryExemptRequest));
-			response.setResultHistoryList(this.queryExemptService.queryExemptHistory(queryExemptRequest));
-			response.setStatus(AppConstant.SUCCESS);
+			if(!StringUtils.isEmpty(queryExemptRequest.getSelectType())) {
+				response.setResultCurrentList(this.queryExemptService.queryExempt(queryExemptRequest));
+				response.setResultHistoryList(this.queryExemptService.queryExemptHistory(queryExemptRequest));
+			}else{
+				errorMsg = "Select Type is require";
+			}
 		} catch (ExemptException e) {
 			log.error("Exception queryExempt : {}", e.getMessage(), e);
 			errorMsg = "queryExempt Internal server Error process";
-			response.setStatus(AppConstant.FAIL);
 		} finally {
-			response.setMessage(errorMsg);
+			response.setErrorMsg(errorMsg);
+
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/search-billing",produces = "application/json")
+	public ResponseEntity<GetBillingResponse> searchBilling(@RequestBody GetBillingRequest request){
+
+		String errorMsg = null;
+		GetBillingResponse response = GetBillingResponse.builder().build();
+		try {
+			response.setResultList(this.queryExemptService.getBillingAccNum(request));
+
+		} catch (ExemptException e) {
+			log.error("Exception queryExempt : {}", e.getMessage(), e);
+			errorMsg = "queryExempt Internal server Error process";
+		} finally {
+			response.setErrorMsg(errorMsg);
 
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);

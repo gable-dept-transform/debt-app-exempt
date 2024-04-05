@@ -1,10 +1,17 @@
-package th.co.ais.mimo.debt.model;
+package th.co.ais.mimo.debt.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 
 @Embeddable
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class DccExemptModelId implements Serializable {
 
     @Column(name = "CUST_ACC_NUM")

@@ -1,4 +1,4 @@
-package th.co.ais.mimo.debt.entity.queryexempt;
+package th.co.ais.mimo.debt.model.queryexempt;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,9 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class QueryExemptResponse {
-    private String status;
-    private String message;
-
+    private String errorMsg;
     private List<DcExemptDto> resultCurrentList;
     private List<DcExempHistoryDto> resultHistoryList;
 }

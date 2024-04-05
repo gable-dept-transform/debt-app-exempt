@@ -5,9 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import th.co.ais.mimo.debt.constant.AppConstant;
+import th.co.ais.mimo.debt.dto.BillingAccDto;
 import th.co.ais.mimo.debt.dto.DcExempHistoryDto;
 import th.co.ais.mimo.debt.dto.DcExemptDto;
-import th.co.ais.mimo.debt.entity.queryexempt.QueryExemptRequest;
+import th.co.ais.mimo.debt.model.queryexempt.GetBillingRequest;
+import th.co.ais.mimo.debt.model.queryexempt.QueryExemptRequest;
 import th.co.ais.mimo.debt.exception.ExemptException;
 import th.co.ais.mimo.debt.service.QueryExemptService;
 
@@ -27,27 +29,6 @@ public class QueryExemptServiceImpl implements QueryExemptService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public String setupModeQuery(QueryExemptRequest request){
-        if(StringUtils.isEmpty(request.getCustAccNum()) && StringUtils.isEmpty(request.getBillingAccNum())
-                && StringUtils.isEmpty(request.getMobileNum())
-                && StringUtils.isEmpty(request.getEffectiveDateFrom()) && StringUtils.isEmpty(request.getEffectiveDateTo())
-                && StringUtils.isEmpty(request.getEndDateFrom()) && StringUtils.isEmpty(request.getEndDateTo())
-                && StringUtils.isEmpty(request.getExpireDateFrom()) && StringUtils.isEmpty(request.getExpireDateTo())){
-            return "Default";
-        }else if(!StringUtils.isEmpty(request.getCustAccNum()) && !StringUtils.isEmpty(request.getBillingAccNum()) && !StringUtils.isEmpty(request.getMobileNum())){
-            return "M";
-        }else if(!StringUtils.isEmpty(request.getMobileNum())){
-            return "m";
-        }else if(!StringUtils.isEmpty(request.getBillingAccNum())){
-            return "B";
-        }else if(!StringUtils.isEmpty(request.getCustAccNum())
-                || (!StringUtils.isEmpty(request.getEffectiveDateFrom()) && !StringUtils.isEmpty(request.getEffectiveDateTo()))
-                || (!StringUtils.isEmpty(request.getEndDateFrom()) && !StringUtils.isEmpty(request.getEndDateTo()))
-                || (!StringUtils.isEmpty(request.getExpireDateFrom()) && !StringUtils.isEmpty(request.getExpireDateTo()))){
-            return  "C";
-        }
-        return null;
-    }
     private QueryExemptRequest setupDefaultCommonValue(QueryExemptRequest request){
         if(StringUtils.isEmpty(request.getMobileStatus())){
             request.setMobileStatus("ALL");
@@ -61,9 +42,6 @@ public class QueryExemptServiceImpl implements QueryExemptService {
         if(request.getEndRow()==0){
             request.setEndRow(1000);
         }
-        request.setMode(this.setupModeQuery(request));
-        log.info("search Mode :{}",request.getMode());
-
         return  request;
     }
 
@@ -74,11 +52,8 @@ public class QueryExemptServiceImpl implements QueryExemptService {
             HashMap<String ,Object> mapParam = new HashMap<>();
             this.setupDefaultCommonValue(request);
 
-            if(StringUtils.isEmpty(request.getMode())){
-                throw  new ExemptException(AppConstant.FAIL,"CRITERIA QUERY NOT FOUND");
-            }
 
-            if("Default".equals(request.getMode())) {
+            if("Default".equals(request.getSelectType())) {
                 sql = "select cust_acc_num, billing_acc_num, " +
                         "   mobile_num, module_code, mode_id, exempt_level," +
                         "   (select b.x_con_full_name from billing_profile b  where b.ou_num = billing_acc_num ) billing_acc_name, " +
@@ -91,7 +66,7 @@ public class QueryExemptServiceImpl implements QueryExemptService {
                         "   update_location, last_update_by, to_char(last_update_dtm,'YYYY/MM/DD HH24:Mi:SS') AS last_update_date, " +
                         "   no_of_exempt, sent_interface_flag " +
                         "   from   dcc_exempt e";
-            }else if("M".equals(request.getMode())){
+            }else if("MNO".equals(request.getSelectType()) && !StringUtils.isEmpty(request.getBillingAccNum())){
                 sql = "select * from (select aa.*, row_number() over (order by exempt_level desc, module_code,mode_id, cust_acc_num, billing_acc_num,mobile_status, mobile_num) as rownumber from ( " +
                         " select cust_acc_num, billing_acc_num, mobile_num, module_code, mode_id, exempt_level, " +
                         "   (select a.name from account a where a.ou_num = billing_acc_num and a.accnt_type_cd = 'Billing' ) billing_acc_name, " +
@@ -154,7 +129,7 @@ public class QueryExemptServiceImpl implements QueryExemptService {
                     mapParam.put("inDccMobileStatusList",request.getMobileStatus());
                     mapParam.put("startRow",request.getStartRow());
                     mapParam.put("endRow",request.getEndRow());
-            }else if("B".equals(request.getMode())){
+            }else if("BNO".equals(request.getSelectType())){
                         sql = "select * from (select aa.*, row_number() over (order by exempt_level desc, module_code,mode_id, cust_acc_num, billing_acc_num, mobile_status, mobile_num) as rownumber from (  " +
                                 "  select cust_acc_num, billing_acc_num, mobile_num, module_code, mode_id, exempt_level,  " +
                                 "  (select a.name from account a where a.ou_num = billing_acc_num and a.accnt_type_cd = 'Billing' ) billing_acc_name,  " +
@@ -199,7 +174,7 @@ public class QueryExemptServiceImpl implements QueryExemptService {
                             mapParam.put("inDccMobileStatusList",request.getMobileStatus());
                             mapParam.put("startRow",request.getStartRow());
                             mapParam.put("endRow",request.getEndRow());
-            }else if("m".equals(request.getMode())){
+            }else if("MNO".equals(request.getSelectType())){
                 sql = "select cust_acc_num, billing_acc_num, mobile_num, module_code, mode_id, exempt_level, " +
                         "     (select b.x_con_full_name from billing_profile b  where b.ou_num = billing_acc_num ) billing_acc_name,  " +
                         "      to_char(effective_dat,'YYYY/MM/DD') AS effective_dat ,  " +
@@ -255,7 +230,10 @@ public class QueryExemptServiceImpl implements QueryExemptService {
                         "   and exempt_level ='MO' " +
                         " order by exempt_level desc, module_code, mode_id, cust_acc_num, billing_acc_num, mobile_num, no_of_exempt ";
                 mapParam.put("mobileNum",request.getMobileNum());
-            }else if("C".equals(request.getMode())){
+            }else if("CNO".equals(request.getSelectType())
+                    || "EFD".equals(request.getSelectType())
+                    || "END".equals(request.getSelectType())
+                    || "EPD".equals(request.getSelectType())){
                         sql = " select * from (select cust_acc_num, billing_acc_num,  " +
                                 "     mobile_num, module_code, mode_id, exempt_level,  " +
                                 "     (select a.name from account a where a.ou_num = billing_acc_num and a.accnt_type_cd = 'Billing' ) billing_acc_name,  " +
@@ -271,17 +249,17 @@ public class QueryExemptServiceImpl implements QueryExemptService {
                                 "     no_of_exempt, sent_interface_flag, decode(mb.x_suspend_type,null,mb.status_cd,mb.status_cd || '/' ||  mb.x_suspend_type) mobile_status,  " +
                                 "     row_number() over (order by exempt_level desc, module_code, mode_id, cust_acc_num, billing_acc_num, mobile_num, no_of_exempt) as rownumber  " +
                                 "   from dcc_exempt e, account_has_mobile mb  ";
-                               if(!StringUtils.isEmpty(request.getEffectiveDateFrom()) && !StringUtils.isEmpty(request.getEffectiveDateTo())) {
+                               if("EFD".equals(request.getSelectType())) {
                                    sql = sql +"     where ( :effectiveDateFrom is null or effective_dat >= to_date( :effectiveDateFrom,'YYYY/MM/DD'))   " +
                                               "       and ( :effectiveDateTo is null or effective_dat <= to_date( :effectiveDateTo,'YYYY/MM/DD'))   ";
                                    mapParam.put("effectiveDateFrom",request.getEffectiveDateFrom());
                                    mapParam.put("effectiveDateTo",request.getEffectiveDateTo());
-                               }else if(!StringUtils.isEmpty(request.getEndDateFrom()) && !StringUtils.isEmpty(request.getEndDateTo())) {
+                               }else if("END".equals(request.getSelectType())) {
                                    sql = sql +"     where ( :endDateFrom is null or end_dat>=to_date( :endDateFrom,'YYYY/MM/DD'))   " +
                                               "       and ( :endDateTo is null or end_dat<=to_date( :endDateTo,'YYYY/MM/DD'))  ";
                                    mapParam.put("endDateFrom",request.getEndDateFrom());
                                    mapParam.put("endDateTo",request.getEndDateTo());
-                               }else if(!StringUtils.isEmpty(request.getExpireDateFrom()) && !StringUtils.isEmpty(request.getExpireDateTo())) {
+                               }else if("EPD".equals(request.getSelectType())) {
                                    sql = sql +"     where ( :expireDateFrom is null or expire_dat>=to_date( :expireDateFrom,'YYYY/MM/DD'))   " +
                                               "       and ( :expireDateTo is null or expire_dat<=to_date( :expireDateTo,'YYYY/MM/DD'))  ";
                                    mapParam.put("expireDateFrom",request.getExpireDateFrom());
@@ -317,13 +295,13 @@ public class QueryExemptServiceImpl implements QueryExemptService {
             HashMap<String ,Object> mapParam = new HashMap<>();
             this.setupDefaultCommonValue(request);
 
-            if(!StringUtils.isEmpty(request.getMode())) {
+            if(!StringUtils.isEmpty(request.getSelectType())) {
 
-                if ("M".equals(request.getMode())) {
+                if ("MNO".equals(request.getSelectType()) && !StringUtils.isEmpty(request.getBillingAccNum())) {
                     sql = "select * from (select aa.*, row_number() over (order by exempt_level desc,  module_code, mode_id, cust_acc_num, billing_acc_num, mobile_status, mobile_num, no_of_exempt, exempt_seq) as rownumber from (  " +
                             "     select cust_acc_num, billing_acc_num, mobile_num, module_code, mode_id, exempt_level,  " +
                             "       (select a.name from account a where a.ou_num = billing_acc_num and a.accnt_type_cd = 'Billing' ) billing_acc_name,   " +
-                            "       to_char(effective_dat,'YYYY/MM/DD') effective_dat , " +
+                            "       to_char(effective_dat,'YYYY/MM/DD') as effective_dat , " +
                             "       to_char(end_dat,'YYYY/MM/DD') as end_date,  " +
                             "       to_char(expire_dat,'YYYY/MM/DD') as expire_date,  " +
                             "       (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_ADD' and reason_code=e.add_reason) add_reason, add_location,   " +
@@ -343,7 +321,7 @@ public class QueryExemptServiceImpl implements QueryExemptService {
                             "       :mobileNum  as mobile_num,  " +
                             "       module_code, mode_id, exempt_level,  " +
                             "       (select a.name from account a where a.ou_num = billing_acc_num and a.accnt_type_cd = 'Billing' ) billing_acc_name,   " +
-                            "       to_char(effective_dat,'YYYY/MM/DD') effective_dat ," +
+                            "       to_char(effective_dat,'YYYY/MM/DD') as effective_dat ," +
                             "       to_char(end_dat,'YYYY/MM/DD') as end_date,  " +
                             "       to_char(expire_dat,'YYYY/MM/DD') as expire_date,  " +
                             "       (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_ADD' and reason_code=e.add_reason) add_reason, add_location,   " +
@@ -363,7 +341,7 @@ public class QueryExemptServiceImpl implements QueryExemptService {
                             "       :billingAccNum as billing_acc_num,  " +
                             "       :mobileNum as  mobile_num, module_code, mode_id, exempt_level,  " +
                             "       (select a.name from account a where a.ou_num = billing_acc_num and a.accnt_type_cd = 'Billing' ) billing_acc_name,   " +
-                            "       to_char(effective_dat,'YYYY/MM/DD') effective_dat , " +
+                            "       to_char(effective_dat,'YYYY/MM/DD') as effective_dat , " +
                             "       to_char(end_dat,'YYYY/MM/DD') as end_date,  " +
                             "       to_char(expire_dat,'YYYY/MM/DD') as expire_date,  " +
                             "       (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_ADD' and reason_code=e.add_reason) add_reason, add_location,   " +
@@ -391,10 +369,13 @@ public class QueryExemptServiceImpl implements QueryExemptService {
                             mapParam.put("inDccExemptActionList",request.getExemptAction());
                             mapParam.put("inDccMobileStatusList",request.getMobileStatus());
 
-                } else if ("C".equals(request.getMode())) {
+                }else if("CNO".equals(request.getSelectType())
+                        || "EFD".equals(request.getSelectType())
+                        || "END".equals(request.getSelectType())
+                        || "EPD".equals(request.getSelectType())){
                     sql = "select * from (select cust_acc_num, billing_acc_num, mobile_num, module_code, mode_id, exempt_level, " +
                             "    (select a.name from account a where a.ou_num = billing_acc_num and a.accnt_type_cd = 'Billing' ) billing_acc_name,  " +
-                            "    to_char(effective_dat,'YYYY/MM/DD') ," +
+                            "    to_char(effective_dat,'YYYY/MM/DD') as effective_dat ," +
                             "    to_char(end_dat,'YYYY/MM/DD') as end_date,  " +
                             "    to_char(expire_dat,'YYYY/MM/DD') as expire_date,  " +
                             "    (select reason_code || ' : ' || reason_description MODULE_CODE from dcc_reason where reason_type='EXEMPT_ADD' and reason_code=e.add_reason) add_reason, add_location,  " +
@@ -404,29 +385,18 @@ public class QueryExemptServiceImpl implements QueryExemptService {
                             "    no_of_exempt , exempt_seq , cate_code, action_type, decode(mb.x_suspend_type,null,mb.status_cd,mb.status_cd || '/' ||  mb.x_suspend_type) mobile_status  " +
                             "    ,row_number() over (order by exempt_level desc,  module_code, mode_id, cust_acc_num, billing_acc_num, status_cd, mobile_num, no_of_exempt, exempt_seq) as rownumber  " +
                             "    from   dcc_exempt_history  e, account_has_mobile mb ";
-                            
-                            /*"    where (:v2 is null or effective_dat>=to_date(:v3,'YYYY/MM/DD'))  " +
-                            "         and (:v4 is null or effective_dat<=to_date(:v5,'YYYY/MM/DD')) " +
-                            
-                            "    where (:v6 is null or end_dat>=to_date(:v7,'YYYY/MM/DD'))  " +
-                            "     and (:v8 is null or end_dat<=to_date(:v9,'YYYY/MM/DD')) " +
-                            
-                            "   where (:v10 is null or expire_dat>=to_date(:v11,'YYYY/MM/DD'))  " +
-                            "    and (:v12 is null or expire_dat<=to_date(:v13,'YYYY/MM/DD')) " +
-                           
-                            "    WHERE cust_acc_num = '32000070194200'  --V  " +
-                           */
-                            if(!StringUtils.isEmpty(request.getEffectiveDateFrom()) && !StringUtils.isEmpty(request.getEffectiveDateTo())) {
+
+                            if("EFD".equals(request.getSelectType())) {
                                 sql = sql +"     where ( :effectiveDateFrom is null or effective_dat >= to_date( :effectiveDateFrom,'YYYY/MM/DD'))   " +
                                         "       and ( :effectiveDateTo is null or effective_dat <= to_date( :effectiveDateTo,'YYYY/MM/DD'))   ";
                                 mapParam.put("effectiveDateFrom",request.getEffectiveDateFrom());
                                 mapParam.put("effectiveDateTo",request.getEffectiveDateTo());
-                            }else if(!StringUtils.isEmpty(request.getEndDateFrom()) && !StringUtils.isEmpty(request.getEndDateTo())) {
+                            }else if("END".equals(request.getSelectType())) {
                                 sql = sql +"     where ( :endDateFrom is null or end_dat>=to_date( :endDateFrom,'YYYY/MM/DD'))   " +
                                         "       and ( :endDateTo is null or end_dat<=to_date( :endDateTo,'YYYY/MM/DD'))  ";
                                 mapParam.put("endDateFrom",request.getEndDateFrom());
                                 mapParam.put("endDateTo",request.getEndDateTo());
-                            }else if(!StringUtils.isEmpty(request.getExpireDateFrom()) && !StringUtils.isEmpty(request.getExpireDateTo())) {
+                            }else if("EPD".equals(request.getSelectType())) {
                                 sql = sql +"     where ( :expireDateFrom is null or expire_dat>=to_date( :expireDateFrom,'YYYY/MM/DD'))   " +
                                         "       and ( :expireDateTo is null or expire_dat<=to_date( :expireDateTo,'YYYY/MM/DD'))  ";
                                 mapParam.put("expireDateFrom",request.getExpireDateFrom());
@@ -452,11 +422,11 @@ public class QueryExemptServiceImpl implements QueryExemptService {
                         mapParam.put("inDccExemptActionList",request.getExemptAction());
                         mapParam.put("inDccMobileStatusList",request.getMobileStatus());
 
-                } else if ("B".equals(request.getMode())) {
+                } else if ("BNO".equals(request.getSelectType())) {
                     sql = "select * from (select aa.*, row_number() over (order by exempt_level desc,  module_code, mode_id, cust_acc_num, billing_acc_num, mobile_status, mobile_num, no_of_exempt, exempt_seq) as rownumber from ( " +
                             "  select cust_acc_num, billing_acc_num, mobile_num, module_code, mode_id, exempt_level, " +
                             "    (select a.name from account a where a.ou_num = billing_acc_num and a.accnt_type_cd = 'Billing' ) billing_acc_name,  " +
-                            "    to_char(effective_dat,'YYYY/MM/DD') effective_dat , " +
+                            "    to_char(effective_dat,'YYYY/MM/DD') as effective_dat , " +
                             "    to_char(end_dat,'YYYY/MM/DD') as end_date,  " +
                             "    to_char(expire_dat,'YYYY/MM/DD') as expire_date,  " +
                             "    (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_ADD' and reason_code=e.add_reason) add_reason, add_location,  " +
@@ -475,7 +445,7 @@ public class QueryExemptServiceImpl implements QueryExemptService {
                             "    :billingAccNum as  billing_acc_num, " +
                             "    mobile_num, module_code, mode_id, exempt_level, " +
                             "    (select a.name from account a where a.ou_num = billing_acc_num and a.accnt_type_cd = 'Billing' ) billing_acc_name,  " +
-                            "    to_char(effective_dat,'YYYY/MM/DD') effective_dat , " +
+                            "    to_char(effective_dat,'YYYY/MM/DD') as effective_dat , " +
                             "    to_char(end_dat,'YYYY/MM/DD') as end_date,  " +
                             "    to_char(expire_dat,'YYYY/MM/DD') as expire_date,  " +
                             "    (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_ADD' and reason_code=e.add_reason) add_reason, add_location,  " +
@@ -503,7 +473,7 @@ public class QueryExemptServiceImpl implements QueryExemptService {
                     mapParam.put("inDccExemptActionList",request.getExemptAction());
                     mapParam.put("inDccMobileStatusList",request.getMobileStatus());
                 }else{
-                    log.info("search Mode  not match!");
+                    log.info("search Type  not match!");
                     return null;
                 }
 
@@ -516,10 +486,25 @@ public class QueryExemptServiceImpl implements QueryExemptService {
                 return null;
             }
         }catch (PersistenceException | IllegalArgumentException e){
-            e.printStackTrace();
             throw new ExemptException(AppConstant.FAIL,e.getMessage());
         }
 
+    }
+
+    @Override
+    public List<BillingAccDto> getBillingAccNum(GetBillingRequest request) throws ExemptException {
+        try{
+            String sql = " select  a.bill_accnt_num AS bill_acc_num ,b.name AS bill_name ,a.status_cd AS mobile_status " +
+                    "     from account_has_mobile a,account b  " +
+                    "     where  " +
+                    "     a.service_num = :mobileNum  " +
+                    "     and  a.bill_accnt_num = b.ou_num  ";
+            Query query = entityManager.createNativeQuery(sql, "billAccDtoMapping");
+                    query.setParameter("mobileNum",request.getMobileNum());
+            return query.getResultList();
+        }catch (PersistenceException | IllegalArgumentException e){
+            throw new ExemptException(AppConstant.FAIL,e.getMessage());
+        }
     }
 
 }
