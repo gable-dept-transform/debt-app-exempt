@@ -40,7 +40,9 @@ import java.util.Date;
                         @ColumnResult(name = "last_update_by"),
                         @ColumnResult(name = "last_update_date"),
                         @ColumnResult(name = "no_of_exempt",type = Integer.class),
-                        @ColumnResult(name = "sent_interface_flag")
+                        @ColumnResult(name = "sent_interface_flag"),
+                        @ColumnResult(name = "mobile_status"),
+                        @ColumnResult(name = "rownumber",type = Integer.class)
                 }))
 
 @SqlResultSetMapping(

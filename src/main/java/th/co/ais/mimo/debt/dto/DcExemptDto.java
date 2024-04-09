@@ -29,5 +29,7 @@ public class DcExemptDto {
     private String lastUpdateDtm;
     private Integer noOfExempt;
     private String sentInterfaceFlag;
+    private String mobileStatus;
+    private Integer rowNumber;
 
 }
