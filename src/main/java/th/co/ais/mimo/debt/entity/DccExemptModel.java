@@ -1,5 +1,6 @@
 package th.co.ais.mimo.debt.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,7 +8,6 @@ import lombok.NoArgsConstructor;
 import th.co.ais.mimo.debt.dto.DcExempHistoryDto;
 import th.co.ais.mimo.debt.dto.DcExemptDto;
 
-import javax.persistence.*;
 import java.util.Date;
 
 
@@ -40,7 +40,9 @@ import java.util.Date;
                         @ColumnResult(name = "last_update_by"),
                         @ColumnResult(name = "last_update_date"),
                         @ColumnResult(name = "no_of_exempt",type = Integer.class),
-                        @ColumnResult(name = "sent_interface_flag")
+                        @ColumnResult(name = "sent_interface_flag"),
+                        @ColumnResult(name = "mobile_status"),
+                        @ColumnResult(name = "rownumber",type = Integer.class)
                 }))
 
 @SqlResultSetMapping(

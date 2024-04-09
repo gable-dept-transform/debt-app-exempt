@@ -1,11 +1,11 @@
 package th.co.ais.mimo.debt.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -13,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor 
 @AllArgsConstructor 
 @Builder 
-@Entity 
+@Entity
 @Table(name = "DCC_GLOBAL_PARAMETER")
 public class DccGlobalParameter implements Serializable{
 

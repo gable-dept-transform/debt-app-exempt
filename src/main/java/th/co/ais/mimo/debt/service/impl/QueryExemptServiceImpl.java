@@ -1,5 +1,10 @@
 package th.co.ais.mimo.debt.service.impl;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.Query;
+import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,16 +13,12 @@ import th.co.ais.mimo.debt.constant.AppConstant;
 import th.co.ais.mimo.debt.dto.BillingAccDto;
 import th.co.ais.mimo.debt.dto.DcExempHistoryDto;
 import th.co.ais.mimo.debt.dto.DcExemptDto;
+import th.co.ais.mimo.debt.exception.ExemptException;
 import th.co.ais.mimo.debt.model.queryexempt.GetBillingRequest;
 import th.co.ais.mimo.debt.model.queryexempt.QueryExemptRequest;
-import th.co.ais.mimo.debt.exception.ExemptException;
 import th.co.ais.mimo.debt.service.QueryExemptService;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceException;
-import javax.persistence.Query;
-import javax.transaction.Transactional;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -284,6 +285,7 @@ public class QueryExemptServiceImpl implements QueryExemptService {
             }
             return query.getResultList();
         }catch (PersistenceException | IllegalArgumentException e){
+            e.printStackTrace();
             throw new ExemptException(AppConstant.FAIL,e.getMessage());
         }
     }

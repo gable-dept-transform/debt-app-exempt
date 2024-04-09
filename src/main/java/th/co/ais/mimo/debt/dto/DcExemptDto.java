@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DcExemptDto {
+
     private String custAccNum;
     private String billingAccNum;
     private String mobileNum;
@@ -29,5 +30,7 @@ public class DcExemptDto {
     private String lastUpdateDtm;
     private Integer noOfExempt;
     private String sentInterfaceFlag;
+    private String mobileStatus;
+    private Integer rowNumber;
 
 }

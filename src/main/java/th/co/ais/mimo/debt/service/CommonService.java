@@ -1,5 +1,6 @@
 package th.co.ais.mimo.debt.service;
 
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,7 @@ import th.co.ais.mimo.debt.dto.common.CommonDropdownListDto;
 import th.co.ais.mimo.debt.enums.ConfigSectionNameEnums;
 import th.co.ais.mimo.debt.repo.DccGlobalParameterRepo;
 
-import javax.transaction.Transactional;
+
 import java.util.List;
 
 @Service

@@ -1,12 +1,12 @@
 package th.co.ais.mimo.debt.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
+
 import java.io.Serializable;
 
 @NoArgsConstructor

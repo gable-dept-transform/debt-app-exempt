@@ -1,13 +1,12 @@
 package th.co.ais.mimo.debt.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import th.co.ais.mimo.debt.dto.BillingAccDto;
-import th.co.ais.mimo.debt.dto.DcExempHistoryDto;
 
-import javax.persistence.*;
 import java.util.Date;
 
 @Data
