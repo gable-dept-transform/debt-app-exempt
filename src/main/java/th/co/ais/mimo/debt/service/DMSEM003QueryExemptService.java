@@ -10,14 +10,12 @@ import th.co.ais.mimo.debt.model.queryexempt.QueryExemptRequest;
 
 import java.util.List;
 
-public interface QueryExemptService {
-    List<DcExemptCurrentDto> queryExempt(QueryExemptRequest request) throws ExemptException;
+public interface DMSEM003QueryExemptService {
+    List<DcExemptCurrentDtoMapping> queryExempt(QueryExemptRequest request) throws ExemptException;
 
     List<DcExempHistoryDto> queryExemptHistory(QueryExemptRequest request) throws ExemptException;
 
 
     List<BillingAccDto> getBillingAccNum(GetBillingRequest request) throws ExemptException;
 
-
-    List<DcExemptCurrentDtoMapping> searchExempt(QueryExemptRequest request) throws ExemptException;
 }

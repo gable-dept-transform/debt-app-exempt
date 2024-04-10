@@ -4,11 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Builder
 @Data
 @AllArgsConstructor
-public class DcExempHistoryDto {
+public class DcExempHistoryDto  implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private String custAccNum;
     private String billingAccNum;
     private String mobileNum;

@@ -15,7 +15,7 @@ import th.co.ais.mimo.debt.model.queryexempt.GetBillingRequest;
 import th.co.ais.mimo.debt.model.queryexempt.GetBillingResponse;
 import th.co.ais.mimo.debt.model.queryexempt.QueryExemptRequest;
 import th.co.ais.mimo.debt.model.queryexempt.QueryExemptResponse;
-import th.co.ais.mimo.debt.service.QueryExemptService;
+import th.co.ais.mimo.debt.service.DMSEM003QueryExemptService;
 
 @RestController
 @RequestMapping("${api.path}/transaction/dmsem003")
@@ -24,7 +24,7 @@ public class DMSEM003QueryExemptController {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	private QueryExemptService queryExemptService;
+	private DMSEM003QueryExemptService DMSEM003QueryExemptService;
 
 
 
@@ -35,9 +35,8 @@ public class DMSEM003QueryExemptController {
 		QueryExemptResponse response = QueryExemptResponse.builder().build();
 		try {
 			if(!StringUtils.isEmpty(queryExemptRequest.getSelectType())) {
-				response.setTestResult(this.queryExemptService.searchExempt(queryExemptRequest));
-				//response.setResultCurrentList(this.queryExemptService.queryExempt(queryExemptRequest));
-				//response.setResultHistoryList(this.queryExemptService.queryExemptHistory(queryExemptRequest));
+				response.setResultCurrentList(this.DMSEM003QueryExemptService.queryExempt(queryExemptRequest));
+				response.setResultHistoryList(this.DMSEM003QueryExemptService.queryExemptHistory(queryExemptRequest));
 			}else{
 				errorMsg = "Select Type is require";
 			}
@@ -57,7 +56,7 @@ public class DMSEM003QueryExemptController {
 		String errorMsg = null;
 		GetBillingResponse response = GetBillingResponse.builder().build();
 		try {
-			response.setResultList(this.queryExemptService.getBillingAccNum(request));
+			response.setResultList(this.DMSEM003QueryExemptService.getBillingAccNum(request));
 
 		} catch (ExemptException e) {
 			log.error("Exception queryExempt : {}", e.getMessage(), e);
