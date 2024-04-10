@@ -35,8 +35,9 @@ public class DMSEM003QueryExemptController {
 		QueryExemptResponse response = QueryExemptResponse.builder().build();
 		try {
 			if(!StringUtils.isEmpty(queryExemptRequest.getSelectType())) {
-				response.setResultCurrentList(this.queryExemptService.queryExempt(queryExemptRequest));
-				response.setResultHistoryList(this.queryExemptService.queryExemptHistory(queryExemptRequest));
+				response.setTestResult(this.queryExemptService.searchExempt(queryExemptRequest));
+				//response.setResultCurrentList(this.queryExemptService.queryExempt(queryExemptRequest));
+				//response.setResultHistoryList(this.queryExemptService.queryExemptHistory(queryExemptRequest));
 			}else{
 				errorMsg = "Select Type is require";
 			}

@@ -14,15 +14,6 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @Entity
-@SqlResultSetMapping(
-        name = "billAccDtoMapping",
-        classes = @ConstructorResult(
-                targetClass = BillingAccDto.class,
-                columns = {
-                        @ColumnResult(name = "bill_acc_num"),
-                        @ColumnResult(name = "bill_name"),
-                        @ColumnResult(name = "mobile_status"),
-                }))
 @Table(name = "ACCOUNT_HAS_MOBILE")
 public class AccHasMobileModel {
 

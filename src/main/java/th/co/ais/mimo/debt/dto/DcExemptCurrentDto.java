@@ -3,13 +3,11 @@ package th.co.ais.mimo.debt.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
-public class DcExemptDto {
+public class DcExemptCurrentDto {
 
     private String custAccNum;
     private String billingAccNum;
@@ -18,18 +16,18 @@ public class DcExemptDto {
     private String modeId;
     private String exemptLevel;
     private String billingAccName;
-    private String effectiveDat;
-    private String endDat;
-    private String expireDat;
+    private String effectiveDate;
+    private String endDate;
+    private String expireDate;
     private String cateCode;
     private String addReason;
     private Integer addLocation;
     private String updateReason;
     private Integer updateLocation;
     private String lastUpdateBy;
-    private String lastUpdateDtm;
+    private String lastUpdateDate;
     private Integer noOfExempt;
-    private String sentInterfaceFlag;
+    private String sentInterFaceFlag;
     private String mobileStatus;
     private Integer rowNumber;
 
