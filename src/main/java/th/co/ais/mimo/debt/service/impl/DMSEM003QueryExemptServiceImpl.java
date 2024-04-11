@@ -1,33 +1,38 @@
 package th.co.ais.mimo.debt.service.impl;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.Query;
+import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import th.co.ais.mimo.debt.constant.AppConstant;
 import th.co.ais.mimo.debt.dto.BillingAccDto;
 import th.co.ais.mimo.debt.dto.DcExempHistoryDto;
-import th.co.ais.mimo.debt.dto.DcExemptDto;
+import th.co.ais.mimo.debt.dto.DcExemptCurrentDto;
+import th.co.ais.mimo.debt.dto.DcExemptCurrentDtoMapping;
+import th.co.ais.mimo.debt.exception.ExemptException;
 import th.co.ais.mimo.debt.model.queryexempt.GetBillingRequest;
 import th.co.ais.mimo.debt.model.queryexempt.QueryExemptRequest;
-import th.co.ais.mimo.debt.exception.ExemptException;
-import th.co.ais.mimo.debt.service.QueryExemptService;
+import th.co.ais.mimo.debt.repo.DMSEM003NativeQueryService;
+import th.co.ais.mimo.debt.service.DMSEM003QueryExemptService;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceException;
-import javax.persistence.Query;
-import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.List;
 
 @Service
 @Transactional
-public class QueryExemptServiceImpl implements QueryExemptService {
+public class DMSEM003QueryExemptServiceImpl implements DMSEM003QueryExemptService {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     @PersistenceContext
     private EntityManager entityManager;
+
+
 
     private QueryExemptRequest setupDefaultCommonValue(QueryExemptRequest request){
         if(StringUtils.isEmpty(request.getMobileStatus())){
@@ -45,136 +50,35 @@ public class QueryExemptServiceImpl implements QueryExemptService {
         return  request;
     }
 
-    public List<DcExemptDto> queryExempt(QueryExemptRequest request) throws ExemptException {
+    @Autowired
+    DMSEM003NativeQueryService dmsem003NativeQueryService;
+
+    public List<DcExemptCurrentDtoMapping> queryExempt(QueryExemptRequest request) throws ExemptException {
         log.info("queryExempt request : {}",request);
         try {
-            String sql = "";
-            HashMap<String ,Object> mapParam = new HashMap<>();
             this.setupDefaultCommonValue(request);
+            if("MNO".equals(request.getSelectType()) && !StringUtils.isEmpty(request.getBillingAccNum())){
 
-
-            if("Default".equals(request.getSelectType())) {
-                sql = "select cust_acc_num, billing_acc_num, " +
-                        "   mobile_num, module_code, mode_id, exempt_level," +
-                        "   (select b.x_con_full_name from billing_profile b  where b.ou_num = billing_acc_num ) billing_acc_name, " +
-                        "   to_char(effective_dat,'YYYY/MM/DD') AS effective_dat , to_char(end_dat,'YYYY/MM/DD') AS end_date , " +
-                        "   to_char(expire_dat,'YYYY/MM/DD') AS expire_date," +
-                        "   cate_code, " +
-                        "   (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_ADD' and reason_code = e.add_reason) add_reason , " +
-                        "   add_location, " +
-                        "   (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_UPDATE' and reason_code=e.update_reason) update_reason, " +
-                        "   update_location, last_update_by, to_char(last_update_dtm,'YYYY/MM/DD HH24:Mi:SS') AS last_update_date, " +
-                        "   no_of_exempt, sent_interface_flag " +
-                        "   from   dcc_exempt e";
-            }else if("MNO".equals(request.getSelectType()) && !StringUtils.isEmpty(request.getBillingAccNum())){
-                sql = "select * from (select aa.*, row_number() over (order by exempt_level desc, module_code,mode_id, cust_acc_num, billing_acc_num,mobile_status, mobile_num) as rownumber from ( " +
-                        " select cust_acc_num, billing_acc_num, mobile_num, module_code, mode_id, exempt_level, " +
-                        "   (select a.name from account a where a.ou_num = billing_acc_num and a.accnt_type_cd = 'Billing' ) billing_acc_name, " +
-                        "   to_char(effective_dat,'YYYY/MM/DD') as effective_dat , " +
-                        "   to_char(end_dat,'YYYY/MM/DD') as end_date,  " +
-                        "   to_char(expire_dat,'YYYY/MM/DD') as expire_date, " +
-                        "   cate_code,  " +
-                        "   (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_ADD' and reason_code=e.add_reason) add_reason ,  " +
-                        "   add_location,  " +
-                        "   (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_UPDATE' and reason_code=e.update_reason) update_reason,  " +
-                        "   update_location,  " +
-                        "  last_update_by, to_char(last_update_dtm,'YYYY/MM/DD HH24:Mi:SS') AS last_update_date,  " +
-                        "   no_of_exempt, sent_interface_flag, decode(mb.x_suspend_type,null,mb.status_cd,mb.status_cd || '/' ||  mb.x_suspend_type) mobile_status  " +
-                        "   from dcc_exempt e ,account_has_mobile mb  " +
-                        "   where billing_acc_num= :billingAccNum  " +
-                        "   and   mobile_num= :mobileNum  " +
-                        "   and   exempt_level='MO'  " +
-                        "   and e.billing_acc_num = mb.bill_accnt_num  " +
-                        "   and e.mobile_num = mb.service_num  " +
-                        "   and ( :inDccMobileStatusList = 'ALL' or DCCU_UTIL.FIND_LIST( :inDccMobileStatusList,status_cd) > 0 or DCCU_UTIL.FIND_LIST( :inDccMobileStatusList,MB.STATUS_CD || '/' || trim(mb.x_suspend_type)) > 0)  " +
-                        " union  " +
-                        " select cust_acc_num, billing_acc_num, :mobileNum  as mobile_num, module_code, mode_id, exempt_level, " +
-                        "    (select b.x_con_full_name from billing_profile b  where b.ou_num = billing_acc_num ) billing_acc_name, " +
-                        "   to_char(effective_dat,'YYYY/MM/DD') as effective_dat ," +
-                        "   to_char(end_dat,'YYYY/MM/DD') as end_date,  " +
-                        "   to_char(expire_dat,'YYYY/MM/DD') as expire_date, cate_code,  " +
-                        "   (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_ADD' and reason_code=e.add_reason) add_reason  ,  " +
-                        "   add_location,  " +
-                        "   (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_UPDATE' and reason_code=e.update_reason) update_reason,  " +
-                        "   update_location, last_update_by, " +
-                        "   to_char(last_update_dtm,'YYYY/MM/DD HH24:Mi:SS') AS last_update_date,  " +
-                        "   no_of_exempt, sent_interface_flag, decode(mb.x_suspend_type,null,mb.status_cd,mb.status_cd || '/' ||  mb.x_suspend_type) mobile_status  " +
-                        "   from dcc_exempt e ,account_has_mobile mb  " +
-                        "   where billing_acc_num= :billingAccNum  " +
-                        "   and   exempt_level='BA'  " +
-                        "   and e.billing_acc_num = mb.bill_accnt_num  " +
-                        "   and e.mobile_num = mb.service_num  " +
-                        "   and ( :inDccMobileStatusList = 'ALL' or DCCU_UTIL.FIND_LIST( :inDccMobileStatusList,status_cd) > 0 or DCCU_UTIL.FIND_LIST( :inDccMobileStatusList,MB.STATUS_CD || '/' || trim(mb.x_suspend_type)) > 0) " +
-                        " union  " +
-                        " select cust_acc_num,  :billingAccNum as billing_acc_num, :mobileNum as  mobile_num, module_code, mode_id, exempt_level, " +
-                        "   (select b.x_con_full_name from billing_profile b  where b.ou_num = billing_acc_num ) billing_acc_name, " +
-                        "   to_char(effective_dat,'YYYY/MM/DD') as effective_dat, to_char(end_dat,'YYYY/MM/DD') as end_date,  " +
-                        "   to_char(expire_dat,'YYYY/MM/DD') as expire_date, cate_code,  " +
-                        "   (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_ADD' and reason_code=e.add_reason) add_reason ,  " +
-                        "   add_location,  " +
-                        "   (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_UPDATE' and reason_code=e.update_reason) update_reason,  " +
-                        "   update_location, last_update_by, to_char(last_update_dtm,'YYYY/MM/DD HH24:Mi:SS') AS last_update_date,  " +
-                        "   no_of_exempt, sent_interface_flag, decode(mb.x_suspend_type,null,mb.status_cd,mb.status_cd || '/' ||  mb.x_suspend_type) mobile_status  " +
-                        "   from dcc_exempt e ,account_has_mobile mb " +
-                        "   where cust_acc_num= :custAccNum  " +
-                        "   and exempt_level='CA'  " +
-                        "   and e.billing_acc_num = mb.bill_accnt_num  " +
-                        "   and e.mobile_num = mb.service_num  " +
-                        "   and ( :inDccMobileStatusList = 'ALL' or DCCU_UTIL.FIND_LIST( :inDccMobileStatusList,status_cd) > 0 or DCCU_UTIL.FIND_LIST( :inDccMobileStatusList,MB.STATUS_CD || '/' || trim(mb.x_suspend_type)) > 0) " +
-                        "   ) aa) where rownumber >= :startRow and rownumber <= :endRow  " +
-                        "   order by exempt_level desc, module_code,mode_id, cust_acc_num, billing_acc_num, mobile_num";
-                    mapParam.put("custAccNum",request.getCustAccNum());
-                    mapParam.put("billingAccNum",request.getBillingAccNum());
-                    mapParam.put("mobileNum",request.getMobileNum());
-                    mapParam.put("inDccMobileStatusList",request.getMobileStatus());
-                    mapParam.put("startRow",request.getStartRow());
-                    mapParam.put("endRow",request.getEndRow());
+                return this.dmsem003NativeQueryService.getExemptByMobileAndBilling(request.getMobileNum(),request.getCustAccNum(),request.getBillingAccNum(),request.getMobileStatus(),request.getStartRow(), request.getEndRow());
             }else if("BNO".equals(request.getSelectType())){
-                        sql = "select * from (select aa.*, row_number() over (order by exempt_level desc, module_code,mode_id, cust_acc_num, billing_acc_num, mobile_status, mobile_num) as rownumber from (  " +
-                                "  select cust_acc_num, billing_acc_num, mobile_num, module_code, mode_id, exempt_level,  " +
-                                "  (select a.name from account a where a.ou_num = billing_acc_num and a.accnt_type_cd = 'Billing' ) billing_acc_name,  " +
-                                "   to_char(effective_dat,'YYYY/MM/DD') as effective_dat,  " +
-                                "   to_char(end_dat,'YYYY/MM/DD') as end_date,   " +
-                                "   to_char(expire_dat,'YYYY/MM/DD') as expire_date,   " +
-                                "   cate_code,   " +
-                                "   (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_ADD' and reason_code=e.add_reason) add_reason ,   " +
-                                "   add_location,   " +
-                                "   (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_UPDATE' and reason_code=e.update_reason) update_reason,   " +
-                                "   update_location, last_update_by,   " +
-                                "   to_char(last_update_dtm,'YYYY/MM/DD HH24:Mi:SS') as last_update_date,   " +
-                                "   no_of_exempt, sent_interface_flag, decode(mb.x_suspend_type,null,mb.status_cd,mb.status_cd || '/' ||  mb.x_suspend_type) mobile_status   " +
-                                "   from dcc_exempt e, account_has_mobile mb   " +
-                                "   where billing_acc_num= :billingAccNum  " +
-                                "   and e.billing_acc_num = mb.bill_accnt_num   " +
-                                "   and e.mobile_num = mb.service_num   " +
-                                "   and (:inDccMobileStatusList = 'ALL' or DCCU_UTIL.FIND_LIST(:inDccMobileStatusList,status_cd) > 0 or DCCU_UTIL.FIND_LIST(:inDccMobileStatusList,MB.STATUS_CD || '/' || trim(mb.x_suspend_type)) > 0)   " +
-                                "    UNION  " +
-                                "    select cust_acc_num, :billingAccNum as  billing_acc_num,  mobile_num, module_code, mode_id, exempt_level,  " +
-                                "    (select a.name from account a where a.ou_num = billing_acc_num and a.accnt_type_cd = 'Billing' ) billing_acc_name,  " +
-                                "   to_char(effective_dat,'YYYY/MM/DD') as effective_dat,  " +
-                                "   to_char(end_dat,'YYYY/MM/DD') as end_date,   " +
-                                "   to_char(expire_dat,'YYYY/MM/DD') as expire_date,   " +
-                                "   cate_code,   " +
-                                "   (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_ADD' and reason_code=e.add_reason) add_reason ,   " +
-                                "   add_location,   " +
-                                "   (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_UPDATE' and reason_code=e.update_reason) update_reason,   " +
-                                "   update_location, last_update_by, " +
-                                "   to_char(last_update_dtm,'YYYY/MM/DD HH24:Mi:SS') as last_update_date,   " +
-                                "   no_of_exempt, sent_interface_flag, mb.status_cd mobile_status   " +
-                                "   from dcc_exempt e, account_has_mobile mb   " +
-                                "   where cust_acc_num= :custAccNum   " +
-                                "   and exempt_level='CA'   " +
-                                "   and e.billing_acc_num = mb.bill_accnt_num   " +
-                                "   and e.mobile_num = mb.service_num   " +
-                                "   and (:inDccMobileStatusList = 'ALL' or DCCU_UTIL.FIND_LIST(:inDccMobileStatusList,status_cd) > 0 or DCCU_UTIL.FIND_LIST(:inDccMobileStatusList,MB.STATUS_CD || '/' || trim(mb.x_suspend_type)) > 0)   " +
-                                "     ) aa) where rownumber >= :startRow and rownumber <= :endRow  " +
-                                "     order by exempt_level desc, module_code,mode_id, cust_acc_num, billing_acc_num, mobile_num";
-                            mapParam.put("billingAccNum",request.getBillingAccNum());
-                            mapParam.put("custAccNum",request.getCustAccNum());
-                            mapParam.put("inDccMobileStatusList",request.getMobileStatus());
-                            mapParam.put("startRow",request.getStartRow());
-                            mapParam.put("endRow",request.getEndRow());
-            }else if("MNO".equals(request.getSelectType())){
+
+                return  this.dmsem003NativeQueryService.getExemptByBilling(request.getCustAccNum(),request.getBillingAccNum(), request.getMobileStatus(), request.getStartRow(), request.getEndRow());
+            }else if("CNO".equals(request.getSelectType())) {
+
+                return this.dmsem003NativeQueryService.getExemptByCustAccNum(request.getCustAccNum(), request.getMobileStatus(), request.getStartRow(), request.getEndRow());
+            }else if("EFD".equals(request.getSelectType())) {
+
+                return  this.dmsem003NativeQueryService.getExemptByEffectiveDate(request.getEffectiveDateFrom(), request.getEffectiveDateTo(), request.getMobileStatus(), request.getStartRow(), request.getEndRow());
+            }else if("END".equals(request.getSelectType())) {
+
+                return this.dmsem003NativeQueryService.getExemptByEndDate(request.getEndDateFrom(), request.getEndDateTo(), request.getMobileStatus(), request.getStartRow(), request.getEndRow());
+            }else if("EPD".equals(request.getSelectType())) {
+
+                return this.dmsem003NativeQueryService.getExemptByExpireDate(request.getExpireDateFrom(), request.getExpireDateTo(), request.getMobileStatus(), request.getStartRow(), request.getEndRow());
+            }
+
+
+           /* only  mobilenum
                 sql = "select cust_acc_num, billing_acc_num, mobile_num, module_code, mode_id, exempt_level, " +
                         "     (select b.x_con_full_name from billing_profile b  where b.ou_num = billing_acc_num ) billing_acc_name,  " +
                         "      to_char(effective_dat,'YYYY/MM/DD') AS effective_dat ,  " +
@@ -229,60 +133,8 @@ public class QueryExemptServiceImpl implements QueryExemptService {
                         "   where mobile_num = :mobileNum " +
                         "   and exempt_level ='MO' " +
                         " order by exempt_level desc, module_code, mode_id, cust_acc_num, billing_acc_num, mobile_num, no_of_exempt ";
-                mapParam.put("mobileNum",request.getMobileNum());
-            }else if("CNO".equals(request.getSelectType())
-                    || "EFD".equals(request.getSelectType())
-                    || "END".equals(request.getSelectType())
-                    || "EPD".equals(request.getSelectType())){
-                        sql = " select * from (select cust_acc_num, billing_acc_num,  " +
-                                "     mobile_num, module_code, mode_id, exempt_level,  " +
-                                "     (select a.name from account a where a.ou_num = billing_acc_num and a.accnt_type_cd = 'Billing' ) billing_acc_name,  " +
-                                "     to_char(effective_dat,'YYYY/MM/DD') AS effective_dat  ,  " +
-                                "     to_char(end_dat,'YYYY/MM/DD')  AS end_date,  " +
-                                "     to_char(expire_dat,'YYYY/MM/DD') AS expire_date,  " +
-                                "     cate_code,  " +
-                                "     (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_ADD' and reason_code=e.add_reason) add_reason ,  " +
-                                "     add_location,  " +
-                                "     (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_UPDATE' and reason_code=e.update_reason) update_reason,  " +
-                                "     update_location, last_update_by,   " +
-                                "     to_char(last_update_dtm,'YYYY/MM/DD HH24:Mi:SS') AS last_update_date,  " +
-                                "     no_of_exempt, sent_interface_flag, decode(mb.x_suspend_type,null,mb.status_cd,mb.status_cd || '/' ||  mb.x_suspend_type) mobile_status,  " +
-                                "     row_number() over (order by exempt_level desc, module_code, mode_id, cust_acc_num, billing_acc_num, mobile_num, no_of_exempt) as rownumber  " +
-                                "   from dcc_exempt e, account_has_mobile mb  ";
-                               if("EFD".equals(request.getSelectType())) {
-                                   sql = sql +"     where ( :effectiveDateFrom is null or effective_dat >= to_date( :effectiveDateFrom,'YYYY/MM/DD'))   " +
-                                              "       and ( :effectiveDateTo is null or effective_dat <= to_date( :effectiveDateTo,'YYYY/MM/DD'))   ";
-                                   mapParam.put("effectiveDateFrom",request.getEffectiveDateFrom());
-                                   mapParam.put("effectiveDateTo",request.getEffectiveDateTo());
-                               }else if("END".equals(request.getSelectType())) {
-                                   sql = sql +"     where ( :endDateFrom is null or end_dat>=to_date( :endDateFrom,'YYYY/MM/DD'))   " +
-                                              "       and ( :endDateTo is null or end_dat<=to_date( :endDateTo,'YYYY/MM/DD'))  ";
-                                   mapParam.put("endDateFrom",request.getEndDateFrom());
-                                   mapParam.put("endDateTo",request.getEndDateTo());
-                               }else if("EPD".equals(request.getSelectType())) {
-                                   sql = sql +"     where ( :expireDateFrom is null or expire_dat>=to_date( :expireDateFrom,'YYYY/MM/DD'))   " +
-                                              "       and ( :expireDateTo is null or expire_dat<=to_date( :expireDateTo,'YYYY/MM/DD'))  ";
-                                   mapParam.put("expireDateFrom",request.getExpireDateFrom());
-                                   mapParam.put("expireDateTo",request.getExpireDateTo());
-                               }else {
-                                   sql = sql +"   where  cust_acc_num = :custAccNum  ";
-                                   mapParam.put("custAccNum",request.getCustAccNum());
-                               }
-                                   sql = sql +"   and e.billing_acc_num = mb.bill_accnt_num   " +
-                                              "           and e.mobile_num = mb.service_num   " +
-                                              "           and (:inDccMobileStatusList = 'ALL' or DCCU_UTIL.FIND_LIST(:inDccMobileStatusList,status_cd) > 0 or DCCU_UTIL.FIND_LIST(:inDccMobileStatusList,MB.STATUS_CD || '/' || trim(mb.x_suspend_type)) > 0)   " +
-                                              "           ) where rownumber >= :startRow and rownumber <= :endRow  " +
-                                              "           order by rownumber ";
-                                    mapParam.put("inDccMobileStatusList",request.getMobileStatus());
-                                    mapParam.put("startRow",request.getStartRow());
-                                    mapParam.put("endRow",request.getEndRow());
-            }
-
-            Query query = entityManager.createNativeQuery(sql, "dcExemptDtoMapping");
-            if(!mapParam.isEmpty()){
-                mapParam.forEach(query::setParameter);
-            }
-            return query.getResultList();
+            */
+            return null;
         }catch (PersistenceException | IllegalArgumentException e){
             throw new ExemptException(AppConstant.FAIL,e.getMessage());
         }

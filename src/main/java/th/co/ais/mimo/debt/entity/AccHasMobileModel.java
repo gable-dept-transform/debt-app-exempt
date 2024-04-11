@@ -1,13 +1,12 @@
 package th.co.ais.mimo.debt.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import th.co.ais.mimo.debt.dto.BillingAccDto;
-import th.co.ais.mimo.debt.dto.DcExempHistoryDto;
 
-import javax.persistence.*;
 import java.util.Date;
 
 @Data
@@ -15,15 +14,6 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @Entity
-@SqlResultSetMapping(
-        name = "billAccDtoMapping",
-        classes = @ConstructorResult(
-                targetClass = BillingAccDto.class,
-                columns = {
-                        @ColumnResult(name = "bill_acc_num"),
-                        @ColumnResult(name = "bill_name"),
-                        @ColumnResult(name = "mobile_status"),
-                }))
 @Table(name = "ACCOUNT_HAS_MOBILE")
 public class AccHasMobileModel {
 

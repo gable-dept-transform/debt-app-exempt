@@ -4,12 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
+import jakarta.persistence.Tuple;
+import jakarta.persistence.TupleElement;
 import org.apache.commons.collections4.CollectionUtils;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-import javax.persistence.Tuple;
-import javax.persistence.TupleElement;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.*;
@@ -92,9 +92,9 @@ public class SqlUtils {
         List<Map<String, Object>> result = new ArrayList<>();
 
         tuples.forEach(object->{
-            if(object instanceof javax.persistence.Tuple ) {
+            if(object instanceof Tuple ) {
                 Map<String, Object> tempMap = new HashMap<>();
-                final javax.persistence.Tuple single = (javax.persistence.Tuple) object;
+                final Tuple single = (Tuple) object;
        for (TupleElement<?> key : single.getElements()) {
                     tempMap.put(key.getAlias(), single.get(key));
                 }

@@ -2,21 +2,14 @@ package th.co.ais.mimo.debt;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.web.client.RestTemplate;
-
-import io.jaegertracing.Configuration;
 
 @SpringBootApplication
-@EnableFeignClients
-@EnableScheduling
+/*@EnableFeignClients*/
+/*@EnableScheduling*/
 public class AppExemptServiceApplication {
 
    
-	@Bean
+	/*@Bean
 	public io.opentracing.Tracer initTracer() {
 		Configuration.SamplerConfiguration samplerConfig = new Configuration.SamplerConfiguration().withType("const")
 				.withParam(1);
@@ -24,13 +17,13 @@ public class AppExemptServiceApplication {
 				.withLogSpans(true);
 		return Configuration.fromEnv("debt-app-nego").withSampler(samplerConfig).withReporter(reporterConfig)
 				.getTracerBuilder().withScopeManager(new MDCScopeManager()).build();
-	}
+	}*/
 
-	@Bean
+	/*@Bean
 	public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
 		return restTemplateBuilder.build();
 	}
-	
+	*/
 
 	public static void main(String[] args) {
 		SpringApplication.run(AppExemptServiceApplication.class, args);
