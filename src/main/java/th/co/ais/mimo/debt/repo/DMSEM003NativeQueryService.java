@@ -7,11 +7,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import th.co.ais.mimo.debt.dto.DcExemptCurrentDtoMapping;
 import th.co.ais.mimo.debt.entity.DccExemptModel;
+import th.co.ais.mimo.debt.entity.DccExemptModelId;
 
 import java.util.List;
 
 @Repository
-public interface DMSEM003NativeQueryService extends JpaRepository<DccExemptModel,String> {
+public interface DMSEM003NativeQueryService extends JpaRepository<DccExemptModel, DccExemptModelId> {
 
     @Query(value = "SELECT * " +
             "FROM ( " +
