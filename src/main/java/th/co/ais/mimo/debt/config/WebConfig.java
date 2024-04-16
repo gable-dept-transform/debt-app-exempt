@@ -17,12 +17,12 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(new LogInterceptor(appName));
     }*/
 
-    @Override
+    /*@Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:4200","http://sta-web-creditcontrol.g-able.cf","http://4.241.1.0")
                 .allowedHeaders("*")
                 .allowCredentials(true);
-    }
+    }*/
 
 }
