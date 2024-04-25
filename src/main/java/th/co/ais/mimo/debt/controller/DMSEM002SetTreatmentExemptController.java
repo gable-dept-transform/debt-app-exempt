@@ -33,8 +33,11 @@ public class DMSEM002SetTreatmentExemptController {
 		SearchResponse response = SearchResponse.builder().build();
 		try {
 			if(!StringUtils.isEmpty(request.getSearchType())) {
-				response.setResultSearchList(this.dmsem002SetTreatmentExemptService.searchData(request));
-
+				if ("BA".equals(request.getSearchType()) || "CA".equals(request.getSearchType()) || "MO".equals(request.getSearchType())) {
+					response.setResultSearchList(this.dmsem002SetTreatmentExemptService.searchData(request));
+				} else {
+					errorMsg = "search Type is invalid";
+				}
 			}else{
 				errorMsg = "search Type is require";
 			}
