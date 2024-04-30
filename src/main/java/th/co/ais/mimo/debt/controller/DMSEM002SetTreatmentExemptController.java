@@ -10,10 +10,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import th.co.ais.mimo.debt.dto.treatment.ExemptDetailDto;
 import th.co.ais.mimo.debt.exception.ExemptException;
 import th.co.ais.mimo.debt.model.treatmentexempt.SearchRequest;
 import th.co.ais.mimo.debt.model.treatmentexempt.SearchResponse;
 import th.co.ais.mimo.debt.service.DMSEM002SetTreatmentExemptService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("${api.path}/transaction/dmsem002")
@@ -33,7 +36,10 @@ public class DMSEM002SetTreatmentExemptController {
 		SearchResponse response = SearchResponse.builder().build();
 		try {
 			if(!StringUtils.isEmpty(request.getSearchType())) {
-				response.setResultSearchList(this.dmsem002SetTreatmentExemptService.searchData(request));
+				response.setResultList(this.dmsem002SetTreatmentExemptService.searchData(request));
+				if(!response.getResultList().isEmpty()){
+					response.setResultDetailList(dmsem002SetTreatmentExemptService.searchExemptDetail(request.getSearchType(),request.getParamValue()));
+				}
 
 			}else{
 				errorMsg = "search Type is require";
@@ -48,5 +54,15 @@ public class DMSEM002SetTreatmentExemptController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
+	@PostMapping(value = "/search-exempt",produces = "application/json")
+	public ResponseEntity searchExemptDetail(@RequestBody SearchRequest request){
+        try {
+            List<ExemptDetailDto> list =  this.dmsem002SetTreatmentExemptService.searchExemptDetail(request.getSearchType(), request.getParamValue());
+			return ResponseEntity.ok().body(list);
+        } catch (ExemptException e) {
+            throw new RuntimeException(e);
+        }
+        //return ResponseEntity.ok().body("");
+	}
 	
 }

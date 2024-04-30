@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import th.co.ais.mimo.debt.constant.AppConstant;
+import th.co.ais.mimo.debt.dto.treatment.ExemptDetailDto;
 import th.co.ais.mimo.debt.dto.treatment.SearchTreatmentDto;
 import th.co.ais.mimo.debt.exception.ExemptException;
 import th.co.ais.mimo.debt.model.treatmentexempt.SearchRequest;
@@ -22,6 +23,10 @@ import java.util.List;
 public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatmentExemptService {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
+    private final String SEARCH_TYPE_CA="CA";
+    private final String SEARCH_TYPE_BA="BA";
+    private final String SEARCH_TYPE_MO="MO";
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -32,7 +37,7 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
             String sql = "";
             HashMap<String, Object> mapParam = new HashMap<>();
 
-            if("CA".equals(request.getSearchType())) {
+            if(SEARCH_TYPE_CA.equals(request.getSearchType())) {
                 sql = " select ca.ou_num cust_acc_num,  " +
                         "        ba.ou_num billing_acc_num, ba.name,    " +
                         "        ba.cust_stat_cd ba_status,  " +
@@ -101,7 +106,7 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
                         "       and   ba.par_ou_id = sa.par_row_id(+)  " +
                         "       and sa.accnt_type_cd(+) = 'Service'   " +
                         "      order by ba.company_code, ba_status, ba.ou_num, mo.status_cd, mo.service_num ";
-            }else if("BA".equals(request.getSearchType())){
+            }else if(SEARCH_TYPE_BA.equals(request.getSearchType())){
                 sql = " select ca.ou_num cust_acc_num,  " +
                         "         ba.ou_num billing_acc_num, ba.name,   " +
                         "         ba.cust_stat_cd ba_status, mo.service_num ,    " +
@@ -167,7 +172,7 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
                         "       and sa.accnt_type_cd(+) = 'Service'  " +
                         "      order by ba.company_code, ba_status, ba.ou_num, mo.status_cd, mo.service_num ";
                 
-            }else if("MO".equals(request.getSearchType())){
+            }else if(SEARCH_TYPE_MO.equals(request.getSearchType())){
                 sql = " select cust_acc_num,  " +
                         "       billing_acc_num, " +
                         "       name,  " +
@@ -215,6 +220,163 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
         } catch (PersistenceException | IllegalArgumentException e) {
             throw new ExemptException(AppConstant.FAIL, e.getMessage());
         }
+    }
+
+    @Override
+    public List<ExemptDetailDto> searchExemptDetail(String searchType, String vaule) throws ExemptException {
+        try{
+            String sql = "";
+            HashMap<String, Object> mapParam = new HashMap<>();
+            if(SEARCH_TYPE_CA.equalsIgnoreCase(searchType)){
+                mapParam.put("recv_cust_acc_num",vaule);
+                //mapParam.put("recv_row_start",1);
+                //mapParam.put("recv_row_end",10);
+                sql = " select * from (select cust_acc_num, billing_acc_num, \n" +
+                        " mobile_num, module_code, mode_id, exempt_level,\n" +
+                        " (select b.x_con_full_name from billing_profile b  where b.ou_num = billing_acc_num ) billing_acc_name, \n" +
+                        " to_char(effective_dat,'DD/MM/YYYY') effective_date, to_char(end_dat,'DD/MM/YYYY') end_date, \n" +
+                        " to_char(expire_dat,'DD/MM/YYYY') expire_date,\n" +
+                        " cate_code, \n" +
+                        " (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_ADD' and reason_code=e.add_reason) add_reason , \n" +
+                        " add_location, \n" +
+                        " (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_UPDATE' and reason_code=e.update_reason) update_reason, \n" +
+                        " update_location, last_update_by, to_char(last_update_dtm,'DD/MM/YYYY HH24:Mi:SS') last_update_date, \n" +
+                        " no_of_exempt, sent_interface_flag \n" +
+                        " , row_number() over (order by exempt_level desc, module_code, mode_id, cust_acc_num, billing_acc_num, mobile_num, no_of_exempt) as rownumber \n" +
+                        " from   dcc_exempt  e \n" +
+                        " where  cust_acc_num = :recv_cust_acc_num) \n" +
+                        //" where rownumber >= :recv_row_start and rownumber <= :recv_row_end \n" +
+                        " order by rownumber";
+                Query query = entityManager.createNativeQuery(sql, "searchExemptDetailDtoMapping");
+                if (!mapParam.isEmpty()) {
+                    mapParam.forEach(query::setParameter);
+                }
+                return query.getResultList();
+            }else if(SEARCH_TYPE_BA.equalsIgnoreCase(searchType)){
+                mapParam.put("recv_billing_acc_num",vaule);
+                //mapParam.put("recv_row_start",1);
+                //mapParam.put("recv_row_end",10);
+                sql = " SELECT a.*,row_number() over (order BY exempt_level desc, module_code, mode_id, cust_acc_num, billing_acc_num, mobile_num, no_of_exempt) rownumber FROM ( \n" +
+                        "select cust_acc_num, billing_acc_num, \n" +
+                        "   mobile_num, module_code, mode_id, exempt_level,\n" +
+                        "   (select b.x_con_full_name from billing_profile b  where b.ou_num = billing_acc_num ) billing_acc_name, \n" +
+                        "   to_char(effective_dat,'DD/MM/YYYY') effective_date , to_char(end_dat,'DD/MM/YYYY') end_date, \n" +
+                        "   to_char(expire_dat,'DD/MM/YYYY') expire_date,\n" +
+                        "   cate_code, \n" +
+                        "   (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_ADD' and reason_code=e.add_reason) add_reason , \n" +
+                        "   add_location, \n" +
+                        "   (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_UPDATE' and reason_code=e.update_reason) update_reason, \n" +
+                        "   update_location, last_update_by, to_char(last_update_dtm,'DD/MM/YYYY HH24:Mi:SS') last_update_date, \n" +
+                        "   no_of_exempt, sent_interface_flag \n" +
+                        "   from   dcc_exempt  e\n" +
+                        "   where cust_acc_num = ( select ou_num from account \n" +
+                        "  where  par_row_id =(select master_ou_id from account \n" +
+                        " where  ou_num = :recv_billing_acc_num \n" +
+                        "  and  accnt_type_cd='Billing' \n" +
+                        "        and ou_num = e.billing_acc_num ) \n" +
+                        "  and  accnt_type_cd='Customer' ) and exempt_level='CA' \n" +
+                        "\n" +
+                        "  UNION\n" +
+                        "\n" +
+                        "  select cust_acc_num, billing_acc_num, \n" +
+                        " mobile_num, module_code, mode_id, exempt_level,\n" +
+                        " (select a.name from account a where a.ou_num = billing_acc_num and a.accnt_type_cd = 'Billing' ) billing_acc_name, \n" +
+                        " to_char(effective_dat,'DD/MM/YYYY') effective_date, to_char(end_dat,'DD/MM/YYYY') end_date, \n" +
+                        " to_char(expire_dat,'DD/MM/YYYY') expire_date,\n" +
+                        " cate_code, \n" +
+                        " (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_ADD' and reason_code=e.add_reason) add_reason , \n" +
+                        " add_location, \n" +
+                        " (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_UPDATE' and reason_code=e.update_reason) update_reason, \n" +
+                        " update_location, last_update_by, to_char(last_update_dtm,'DD/MM/YYYY HH24:Mi:SS') last_update_date, \n" +
+                        " no_of_exempt, sent_interface_flag \n" +
+                        " from   dcc_exempt  e \n" +
+                        " where billing_acc_num = :recv_billing_acc_num   \n" +
+                        " and exempt_level in ('BA','MO')\n" +
+                        " )a\n" +
+                        " order by rownumber";
+                Query query = entityManager.createNativeQuery(sql, "searchExemptDetailDtoMapping");
+
+                if (!mapParam.isEmpty()) {
+                    mapParam.forEach(query::setParameter);
+                }
+                return query.getResultList();
+            }else if(SEARCH_TYPE_MO.equalsIgnoreCase(searchType)){
+                mapParam.put("recv_service_num",vaule);
+                sql = "--D_LstDCExempt m\n" +
+                        "SELECT a.*,row_number() over (order BY exempt_level desc, module_code, mode_id, cust_acc_num, billing_acc_num, mobile_num, no_of_exempt) rownumber FROM ( \n" +
+                        "select cust_acc_num, billing_acc_num, \n" +
+                        "   mobile_num, module_code, mode_id, exempt_level,\n" +
+                        "   (select b.x_con_full_name from billing_profile b  where b.ou_num = billing_acc_num ) billing_acc_name, \n" +
+                        "   to_char(effective_dat,'DD/MM/YYYY') effective_date , to_char(end_dat,'DD/MM/YYYY') end_date, \n" +
+                        "   to_char(expire_dat,'DD/MM/YYYY') expire_date,\n" +
+                        "   cate_code, \n" +
+                        "   (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_ADD' and reason_code=e.add_reason) add_reason , \n" +
+                        "   add_location, \n" +
+                        "   (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_UPDATE' and reason_code=e.update_reason) update_reason, \n" +
+                        "   update_location, last_update_by, to_char(last_update_dtm,'DD/MM/YYYY HH24:Mi:SS') last_update_date, \n" +
+                        "   no_of_exempt, sent_interface_flag \n" +
+                        "   from   dcc_exempt  e\n" +
+                        "   where --cust_acc_num = '32000070195995'\n" +
+                        "   \tcust_acc_num in ( select ou_num  from  account \n" +
+                        " where  par_row_id in ( select ba.master_ou_id  \n" +
+                        " from   account ba, account_has_mobile mo   \n" +
+                        " where  mo.service_num = :recv_service_num \n" +
+                        " and mo.bill_accnt_num=ba.ou_num \n" +
+                        " and  ba.accnt_type_cd='Billing' \n" +
+                        "         and mo.service_num = e.mobile_num) \n" +
+                        " and  accnt_type_cd='Customer' ) \n" +
+                        " and exempt_level ='CA' \n" +
+                        " \n" +
+                        " UNION\n" +
+                        " \n" +
+                        " select cust_acc_num, billing_acc_num, \n" +
+                        " mobile_num, module_code, mode_id, exempt_level,\n" +
+                        " (select b.x_con_full_name from billing_profile b  where b.ou_num = billing_acc_num ) billing_acc_name, \n" +
+                        " to_char(effective_dat,'DD/MM/YYYY') effective_date, to_char(end_dat,'DD/MM/YYYY') end_date, \n" +
+                        " to_char(expire_dat,'DD/MM/YYYY') expire_date,\n" +
+                        " cate_code, \n" +
+                        " (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_ADD' and reason_code=e.add_reason) add_reason , \n" +
+                        " add_location, \n" +
+                        " (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_UPDATE' and reason_code=e.update_reason) update_reason, \n" +
+                        " update_location, last_update_by, to_char(last_update_dtm,'DD/MM/YYYY HH24:Mi:SS') last_update_date, \n" +
+                        " no_of_exempt, sent_interface_flag \n" +
+                        " from   dcc_exempt  e \n" +
+                        "  where billing_acc_num in ( select bill_accnt_num \n" +
+                        " from account_has_mobile \n" +
+                        "where service_num = :recv_service_num) \n" +
+                        "and exempt_level ='BA' \n" +
+
+                        " UNION \n" +
+
+                        " select cust_acc_num, billing_acc_num, \n" +
+                        " mobile_num, module_code, mode_id, exempt_level,\n" +
+                        " (select b.x_con_full_name from billing_profile b  where b.ou_num = billing_acc_num ) billing_acc_name, \n" +
+                        " to_char(effective_dat,'DD/MM/YYYY') effective_date , to_char(end_dat,'DD/MM/YYYY') end_date, \n" +
+                        " to_char(expire_dat,'DD/MM/YYYY') expire_date,\n" +
+                        " cate_code, \n" +
+                        " (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_ADD' and reason_code=e.add_reason) add_reason , \n" +
+                        " add_location, \n" +
+                        " (select reason_code || ' : ' || reason_description from dcc_reason where reason_type='EXEMPT_UPDATE' and reason_code=e.update_reason) update_reason, \n" +
+                        " update_location, last_update_by, to_char(last_update_dtm,'DD/MM/YYYY HH24:Mi:SS') last_update_date, \n" +
+                        " no_of_exempt, sent_interface_flag \n" +
+                        " from   dcc_exempt  e\n" +
+                        " where mobile_num = :recv_service_num --'8919893721' --\n" +
+                        " and exempt_level ='MO'\n" +
+                        " \n" +
+                        ")a";
+                Query query = entityManager.createNativeQuery(sql, "searchExemptDetailDtoMapping");
+
+                if (!mapParam.isEmpty()) {
+                    mapParam.forEach(query::setParameter);
+                }
+                return query.getResultList();
+            }
+        }catch (PersistenceException | IllegalArgumentException e){
+            log.error("error occured when search exempt detail ",e);
+            throw new ExemptException(AppConstant.FAIL, e.getMessage());
+        }
+
+        return null;
     }
 
 

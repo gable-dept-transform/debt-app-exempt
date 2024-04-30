@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import th.co.ais.mimo.debt.dto.treatment.ExemptDetailDto;
 import th.co.ais.mimo.debt.dto.treatment.SearchTreatmentDto;
 
 import java.util.List;
@@ -14,5 +15,6 @@ import java.util.List;
 @AllArgsConstructor
 public class SearchResponse {
     private String errorMsg;
-    private List<SearchTreatmentDto> resultSearchList;
+    private List<SearchTreatmentDto> resultList;
+    private List<ExemptDetailDto> resultDetailList;
 }

@@ -7,6 +7,7 @@ import jakarta.persistence.SqlResultSetMapping;
 import th.co.ais.mimo.debt.dto.BillingAccDto;
 import th.co.ais.mimo.debt.dto.DcExempHistoryDto;
 import th.co.ais.mimo.debt.dto.DcExemptCurrentDto;
+import th.co.ais.mimo.debt.dto.treatment.ExemptDetailDto;
 import th.co.ais.mimo.debt.dto.treatment.SearchTreatmentDto;
 
 import java.math.BigDecimal;
@@ -129,6 +130,33 @@ import java.util.Date;
                         @ColumnResult(name = "ba_status",type = String.class),
                         @ColumnResult(name = "service_num",type = String.class),
                         @ColumnResult(name = "mobile_status",type = String.class),
+                }))
+
+@SqlResultSetMapping(
+        name = "searchExemptDetailDtoMapping",
+        classes = @ConstructorResult(
+                targetClass = ExemptDetailDto.class,
+                columns = {
+                        @ColumnResult(name = "cust_acc_num",type = String.class),
+                        @ColumnResult(name = "billing_acc_num",type = String.class),
+                        @ColumnResult(name = "mobile_num",type = String.class),
+                        @ColumnResult(name = "module_code",type = String.class),
+                        @ColumnResult(name = "mode_id",type = String.class),
+                        @ColumnResult(name = "exempt_level",type = String.class),
+                        @ColumnResult(name = "billing_acc_name",type = String.class),
+                        @ColumnResult(name = "effective_date",type = String.class),
+                        @ColumnResult(name = "end_date",type = String.class),
+                        @ColumnResult(name = "expire_date",type = String.class),
+                        @ColumnResult(name = "cate_code",type = String.class),
+                        @ColumnResult(name = "add_reason",type = String.class),
+                        @ColumnResult(name = "add_location",type = String.class),
+                        @ColumnResult(name = "update_reason",type = String.class),
+                        @ColumnResult(name = "update_location",type = String.class),
+                        @ColumnResult(name = "last_update_by",type = String.class),
+                        @ColumnResult(name = "last_update_date",type = String.class),
+                        @ColumnResult(name = "no_of_exempt",type = Long.class),
+                        @ColumnResult(name = "sent_interface_flag",type = String.class),
+                        @ColumnResult(name = "rownumber",type = Long.class)
                 }))
 
 @Embeddable

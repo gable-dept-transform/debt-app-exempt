@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import th.co.ais.mimo.debt.dto.common.CommonDropdownListDto;
@@ -63,6 +64,73 @@ public class CommonController {
         } catch (Exception e) {
             log.error("Exception get exempt action : {}", e.getMessage(), e);
             errorMsg = "Get exempt action Internal server Error process";
+        } finally {
+            response = new CommonDropDownResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/global-parameter/{keyword}/{sectionName}")
+    public ResponseEntity<CommonDropDownResponse> getGlobalParameter(@PathVariable(name = "keyword") String keyword, @PathVariable(name = "sectionName") String sectionName)  {
+        CommonDropDownResponse response = new CommonDropDownResponse();
+        List<CommonDropdownListDto> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.getGlobalParameter(keyword,sectionName);
+            if(resultList.isEmpty()){
+                errorMsg= "keyword "+keyword+" and sectionName + "+sectionName +" not found";
+            }else{
+                response.setResultList(resultList);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception getGlobalParameter : {}", e.getMessage(), e);
+            errorMsg = "Get globalParameter Internal server Error process";
+        } finally {
+            response = new CommonDropDownResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/exempt-reason/{reasonType}")
+    public ResponseEntity<CommonDropDownResponse> getExemptReason(@PathVariable(name="reasonType") String reasonType)  {
+        CommonDropDownResponse response = new CommonDropDownResponse();
+        List<CommonDropdownListDto> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.getDccReason(reasonType);
+            if(resultList.isEmpty()){
+                errorMsg= "reason not found";
+            }else{
+                response.setResultList(resultList);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception get reason : {}", e.getMessage(), e);
+            errorMsg = "Get reason Internal server Error process";
+        } finally {
+            response = new CommonDropDownResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/mode/{module}/{level}")
+    public ResponseEntity<CommonDropDownResponse> getMode(@PathVariable(name="module") String module,@PathVariable(name="level") String level)  {
+        CommonDropDownResponse response = new CommonDropDownResponse();
+        String userLocationId = "";
+        List<CommonDropdownListDto> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.getPopupMode(userLocationId,module,level);
+            if(resultList.isEmpty()){
+                errorMsg= "mode not found";
+            }else{
+                response.setResultList(resultList);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception get mode : {}", e.getMessage(), e);
+            errorMsg = "Get mode Internal server Error process";
         } finally {
             response = new CommonDropDownResponse(resultList,errorMsg);
         }
