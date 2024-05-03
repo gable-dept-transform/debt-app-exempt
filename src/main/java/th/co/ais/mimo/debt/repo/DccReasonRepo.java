@@ -17,4 +17,10 @@ public interface DccReasonRepo extends JpaRepository<DccReason,String> {
             "where reason_type = :reason_type \n" +
             "order by reason_type, reason_code ",nativeQuery = true)
     public List<CommonDropdownListDto> findByReasonType(@Param("reason_type") String reasonType);
+
+    @Query(value =" select  reason_code AS val, reason_description AS label\n" +
+            "from dcc_reason\n" +
+            "where reason_code = :reason_code and reason_type = :reason_type ",nativeQuery = true)
+    public List<CommonDropdownListDto> findReasonByCodeAndType(@Param("reason_code") String reasonCode,@Param("reason_type") String reasonType);
+
 }

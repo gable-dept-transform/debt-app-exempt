@@ -4,9 +4,7 @@ import jakarta.persistence.ColumnResult;
 import jakarta.persistence.ConstructorResult;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.SqlResultSetMapping;
-import th.co.ais.mimo.debt.dto.BillingAccDto;
-import th.co.ais.mimo.debt.dto.DcExempHistoryDto;
-import th.co.ais.mimo.debt.dto.DcExemptCurrentDto;
+import th.co.ais.mimo.debt.dto.*;
 import th.co.ais.mimo.debt.dto.treatment.ExemptDetailDto;
 import th.co.ais.mimo.debt.dto.treatment.SearchTreatmentDto;
 
@@ -158,6 +156,38 @@ import java.util.Date;
                         @ColumnResult(name = "sent_interface_flag",type = String.class),
                         @ColumnResult(name = "rownumber",type = Long.class)
                 }))
+
+
+@SqlResultSetMapping(
+        name = "searchExemptCateMasterDtoMapping",
+        classes = @ConstructorResult(
+                targetClass = DccExemptCateMaster.class,
+                columns = {
+                        @ColumnResult(name = "cate_code",type = String.class),
+                        @ColumnResult(name = "cate_description",type = String.class),
+                        @ColumnResult(name = "exempt_reason",type = String.class),
+                        @ColumnResult(name = "active_flag",type = String.class),
+                        @ColumnResult(name = "last_update_by",type = String.class),
+                        @ColumnResult(name = "last_update_dtm",type = String.class)
+                }))
+
+@SqlResultSetMapping(
+        name = "searchExemptCateDetailDtoMapping",
+        classes = @ConstructorResult(
+                targetClass = DccExemptCateDetail.class,
+                columns = {
+                        @ColumnResult(name = "mode_id",type = String.class),
+                        @ColumnResult(name = "module_code",type = String.class),
+                        @ColumnResult(name = "exempt_duration",type = Long.class),
+                        @ColumnResult(name = "expire_date",type = String.class),
+                        @ColumnResult(name = "last_update_by",type = String.class),
+                        @ColumnResult(name = "last_update_dtm",type = String.class),
+                        @ColumnResult(name = "exempt_level",type = String.class)
+                }))
+
+
+
+
 
 @Embeddable
 public class SQLMappingConfigEntity {

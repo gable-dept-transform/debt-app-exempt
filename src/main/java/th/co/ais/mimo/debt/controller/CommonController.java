@@ -9,8 +9,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import th.co.ais.mimo.debt.dto.DccExemptCateDetail;
+import th.co.ais.mimo.debt.dto.DccExemptCateMaster;
 import th.co.ais.mimo.debt.dto.common.CommonDropdownListDto;
 import th.co.ais.mimo.debt.model.common.CommonDropDownResponse;
+import th.co.ais.mimo.debt.model.common.ExemptCateDetailResponse;
+import th.co.ais.mimo.debt.model.common.ExemptCateMasterResponse;
 import th.co.ais.mimo.debt.service.CommonService;
 
 import java.util.List;
@@ -114,6 +118,29 @@ public class CommonController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/exempt-reason-code-and-type/{reasonCode}/{reasonType}")
+    public ResponseEntity<CommonDropDownResponse> getExemptReason(@PathVariable(name="reasonCode") String reasonCode,@PathVariable(name="reasonType") String reasonType)  {
+        CommonDropDownResponse response = new CommonDropDownResponse();
+        List<CommonDropdownListDto> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.getDccReason(reasonCode,reasonType);
+            if(resultList.isEmpty()){
+                errorMsg= "reason not found";
+            }else{
+                response.setResultList(resultList);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception get reason : {}", e.getMessage(), e);
+            errorMsg = "Get reason Internal server Error process";
+        } finally {
+            response = new CommonDropDownResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
     @GetMapping(value = "/mode/{module}/{level}")
     public ResponseEntity<CommonDropDownResponse> getMode(@PathVariable(name="module") String module,@PathVariable(name="level") String level)  {
         CommonDropDownResponse response = new CommonDropDownResponse();
@@ -137,4 +164,50 @@ public class CommonController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/cate")
+    public ResponseEntity<ExemptCateMasterResponse> getCateMaster()  {
+        ExemptCateMasterResponse response = new ExemptCateMasterResponse();
+
+        List<DccExemptCateMaster> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.searchExemptCateMaster();
+            if(resultList.isEmpty()){
+                errorMsg= "cate not found";
+            }else{
+                response.setResultList(resultList);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception get cate : {}", e.getMessage(), e);
+            errorMsg = "Get cate Internal server Error process";
+        } finally {
+            response = new ExemptCateMasterResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    @GetMapping(value = "/cate-detail/{cateCode}")
+    public ResponseEntity<ExemptCateDetailResponse> getCateDetail(@PathVariable(name="cateCode") String cateCode)  {
+        ExemptCateDetailResponse response = new ExemptCateDetailResponse();
+
+        List<DccExemptCateDetail> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.searchExemptCateDetail(cateCode);
+            if(resultList.isEmpty()){
+                errorMsg= "cate not found";
+            }else{
+                response.setResultList(resultList);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception get cate : {}", e.getMessage(), e);
+            errorMsg = "Get cate Internal server Error process";
+        } finally {
+            response = new ExemptCateDetailResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
