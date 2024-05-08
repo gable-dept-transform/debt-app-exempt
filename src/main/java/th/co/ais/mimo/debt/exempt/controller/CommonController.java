@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import th.co.ais.mimo.debt.exempt.dto.CommonDropdownListDto;
-import th.co.ais.mimo.debt.exempt.dto.DccExemptCateDetail;
-import th.co.ais.mimo.debt.exempt.dto.DccExemptCateMaster;
+import th.co.ais.mimo.debt.exempt.dto.DccExemptCateDetailDto;
+import th.co.ais.mimo.debt.exempt.dto.DccExemptCateMasterDto;
 import th.co.ais.mimo.debt.exempt.model.CommonDropDownResponse;
 import th.co.ais.mimo.debt.exempt.model.ExemptCateDetailResponse;
 import th.co.ais.mimo.debt.exempt.model.ExemptCateMasterResponse;
@@ -168,7 +168,7 @@ public class CommonController {
     public ResponseEntity<ExemptCateMasterResponse> getCateMaster()  {
         ExemptCateMasterResponse response = new ExemptCateMasterResponse();
 
-        List<DccExemptCateMaster> resultList = null;
+        List<DccExemptCateMasterDto> resultList = null;
         String errorMsg = null;
         try {
             resultList = commonService.searchExemptCateMaster();
@@ -193,7 +193,7 @@ public class CommonController {
 
         ExemptCateDetailResponse response = new ExemptCateDetailResponse();
 
-        List<DccExemptCateDetail> resultList = null;
+        List<DccExemptCateDetailDto> resultList = null;
         String errorMsg = null;
         try {
             resultList = commonService.searchExemptCateDetail(cateCode);

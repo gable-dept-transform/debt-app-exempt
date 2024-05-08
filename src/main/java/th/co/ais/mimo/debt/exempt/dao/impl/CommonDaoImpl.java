@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import th.co.ais.mimo.debt.exempt.constant.AppConstant;
 import th.co.ais.mimo.debt.exempt.dao.CommonDao;
-import th.co.ais.mimo.debt.exempt.dto.DccExemptCateDetail;
-import th.co.ais.mimo.debt.exempt.dto.DccExemptCateMaster;
+import th.co.ais.mimo.debt.exempt.dto.DccExemptCateDetailDto;
+import th.co.ais.mimo.debt.exempt.dto.DccExemptCateMasterDto;
 import th.co.ais.mimo.debt.exempt.exception.ExemptException;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class CommonDaoImpl implements CommonDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public List<DccExemptCateMaster> searchExemptCateMaster() throws ExemptException {
+    public List<DccExemptCateMasterDto> searchExemptCateMaster() throws ExemptException {
         try{
             String sql = "select cate_code, cate_description,exempt_reason,active_flag, \n" +
                     "  last_update_by, to_char(last_update_dtm,'YYYY/MM/DD  HH24:MI:SS') last_update_dtm\n" +
@@ -39,7 +39,7 @@ public class CommonDaoImpl implements CommonDao {
         }
     }
 
-    public List<DccExemptCateDetail> searchExemptCateDetail(String cateCode)throws ExemptException{
+    public List<DccExemptCateDetailDto> searchExemptCateDetail(String cateCode)throws ExemptException{
         try{
             String sql = "select mode_id,module_code,exempt_duration, to_char(expire_dat,'YYYY/MM/DD') expire_date, \n" +
                     "last_update_by, to_char(last_update_dtm,'YYYY/MM/DD  HH24:Mi:SS') last_update_dtm, exempt_level  \n" +

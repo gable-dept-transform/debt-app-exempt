@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import th.co.ais.mimo.debt.exempt.dto.DccExemptCateMaster;
+import th.co.ais.mimo.debt.exempt.dto.DccExemptCateMasterDto;
 
 import java.util.List;
 
@@ -13,6 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExemptCateMasterResponse {
-    private List<DccExemptCateMaster> resultList;
+    private List<DccExemptCateMasterDto> resultList;
     private String errorMsg;
 }

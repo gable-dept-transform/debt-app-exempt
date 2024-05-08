@@ -5,8 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import th.co.ais.mimo.debt.exempt.dao.CommonDao;
 import th.co.ais.mimo.debt.exempt.dto.CommonDropdownListDto;
-import th.co.ais.mimo.debt.exempt.dto.DccExemptCateDetail;
-import th.co.ais.mimo.debt.exempt.dto.DccExemptCateMaster;
+import th.co.ais.mimo.debt.exempt.dto.DccExemptCateDetailDto;
+import th.co.ais.mimo.debt.exempt.dto.DccExemptCateMasterDto;
 import th.co.ais.mimo.debt.exempt.enums.ConfigSectionNameEnums;
 import th.co.ais.mimo.debt.exempt.exception.ExemptException;
 import th.co.ais.mimo.debt.exempt.repo.DccGlobalParameterRepo;
@@ -102,11 +102,11 @@ public class CommonService {
         return responseDD;
     }
 
-    public List<DccExemptCateMaster> searchExemptCateMaster() throws ExemptException {
+    public List<DccExemptCateMasterDto> searchExemptCateMaster() throws ExemptException {
         return commonDao.searchExemptCateMaster();
     }
 
-    public List<DccExemptCateDetail> searchExemptCateDetail(String cateCode)throws ExemptException{
+    public List<DccExemptCateDetailDto> searchExemptCateDetail(String cateCode)throws ExemptException{
         return commonDao.searchExemptCateDetail(cateCode);
 
     }
