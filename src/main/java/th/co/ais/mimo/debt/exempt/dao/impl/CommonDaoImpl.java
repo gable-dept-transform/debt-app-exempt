@@ -53,4 +53,20 @@ public class CommonDaoImpl implements CommonDao {
             throw new ExemptException(AppConstant.FAIL,e.getMessage());
         }
     }
+
+    @Override
+    public String getBillingSystem(String billingAccNum) throws ExemptException {
+
+        String sql = "select b.BILLING_SYSTEM \n" +
+                " from BILLING_PROFILE b \n" +
+                " where b.OU_NUM = :billingAccNum ";
+        Query query = entityManager.createNativeQuery(sql);
+        query.setParameter("billingAccNum",billingAccNum);
+
+        List list = query.getResultList();
+        if(list != null && !list.isEmpty()){
+            return (String)list.get(0);
+        }
+        return null;
+    }
 }

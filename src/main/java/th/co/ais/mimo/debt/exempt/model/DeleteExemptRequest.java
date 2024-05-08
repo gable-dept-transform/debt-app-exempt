@@ -21,6 +21,8 @@ public class DeleteExemptRequest {
     private String exemptLevel;
     private String mode;
     private String reason;
+    private String cateCode;
+    private String effectiveDate;
     private String endDate;
     private Long noOfExempt;
 

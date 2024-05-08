@@ -1,4 +1,4 @@
-package th.co.ais.mimo.debt.exempt.service;
+package th.co.ais.mimo.debt.exempt.service.impl;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,5 +109,9 @@ public class CommonService {
     public List<DccExemptCateDetailDto> searchExemptCateDetail(String cateCode)throws ExemptException{
         return commonDao.searchExemptCateDetail(cateCode);
 
+    }
+
+    public String getBillingSystem(String billingAccNum) throws ExemptException{
+        return commonDao.getBillingSystem(billingAccNum);
     }
 }

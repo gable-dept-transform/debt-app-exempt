@@ -7,18 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import th.co.ais.mimo.debt.exempt.constant.AppConstant;
 import th.co.ais.mimo.debt.exempt.dao.DMSEM002SetTreatmentExemptDao;
-import th.co.ais.mimo.debt.exempt.dto.AddExemptCustAccDto;
-import th.co.ais.mimo.debt.exempt.dto.DccExemptCateDetailDto;
-import th.co.ais.mimo.debt.exempt.dto.ExemptDetailDto;
-import th.co.ais.mimo.debt.exempt.dto.SearchTreatmentDto;
-import th.co.ais.mimo.debt.exempt.entity.DccExemptHistory;
-import th.co.ais.mimo.debt.exempt.entity.DccExemptHistoryId;
-import th.co.ais.mimo.debt.exempt.entity.DccExemptModel;
-import th.co.ais.mimo.debt.exempt.entity.DccExemptModelId;
+import th.co.ais.mimo.debt.exempt.dto.*;
+import th.co.ais.mimo.debt.exempt.entity.*;
 import th.co.ais.mimo.debt.exempt.exception.ExemptException;
 import th.co.ais.mimo.debt.exempt.model.*;
+import th.co.ais.mimo.debt.exempt.repo.DccExemptBosRepo;
 import th.co.ais.mimo.debt.exempt.repo.DccExemptHistoryRepo;
 import th.co.ais.mimo.debt.exempt.repo.DccExemptRepo;
+import th.co.ais.mimo.debt.exempt.repo.DccGlobalParameterRepo;
 import th.co.ais.mimo.debt.exempt.service.DMSEM002SetTreatmentExemptService;
 import th.co.ais.mimo.debt.exempt.utils.DateUtils;
 
@@ -53,6 +49,12 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
     @Autowired
     private DccExemptRepo dccExemptRepo;
 
+    @Autowired
+    private CommonService commonService;
+
+    @Autowired
+    private DccExemptBosRepo dccExemptBosRepo;
+
     @Override
     public List<SearchTreatmentDto> searchData(SearchRequest request) throws ExemptException {
 
@@ -67,18 +69,14 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
     @Override
     public AddExemptResponse insertExempt(AddExemptRequest addExemptRequest, Integer location, String addBy)throws ExemptException{
 
-        //validate
-        /*
-        If CStr(marrNModule(IngSave)) = "CCS" And CStr(marrNMode_id(IngSave)) = "DC" Then
-                    If ffCheckBilling_System(CStr(marrGBill_acc_num(IngSave))) = "BOS" Then
-                        ลูกค้าเลขหมายระบบ BOS ไม่สามารถทำยกเว้น Suspend Credit Limit ได้
-         */
+
 
         //1. D_GetDCExemptH
         //2. D_InsDCExempt
         //3. D_InsDCExemptH
         String sentInterfaceFlag = EXEMPT_SENT_INTERFACE_FLAG_N;
         if(EXEMPT_BY_MODE.equals(addExemptRequest.getExemptBy())) {
+
             List<AddExemptCustAccDto> listCustAccDto = new ArrayList<>();
             if (EXEMPT_LEVEL_CA.equals(addExemptRequest.getExemptLevel())) {
                 //if exempt level = CA,BA then insert only 1 record
@@ -103,11 +101,26 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
                 listCustAccDto = addExemptRequest.getCustAccNo();
             }
 
-            listCustAccDto.forEach(custAccDto -> {
+            for (AddExemptCustAccDto custAccDto:listCustAccDto){
 
                 var mode = addExemptRequest.getExemptMode().split(",");
 
                 for (int i = 0; i < mode.length; i++) {
+                    //validate
+                    /*
+                    If CStr(marrNModule(IngSave)) = "CCS" And CStr(marrNMode_id(IngSave)) = "DC" Then
+                                If ffCheckBilling_System(CStr(marrGBill_acc_num(IngSave))) = "BOS" Then
+                                    ลูกค้าเลขหมายระบบ BOS ไม่สามารถทำยกเว้น Suspend Credit Limit ได้
+                     */
+                    //validate
+                    if("CCS".equalsIgnoreCase(addExemptRequest.getModule())
+                            && "DC".equalsIgnoreCase(addExemptRequest.getExemptMode())){
+                        String biilingSystem = commonService.getBillingSystem(custAccDto.getBillingAccNum());
+                        if("BOS".equalsIgnoreCase(biilingSystem)){
+                            throw new ExemptException(AppConstant.ADD_EXEMPT_ERROR_BOS_SUSPEND_CREDIT_LIMIT_NOT_ALLOW,"ลูกค้าเลขหมายระบบ BOS ไม่สามารถทำยกเว้น Suspend Credit Limit ได้");
+                        }
+                    }
+
                     //1. D_GetDCExemptH
                     Long noOfExempt = dccExemptHistoryRepo.countNumberOfExempt(custAccDto.getCustAccNum(), addExemptRequest.getModule(), mode[i]);
                     noOfExempt++;
@@ -140,10 +153,26 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
                             null,
                             EXEMPT_ACTION_TYPE_ADD
                             );
+
+//                    If CStr(marrNModule(IngSave)) = "CCS" And CStr(marrNMode_id(IngSave)) = "DC" Then
+//                    Call ffSaveDataBOS(CStr(marrGCust_acc_num(IngSave)), CStr(marrGBill_acc_num(IngSave)), CStr(marrGMobile_num(IngSave)), Format(CStr(marrNEffective(IngSave)), "YYYY/MM/DD"), Format(CStr(marrNEnd(IngSave)), "YYYY/MM/DD"), "0")
+//                    End If
+
+                    if("CCS".equalsIgnoreCase(addExemptRequest.getModule()) && "DC".equalsIgnoreCase(mode[i])){
+                        String checkExemptDCBOS = ffGetCheckExemptDCBOS();
+                        ffSaveDataBOS(custAccDto.getBillingAccNum(), custAccDto.getServiceNum(), checkExemptDCBOS, addExemptRequest.getModule(), mode[i],"0",
+                                addExemptRequest.getExemptLevel()
+                                ,DateUtils.getDateByFormatEnLocale(addExemptRequest.getEffectiveDate(), DateUtils.DEFAULT_DATE_PATTERN)
+                                ,DateUtils.getDateByFormatEnLocale(addExemptRequest.getEndDate(), DateUtils.DEFAULT_DATE_PATTERN)
+                                ,addBy,DateUtils.getCurrentDate()
+                                );
+
+                    }
                 }
-            });
+            }
         }else if(EXEMPT_BY_CATE.equals(addExemptRequest.getExemptBy())) {
-            addExemptRequest.getExemptCateDetails().forEach(exemptCateDetailDto -> {
+            for(DccExemptCateDetailDto exemptCateDetailDto:addExemptRequest.getExemptCateDetails()){
+            //addExemptRequest.getExemptCateDetails().forEach(exemptCateDetailDto -> {
 
                 List<AddExemptCustAccDto> listCustAccDto = new ArrayList<>();
                 if (EXEMPT_LEVEL_CA.equals(exemptCateDetailDto.getExemptLevel())) {
@@ -170,8 +199,8 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
                 }
 
 
-
-                listCustAccDto.forEach(custAccDto -> {
+                for(AddExemptCustAccDto custAccDto:listCustAccDto){
+//                listCustAccDto.forEach(custAccDto -> {
 
                     //1. D_GetDCExemptH
                     Long noOfExempt = dccExemptHistoryRepo.countNumberOfExempt(custAccDto.getCustAccNum(), addExemptRequest.getModule(), exemptCateDetailDto.getModeId());
@@ -212,12 +241,22 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
                             EXEMPT_ACTION_TYPE_ADD
                     );
 
-                });
+                    if("CCS".equalsIgnoreCase(addExemptRequest.getModule()) && "DC".equalsIgnoreCase(exemptCateDetailDto.getModeId())){
+                        String checkExemptDCBOS = ffGetCheckExemptDCBOS();
+                        ffSaveDataBOS(custAccDto.getBillingAccNum(), custAccDto.getServiceNum(), checkExemptDCBOS, addExemptRequest.getModule(), exemptCateDetailDto.getModeId(),"0",
+                                addExemptRequest.getExemptLevel()
+                                ,DateUtils.getDateByFormatEnLocale(addExemptRequest.getEffectiveDate(), DateUtils.DEFAULT_DATE_PATTERN)
+                                ,DateUtils.getDateByFormatEnLocale(addExemptRequest.getEndDate(), DateUtils.DEFAULT_DATE_PATTERN)
+                                ,addBy,DateUtils.getCurrentDate()
+                        );
 
-            });
+                    }
+
+                }
+            }
         }
 
-        return AddExemptResponse.builder().build();
+        return AddExemptResponse.builder().responseCode(AppConstant.SUCCESS).build();
     }
 
     @Override
@@ -330,7 +369,7 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
         // D_InsDCExemptH
         addExemptHistory(exemptSeq,deleteExemptRequest.getNoOfExempt(),deleteExemptRequest.getMode(),
                 deleteExemptRequest.getMobileNo(), deleteExemptRequest.getBillingAccNo(), deleteExemptRequest.getCustAccNo(),
-                location, deleteExemptRequest.getReason(),null,null, deleteExemptRequest.getExemptLevel(),
+                location, deleteExemptRequest.getReason(),deleteExemptRequest.getCateCode(),deleteExemptRequest.getEffectiveDate(), deleteExemptRequest.getExemptLevel(),
                 deleteExemptRequest.getEndDate(), deleteBy, deleteExemptRequest.getModule(), "N",null,EXEMPT_ACTION_TYPE_DELETE);
 
 
@@ -348,7 +387,66 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
         }
 
 
+//        If arrModeIDDelete(lngModeId) = "BL" Or arrModeIDDelete(lngModeId) = "DL" Or arrModeIDDelete(lngModeId) = "DC" Then
+//        Call ffGetNegoExemSff(marrCust_acc_num(IngSave), marrBill_acc_num(IngSave), marrMobile_num(IngSave), Format(CStr(marrEffective(IngSave)), "YYYY/MM/DD"), Format(marrEnd(IngSave), "YYYY/MM/DD"), arrModeIDDelete(lngModeId), marrLevel(IngSave))
+//             PLUGIN.DCCFNG_EXEMPT_SFF_ASYNC('D_GetNGExemSFF',:ca,:ba,:mobile,:mode,to_date(:startdate,'YYYY/MM/DD'),to_date(:enddate,'YYYY/MM/DD'),:exempt_level);
+
+        if("BL".equalsIgnoreCase(deleteExemptRequest.getMode())
+                || "DL".equalsIgnoreCase(deleteExemptRequest.getMode())
+                || "DC".equalsIgnoreCase(deleteExemptRequest.getMode())){
+            ffGetNegoExemSff(deleteExemptRequest.getCustAccNo()
+                    ,deleteExemptRequest.getBillingAccNo()
+                    ,deleteExemptRequest.getMobileNo()
+                    ,deleteExemptRequest.getMode()
+                    ,deleteExemptRequest.getEffectiveDate()
+                    ,deleteExemptRequest.getEndDate(),
+                    deleteExemptRequest.getExemptLevel());
+        }
+
+//        If marrModule(IngSave) = "CCS" And arrModeIDDelete(lngModeId) = "DC" Then
+//        Call ffSaveDataBOS(CStr(marrCust_acc_num(IngSave)), CStr(marrBill_acc_num(IngSave)), CStr(marrMobile_num(IngSave)), Format(CStr(marrEffective(IngSave)), "YYYY/MM/DD"), gvClsUtil.FormatDTP(dtpEnd_dateL.value, "YYYY/MM/DD"), "1")
+//        End If
+
+        String checkExemptDCBOS = ffGetCheckExemptDCBOS();
+
+        if("CCS".equalsIgnoreCase(deleteExemptRequest.getModule())
+                && "DC".equalsIgnoreCase(deleteExemptRequest.getMode())){
+            ffSaveDataBOS(deleteExemptRequest.getBillingAccNo(),
+                    deleteExemptRequest.getMobileNo(),checkExemptDCBOS,
+                    deleteExemptRequest.getModule(),
+                    deleteExemptRequest.getMode(),
+                    "1", deleteExemptRequest.getExemptLevel(),
+                    DateUtils.getDateByFormatEnLocale(deleteExemptRequest.getEffectiveDate(), DateUtils.DEFAULT_DATE_PATTERN),
+                    DateUtils.getDateByFormatEnLocale(deleteExemptRequest.getEndDate(), DateUtils.DEFAULT_DATE_PATTERN),
+                    deleteBy,
+                    DateUtils.getCurrentDate()
+                    );
+        }
+
         return response;
+    }
+
+    private DccGlobalParameterRepo dccGlobalParameterRepo;
+
+    private String ffGetCheckExemptDCBOS() {
+//        D_GetDCGbPara
+//        "DCC_SECTION_NAME",  "CONFIG")
+//     "DCC_KEYWORD", "CHECK_EXEMPT_DC_BOS"
+//     "DCC_SQL_STRING", "K"
+        try {
+            List<CommonDropdownListDto> listConfig = dccGlobalParameterRepo.getInfoByKeyWordAndSectionName("CHECK_EXEMPT_DC_BOS","CONFIG");
+            if(listConfig !=null && listConfig.isEmpty()){
+                return listConfig.get(0).getVal();
+            }
+        } catch (Exception e) {
+            log.error("error when get ffGetCheckExemptDCBOS",e);
+        }
+        return null;
+    }
+
+    private void ffGetNegoExemSff(String custAccNo, String billingAccNo, String mobileNo, String mode, String startdate, String enddate, String exemptLevel) {
+//                   PLUGIN.DCCFNG_EXEMPT_SFF_ASYNC('D_GetNGExemSFF',:ca,:ba,:mobile,:mode,to_date(:startdate,'YYYY/MM/DD'),to_date(:enddate,'YYYY/MM/DD'),:exempt_level);
+        dccExemptRepo.ffGetNegoExemSff(custAccNo,billingAccNo,mobileNo,mode,startdate,enddate,exemptLevel);
     }
 
     @Override
@@ -483,6 +581,98 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
                 .build();
 
         dccExemptHistoryRepo.saveAndFlush(dccExemptHistory);
+    }
+
+
+    private void ffSaveDataBOS(String billingAccNum,String mobileNum,String mStrCheckExemptDCBOS,
+                               String moduleCode,String modeId,String inOperType,
+                               String exemptLevel,Date effectiveDate,Date endDate,String updateBy,Date updateDate ) throws ExemptException {
+        //1. D_GetDCBillSys
+        /*
+            select b.BILLING_SYSTEM "
+					" from BILLING_PROFILE b "
+					" where b.OU_NUM = :billing_acc_num
+         */
+        String biilingSystem = commonService.getBillingSystem(billingAccNum);
+
+        if("BOS".equalsIgnoreCase(biilingSystem)
+                && "Y".equalsIgnoreCase(mStrCheckExemptDCBOS)) {
+
+            //2. A_DCExemptBOS
+          /*
+        * If strBilling_System = "BOS" Then
+        If mStrCheckExempt_DC_BOS <> "Y" Then */
+            // sendcallbuf = (FBFR32 *) FADD32(sendcallbuf, DCC_SQL_STRING,  "N", 2);
+        /*
+
+       DCC_SO_NBR = select TO_CHAR(ADD_MONTHS(SYSDATE,6516),'YYMM')||'9'||LTRIM(TO_CHAR(dcc_exempt_gen_bos_seq.nextval,'099999')) exempt_bos_seq FROM DUAL
+         */
+            String tmpSoNbr = dmsem002SetTreatmentExemptDao.getDCBOSSeq();
+
+            // D_GetDCBOSSeq
+            if("2".equalsIgnoreCase(inOperType)) {
+                // if  (in_oper_type == 2) DCC_OPER_TYPE
+                //         DCC_BILLING_ACC_NUM,  in_billing_acc_num
+                //          DCC_MODULE_CODE,  'CCS'
+                //        DCC_MODE_ID,  'DC'
+                //        DCC_SQL_STRING 'O'
+                // DCC_ORIGINAL_SO_NBR = D_GetDCBOSSeq
+        /*
+        select e.SO_NBR from DCC_EXEMPT e "
+				" where e.BILLING_ACC_NUM = :billing_acc_num "
+				" and e.MODULE_CODE = :module_code "
+				" and e.MODE_ID = :mode_id
+         */
+                List<String> originalSoNbr = dccExemptRepo.getOriginalSoNBR(billingAccNum,moduleCode,modeId);
+
+            }
+            // end if
+
+            //CCS_SetExCLBOS
+            // wait for tuxedo proc
+//        DCC_RESULT_CODE
+//        if  (out_bos_result_code == 1000000)
+            if(setExCLBOS() == 1000000L) {
+//            D_UpdDCEMBOS
+        /*
+        update DCC_EXEMPT e set e.SO_NBR = :so_nbr "
+						", SENT_BOS_FLAG = (select g.KEYWORD_VALUE from DCC_GLOBAL_PARAMETER g where g.SECTION_NAME = 'CONFIG_BOS_EXEMPT' and g.KEYWORD = 'SEND_BOS_FLAG') "
+					" where e.BILLING_ACC_NUM = :billing_acc_num "
+					"and e.MOBILE_NUM = :mobile_num "
+					"and e.MODULE_CODE = :module_code "
+					"and e.MODE_ID = :mode_id
+         */
+                dccExemptRepo.updateSONBR(tmpSoNbr,billingAccNum,mobileNum,moduleCode,modeId);
+            }else {
+//        else
+//            D_InsDCEMBOS
+                DccBosExemptId dccBosExemptId = DccBosExemptId.builder()
+                        .billing_acc_num(billingAccNum)
+                        .exemptLevel(exemptLevel)
+                        .effectiveDat(effectiveDate)
+                        .endDat(endDate)
+                        .lastUpdateBy(updateBy)
+                        .lastUpdateDtm(updateDate)
+                        .modeId(modeId)
+                        .mobileNum(mobileNum)
+                        .moduleCode(moduleCode)
+                        .operType(inOperType).build();
+
+                DccBosExempt dccBosExempt = DccBosExempt.builder().id(dccBosExemptId).build();
+                dccExemptBosRepo.saveAndFlush(dccBosExempt);
+        /*
+        insert into DCC_BOS_EXEMPT "
+					"(billing_acc_num, mobile_num, module_code, mode_id, exempt_level, "
+					"effective_dat, end_dat, oper_type, last_update_by, last_update_dtm) "
+					"values (:billing_acc_num, :mobile_num, :module_code, :mode_id, :exempt_level, "
+							"to_date(:effective_dat,'yyyy-mm-dd'), to_date(:end_dat,'yyyy-mm-dd'), :oper_type,  user, sysdate)
+         */
+            }
+        }
+    }
+
+    private Long setExCLBOS(){
+        return 1000000L;
     }
 
 }

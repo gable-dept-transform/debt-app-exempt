@@ -15,7 +15,7 @@ import th.co.ais.mimo.debt.exempt.dto.DccExemptCateMasterDto;
 import th.co.ais.mimo.debt.exempt.model.CommonDropDownResponse;
 import th.co.ais.mimo.debt.exempt.model.ExemptCateDetailResponse;
 import th.co.ais.mimo.debt.exempt.model.ExemptCateMasterResponse;
-import th.co.ais.mimo.debt.exempt.service.CommonService;
+import th.co.ais.mimo.debt.exempt.service.impl.CommonService;
 
 import java.util.List;
 

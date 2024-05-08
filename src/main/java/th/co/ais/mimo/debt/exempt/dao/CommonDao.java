@@ -10,4 +10,7 @@ public interface CommonDao {
     public List<DccExemptCateMasterDto> searchExemptCateMaster() throws ExemptException;
 
     public List<DccExemptCateDetailDto> searchExemptCateDetail(String cateCode)throws ExemptException;
+
+    public String getBillingSystem(String billingAccNum)throws ExemptException;
+
 }

@@ -17,6 +17,12 @@ public interface DccExemptRepo extends JpaRepository<DccExemptModel,String> {
             "  where e.cust_acc_num = :custAccNum AND EXEMPT_LEVEL IN (:exemptLevel)",nativeQuery = true)
     public Long countExemptByLevel(@Param("custAccNum") String custAccNum,@Param("exemptLevel") List<String> exemptLevel);
 
+    @Query(value="select e.SO_NBR from DCC_EXEMPT e "+
+            " where e.BILLING_ACC_NUM = :billing_acc_num "+
+            " and e.MODULE_CODE = :module_code "+
+            " and e.MODE_ID = :mode_id ",nativeQuery = true)
+    public List<String> getOriginalSoNBR(@Param("billing_acc_num") String billingAccNum,@Param("module_code") String moduleCode,@Param("mode_id") String modeId);
+
     @Query(value = "update dcc_exempt set  end_dat = :endDate, \n" +
             " update_reason   = :updateReason, update_location = :updateLocation,\n" +
             " last_update_by  = :lastUpdateBy, last_update_dtm = sysdate ,\n" +
@@ -82,4 +88,16 @@ public interface DccExemptRepo extends JpaRepository<DccExemptModel,String> {
                                 @Param("moduleCode") String moduleCode,
                                 @Param("modeId") String modeId,
                                 @Param("exemptLevel") String exemptLevel);
+
+    @Query(value = "update DCC_EXEMPT e set e.SO_NBR = :so_nbr \n" +
+            ", SENT_BOS_FLAG = (select g.KEYWORD_VALUE from DCC_GLOBAL_PARAMETER g where g.SECTION_NAME = 'CONFIG_BOS_EXEMPT' and g.KEYWORD = 'SEND_BOS_FLAG') \n" +
+            " where e.BILLING_ACC_NUM = :billing_acc_num \n" +
+            "and e.MOBILE_NUM = :mobile_num \n" +
+            "and e.MODULE_CODE = :module_code \n" +
+            "and e.MODE_ID = :mode_id",nativeQuery = true)
+    @Modifying
+    public int updateSONBR(@Param("so_nbr") String soNbr,@Param("billing_acc_num") String billingAccNum,@Param("mobile_num") String mobileNum,@Param("module_code") String moduleCode,@Param("mode_id") String modeId);
+
+    @Query(value = "CALL DCCFNG_EXEMPT_SFF_ASYNC('D_GetNGExemSFF',:ca,:ba,:mobile,:mode,to_date(:startdate,'YYYY/MM/DD'),to_date(:enddate,'YYYY/MM/DD'),:exempt_level);", nativeQuery = true)
+    public void ffGetNegoExemSff(@Param("ca") String custAccNum,@Param("ba") String billingAccNum,@Param("mobile") String mobileNum,@Param("mode") String mode,@Param("startdate") String startdate,@Param("enddate") String enddate,@Param("exempt_level") String exemptLevel);
 }
