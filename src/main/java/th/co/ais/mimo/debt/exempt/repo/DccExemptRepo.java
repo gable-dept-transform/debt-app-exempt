@@ -14,8 +14,8 @@ public interface DccExemptRepo extends JpaRepository<DccExemptModel,String> {
 
     @Query(value = "select count(1)\n" +
             " from dcc_exempt e \n" +
-            "  where e.cust_acc_num = :custAccNum AND EXEMPT_LEVEL IN (:exemptLevel)",nativeQuery = true)
-    public Long countExemptByLevel(@Param("custAccNum") String custAccNum,@Param("exemptLevel") List<String> exemptLevel);
+            "  where e.cust_acc_num = :custAccNum and instr(:modeId,e.mode_id) > 0 and EXEMPT_LEVEL IN (:exemptLevel)",nativeQuery = true)
+    public Long countExemptByLevel(@Param("custAccNum") String custAccNum,@Param("modeId") String modeId,@Param("exemptLevel") List<String> exemptLevel);
 
     @Query(value="select e.SO_NBR from DCC_EXEMPT e "+
             " where e.BILLING_ACC_NUM = :billing_acc_num "+

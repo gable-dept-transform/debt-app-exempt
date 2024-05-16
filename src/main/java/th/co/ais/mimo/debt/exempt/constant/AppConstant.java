@@ -7,6 +7,9 @@ public class AppConstant {
 	public static final String FAIL = "fail";
 
 	public static final String ADD_EXEMPT_WARNING_LOW_LEVEL_FOUND = "WARN_LOW_LEVEL_EXEMPT_FOUND";
+//	public static final String ADD_EXEMPT_WARNING_LOW_LEVEL_BA_FOUND = "WARN_LOW_LEVEL_BA_EXEMPT_FOUND";
+//
+//	public static final String ADD_EXEMPT_WARNING_LOW_LEVEL_MO_FOUND = "WARN_LOW_LEVEL_MO_EXEMPT_FOUND";
 
 	public static final String ADD_EXEMPT_WARNING_EXEMPT_FOUND = "WARN_EXEMPT_FOUND";
 

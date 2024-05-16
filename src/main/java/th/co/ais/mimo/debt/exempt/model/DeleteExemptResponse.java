@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import th.co.ais.mimo.debt.exempt.dto.CustAccDto;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -14,4 +17,7 @@ import lombok.NoArgsConstructor;
 public class DeleteExemptResponse {
     private String errorMsg;
     private String responseCode;
+
+    private List<CustAccDto> successList;
+    private List<CustAccDto> errorList;
 }

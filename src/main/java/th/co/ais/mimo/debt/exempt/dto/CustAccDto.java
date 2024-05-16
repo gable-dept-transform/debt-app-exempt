@@ -1,4 +1,4 @@
-package th.co.ais.mimo.debt.exempt.model;
+package th.co.ais.mimo.debt.exempt.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -11,12 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AddExemptResponse {
-    private String errorMsg;
-    private String responseCode;
-
-    private String exemptLevel;
-    private String custAccNum;
-    private String mode;
-    private Long countExempt;
+public class CustAccDto {
+    private String custAccNo;
+    private String billingAccNo;
+    private String mobileNo;
 }

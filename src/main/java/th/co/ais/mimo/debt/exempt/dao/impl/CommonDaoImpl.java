@@ -26,7 +26,7 @@ public class CommonDaoImpl implements CommonDao {
     public List<DccExemptCateMasterDto> searchExemptCateMaster() throws ExemptException {
         try{
             String sql = "select cate_code, cate_description,exempt_reason,active_flag, \n" +
-                    "  last_update_by, to_char(last_update_dtm,'YYYY/MM/DD  HH24:MI:SS') last_update_dtm\n" +
+                    "  last_update_by, to_char(last_update_dtm,'DD/MM/YYYY  HH24:MI:SS') last_update_dtm\n" +
                     " from dcc_exempt_cate_master\n" +
                     " where active_flag = 'Y'\n" +
                     " order by cate_code";
@@ -41,8 +41,8 @@ public class CommonDaoImpl implements CommonDao {
 
     public List<DccExemptCateDetailDto> searchExemptCateDetail(String cateCode)throws ExemptException{
         try{
-            String sql = "select mode_id,module_code,exempt_duration, to_char(expire_dat,'YYYY/MM/DD') expire_date, \n" +
-                    "last_update_by, to_char(last_update_dtm,'YYYY/MM/DD  HH24:Mi:SS') last_update_dtm, exempt_level  \n" +
+            String sql = "select mode_id,module_code,exempt_duration, to_char(expire_dat,'DD/MM/YYYY') expire_date, \n" +
+                    "last_update_by, to_char(last_update_dtm,'DD/MM/YYYY  HH24:Mi:SS') last_update_dtm, exempt_level  \n" +
                     "from dcc_exempt_cate_detail where cate_code = :cate_code\n" +
                     "order by mode_id";
             Query query = entityManager.createNativeQuery(sql, "searchExemptCateDetailDtoMapping");

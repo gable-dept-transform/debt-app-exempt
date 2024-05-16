@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import th.co.ais.mimo.debt.exempt.dto.CustAccDto;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -14,9 +17,9 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DeleteExemptRequest {
 
-    private String custAccNo;
-    private String billingAccNo;
-    private String mobileNo;
+
+    List<CustAccDto> custAcc;
+
     private String module;
     private String exemptLevel;
     private String mode;

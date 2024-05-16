@@ -7,7 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import th.co.ais.mimo.debt.exempt.dto.AddExemptCustAccDto;
+import th.co.ais.mimo.debt.exempt.dto.CustAccDto;
 import th.co.ais.mimo.debt.exempt.dto.DccExemptCateDetailDto;
+import th.co.ais.mimo.debt.exempt.dto.ExemptDetailDto;
 
 import java.util.List;
 
@@ -18,14 +20,12 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UpdateExemptRequest {
 
-    private String custAccNo;
-    private String billingAccNo;
-    private String mobileNo;
-    private String module;
+    List<ExemptDetailDto> exemptDetail;
     private String exemptLevel;
+    private String module;
     private String mode;
     private String reason;
     private String endDate;
-    private Long noOfExempt;
+
 
 }
