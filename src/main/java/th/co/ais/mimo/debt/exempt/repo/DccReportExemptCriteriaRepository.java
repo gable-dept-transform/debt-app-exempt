@@ -9,21 +9,21 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import th.co.ais.mimo.debt.exempt.entity.DccReportExemptCriteria;
+import th.co.ais.mimo.debt.exempt.entity.DccReportExemptCriteriaId;
 
 @Repository
-public interface DccReportExemptCriteriaRepository extends JpaRepository<DccReportExemptCriteria, String> {
+public interface DccReportExemptCriteriaRepository
+                extends JpaRepository<DccReportExemptCriteria, DccReportExemptCriteriaId> {
 
         @Query(value = " SELECT * FROM {h-schema}DCC_REPORT_EM_CRITERIA " +
                         "WHERE REPORT_ID = :reportId AND REPORT_SEQ = :reportSeq  ", nativeQuery = true)
-        DccReportExemptCriteria getReportExemptCriteriaByReportIdandReportSeq(@Param("reportId") String reportId,
+        List<DccReportExemptCriteria> getReportExemptCriteriaByReportIdandReportSeq(@Param("reportId") String reportId,
                         @Param("reportSeq") String reportSeq) throws Exception;
 
-        List<DccReportExemptCriteria> findBy(Example<DccReportExemptCriteria> example);
-
-        @Query(value = " delete from {h-schema}DCC_REPORT_EM_CRITERIA " +
-                        "where report_id = :reportId and  report_seq =:reportSeq and report_status <> 'DL' ", nativeQuery = true)
-        void deleteReportExemptCriteria(@Param("reportId") String reportId,
-                        @Param("reportSeq") String reportSeq) throws Exception;
+        // @Query(value = " delete from {h-schema}DCC_REPORT_EM_CRITERIA " +
+        //                 "where report_id = :reportId and report_seq = :reportSeq and report_status <> 'DL' ", nativeQuery = true)
+        // List<DccReportExemptCriteria> deleteReportExemptCriteria(@Param("reportId") String reportId,
+        //                 @Param("reportSeq") String reportSeq) throws Exception;
 
         @Query(value = " Update {h-schema}DCC_REPORT_EM_CRITERIA " +
                         "set LAST_UPDATE_BY = :lastUpdateBy, last_update_dtm = sysdate, " +

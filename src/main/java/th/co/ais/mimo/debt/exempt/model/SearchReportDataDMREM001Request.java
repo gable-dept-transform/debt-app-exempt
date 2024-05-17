@@ -1,6 +1,6 @@
 package th.co.ais.mimo.debt.exempt.model;
 
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -17,10 +17,10 @@ public class SearchReportDataDMREM001Request {
     private String reportSeq;
     private String reportStatus;
     private String criteriaBy;
-    private Date criteriaDateFrom;
-    private Date criteriaDateTo;
-    private Date processDateFrom;
-    private Date processDateTo;
-    private Date fvBlnACSLocation;
+    private Calendar criteriaDateFrom;
+    private Calendar criteriaDateTo;
+    private Calendar processDateFrom;
+    private Calendar processDateTo;
+    private String fvBlnACSLocation;
     private List<Integer> acsLocationList;
 }

@@ -82,11 +82,10 @@ public class ReportDMREM001Controller {
     public ResponseEntity<DeleteReportDMREM001Response> deleteInformation(
             RequestEntity<DeleteReportDMREM001Request> request) throws Exception {
         DeleteReportDMREM001Response response = new DeleteReportDMREM001Response();
-        DataDMREM001 resultModel = new DataDMREM001();
         String errorMsg = null;
         try {
             if (request != null) {
-                resultModel = reportDMREM001Service.saveOrUpdateInfo(request.getBody());
+                reportDMREM001Service.deleteReportInformation(request.getBody());
             } else {
                 errorMsg = "Delete Report : request data not found";
             }
@@ -96,7 +95,8 @@ public class ReportDMREM001Controller {
             log.error("Exception searchReportData : {}", e.getMessage(), e);
             errorMsg = "Delete Report Internal server Error process";
         } finally {
-            response = new DeleteReportDMREM001Response("", "", errorMsg);
+            response = new DeleteReportDMREM001Response(request.getBody().getReportId(),
+                    request.getBody().getReportSeq(), errorMsg);
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

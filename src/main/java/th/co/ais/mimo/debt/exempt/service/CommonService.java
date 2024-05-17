@@ -1,21 +1,29 @@
 package th.co.ais.mimo.debt.exempt.service;
 
-import jakarta.transaction.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import jakarta.transaction.Transactional;
 import th.co.ais.mimo.debt.exempt.dao.CommonDao;
+import th.co.ais.mimo.debt.exempt.dto.CommonCheckListDto;
 import th.co.ais.mimo.debt.exempt.dto.CommonDropdownListDto;
+import th.co.ais.mimo.debt.exempt.dto.CpLocationDto;
 import th.co.ais.mimo.debt.exempt.dto.DccExemptCateDetail;
 import th.co.ais.mimo.debt.exempt.dto.DccExemptCateMaster;
 import th.co.ais.mimo.debt.exempt.dto.GenReportSeqDto;
+import th.co.ais.mimo.debt.exempt.enums.ConfigLovEnums;
 import th.co.ais.mimo.debt.exempt.enums.ConfigSectionNameEnums;
 import th.co.ais.mimo.debt.exempt.exception.ExemptException;
+import th.co.ais.mimo.debt.exempt.repo.AscLocationRelationRepository;
+import th.co.ais.mimo.debt.exempt.repo.CpLocationMasterRepository;
 import th.co.ais.mimo.debt.exempt.repo.DccGlobalParameterRepo;
 import th.co.ais.mimo.debt.exempt.repo.DccReasonRepo;
 import th.co.ais.mimo.debt.exempt.repo.DccReportMasterRepo;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import th.co.ais.mimo.debt.exempt.repo.SffLovMasterRepository;
 
 @Service
 @Transactional
@@ -32,6 +40,15 @@ public class CommonService {
 
     @Autowired
     private DccReportMasterRepo dccReportMasterRepo;
+
+    @Autowired
+    private SffLovMasterRepository sffLovMasterRepository;
+
+    @Autowired
+    private AscLocationRelationRepository ascLocationRelationRepository;
+
+    @Autowired
+    private CpLocationMasterRepository cpLocationMasterRepository;
 
     public List<CommonDropdownListDto> getMobileStatus() throws Exception {
         return dccGlobalParameterRepo.getInfoByKeyWordAndSectionName(ConfigSectionNameEnums.MOBILE_STATUS.toString(),
@@ -145,6 +162,118 @@ public class CommonService {
             // log.error("Exception getGenReportSeq : {}", e.getMessage(), e);
             throw e;
         }
+    }
+
+    public List<CommonDropdownListDto> getReportStatus() throws Exception {
+        return dccGlobalParameterRepo.getInfoBySectionName(ConfigSectionNameEnums.REPORT_STATUS.toString());
+    }
+
+    public List<CommonDropdownListDto> getCompanyCode(String sectionName) throws Exception {
+        if (StringUtils.isBlank(sectionName)) {
+            sectionName = ConfigSectionNameEnums.CRITERIA.toString();
+        }
+
+        return dccGlobalParameterRepo.getInfoByKeyWordAndSectionName(ConfigSectionNameEnums.COMPANY_CODE.toString(),
+                sectionName);
+
+    }
+
+    public List<CommonDropdownListDto> getExemptStatus(String sectionName) throws Exception {
+        if (StringUtils.isBlank(sectionName)) {
+            sectionName = ConfigSectionNameEnums.CRITERIA.toString();
+        }
+
+        return dccGlobalParameterRepo.getInfoByKeyWordAndSectionNameCaseDropdown(
+                ConfigSectionNameEnums.EXEMPT_STATUS.toString(),
+                sectionName);
+    }
+
+    public List<CommonDropdownListDto> getExemptFormat(String sectionName) throws Exception {
+        if (StringUtils.isBlank(sectionName)) {
+            sectionName = ConfigSectionNameEnums.CRITERIA.toString();
+        }
+
+        return dccGlobalParameterRepo.getInfoByKeyWordAndSectionNameCaseDropdown(
+                ConfigSectionNameEnums.EXEMPT_FORMAT.toString(),
+                sectionName);
+    }
+
+    public List<CommonDropdownListDto> getGroupByForSummary(String sectionName) throws Exception {
+        return dccGlobalParameterRepo.getInfoByKeyWordAndSectionNameCaseDropdown(
+                ConfigSectionNameEnums.EXEMPT_GROUP_REPORT.toString(),
+                sectionName);
+    }
+
+    public List<CommonDropdownListDto> getExemptModeRep() throws Exception {
+        return dccGlobalParameterRepo.getInfoByKeyWordAndSectionName(
+                ConfigSectionNameEnums.EXEMPT_DMS_MODE_REP.toString(),
+                ConfigSectionNameEnums.EXEMPT_MODE_REP.toString());
+    }
+
+    public List<CommonDropdownListDto> getExemptMode() throws Exception {
+        return dccGlobalParameterRepo.getInfoBySectionNameCaseMulti(ConfigSectionNameEnums.EXEMPT_MODE.toString());
+    }
+
+    public List<CommonDropdownListDto> getExemptLevel(String sectionName) throws Exception {
+        if (StringUtils.isBlank(sectionName)) {
+            sectionName = ConfigSectionNameEnums.CRITERIA.toString();
+        }
+
+        return dccGlobalParameterRepo.getInfoByKeyWordAndSectionNameCaseDropdown(
+                ConfigSectionNameEnums.EXEMPT_LEVEL.toString(),
+                sectionName);
+    }
+
+    public List<CommonDropdownListDto> getExemptActionCaseDropdown() throws Exception {
+        return dccGlobalParameterRepo.getInfoByKeyWordAndSectionNameCaseDropdown(
+                ConfigSectionNameEnums.EXEMPT_ACTION.toString(),
+                ConfigSectionNameEnums.CRITERIA.toString());
+    }
+
+    public List<CommonDropdownListDto> getMobileStatusCaseDropdown(String sectionName) throws Exception {
+        if (StringUtils.isBlank(sectionName)) {
+            sectionName = ConfigSectionNameEnums.CRITERIA.toString();
+        }
+
+        return dccGlobalParameterRepo.getInfoByKeyWordAndSectionNameCaseDropdown(
+                ConfigSectionNameEnums.MOBILE_STATUS.toString(),
+                sectionName);
+    }
+
+    public List<CommonDropdownListDto> getExemptMobileStatus() throws Exception {
+        return dccGlobalParameterRepo.getInfoByKeyWordAndSectionNameCaseDropdown(
+                ConfigSectionNameEnums.EXEMPT_MOBILE_STATUS.toString(),
+                ConfigSectionNameEnums.EXEMPT_MODE_REP.toString());
+    }
+
+    public List<CommonCheckListDto> getAccountCategory() throws Exception {
+        return sffLovMasterRepository.getLovByLovType(ConfigLovEnums.ACCOUNT_CATEGORY.toString());
+    }
+
+    public List<CommonCheckListDto> getAccountSubCategory(String categoryName) throws Exception {
+        return sffLovMasterRepository.getSubLovByLovTypeandSublovTypeandCategory(
+                ConfigLovEnums.ACCOUNT_CATEGORY.toString(),
+                ConfigLovEnums.ACCOUNT_SUBCATEGORY.toString(), categoryName);
+    }
+
+    public Integer getASCLocationList(String username) throws Exception {
+        return ascLocationRelationRepository.getAscLocationList(username).get(0);
+    }
+
+    public List<CpLocationDto> getLocationList(Integer locationId) throws Exception {
+        if (locationId != null) {
+
+            return cpLocationMasterRepository.getLocationListByLocationId(locationId);
+
+        } else {
+            return cpLocationMasterRepository.getLocationList();
+        }
+    }
+
+    public List<CommonDropdownListDto> getInfoByKeyWordAndSectionNameCaseDropdown(String keyword, String sectionName) throws Exception {
+        return dccGlobalParameterRepo.getInfoByKeyWordAndSectionNameCaseDropdown(
+                keyword,
+                sectionName);
     }
 
 }

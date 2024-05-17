@@ -18,7 +18,7 @@ public class DataDMREM001 implements Serializable {
     private String reportSeq;
     private Date criteriaDate;
     private String criteriaBy;
-    private String criteriaLocation;
+    private Integer criteriaLocation;
     private Date processDate;
     private String reportStatus;
     // private String reportStatusDesc;

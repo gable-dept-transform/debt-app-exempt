@@ -1,7 +1,7 @@
 package th.co.ais.mimo.debt.exempt.model;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.util.Calendar;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SaveORUpdateDMREM001Request {
     private String operationMode;
-    private String location;
+    private Integer location;
     private String reportId;
     private String reportSeq;
     private String reportStatus;
@@ -29,13 +29,13 @@ public class SaveORUpdateDMREM001Request {
     private String exemptActionList;
     private String mobileStatusList;
     private String locationList;
-    private Date processDate;
-    private Date effectiveDateFrom;
-    private Date effectiveDateTo;
-    private Date endDateFrom;
-    private Date endDateTo;
-    private Date expireDateFrom;
-    private Date expireDateTo;
+    private Calendar processDate;
+    private Calendar effectiveDateFrom;
+    private Calendar effectiveDateTo;
+    private Calendar endDateFrom;
+    private Calendar endDateTo;
+    private Calendar expireDateFrom;
+    private Calendar expireDateTo;
     private BigDecimal amountFrom;
     private BigDecimal amountTo;
     private String catSubCateList;

@@ -3,7 +3,18 @@ package th.co.ais.mimo.debt.exempt.enums;
 public enum ConfigSectionNameEnums {
     MOBILE_STATUS,
     EXEMPT_ACTION,
+    COMPANY_CODE,
+    EXEMPT_STATUS,
+    EXEMPT_FORMAT,
+    EXEMPT_GROUP_REPORT,
+    EXEMPT_DMS_MODE_REP,
+    EXEMPT_LEVEL,
+    EXEMPT_MOBILE_STATUS,
 
     CRITERIA,
-    EXEMPT_CRITERIA;
+    CRITERIA_REPORT_EM,
+    EXEMPT_CRITERIA,
+    REPORT_STATUS,
+    EXEMPT_MODE_REP,
+    EXEMPT_MODE,
 }

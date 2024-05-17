@@ -1,5 +1,8 @@
 package th.co.ais.mimo.debt.exempt.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,17 +10,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import th.co.ais.mimo.debt.exempt.dto.CommonCheckListDto;
 import th.co.ais.mimo.debt.exempt.dto.CommonDropdownListDto;
+import th.co.ais.mimo.debt.exempt.dto.CpLocationDto;
 import th.co.ais.mimo.debt.exempt.dto.DccExemptCateDetail;
 import th.co.ais.mimo.debt.exempt.dto.DccExemptCateMaster;
+import th.co.ais.mimo.debt.exempt.model.AscLocationListResponse;
+import th.co.ais.mimo.debt.exempt.model.CommonCheckListResponse;
 import th.co.ais.mimo.debt.exempt.model.CommonDropDownResponse;
 import th.co.ais.mimo.debt.exempt.model.ExemptCateDetailResponse;
 import th.co.ais.mimo.debt.exempt.model.ExemptCateMasterResponse;
+import th.co.ais.mimo.debt.exempt.model.LocationListResponse;
 import th.co.ais.mimo.debt.exempt.service.CommonService;
-
-import java.util.List;
 
 
 @RestController
@@ -208,6 +217,365 @@ public class CommonController {
             errorMsg = "Get cate Internal server Error process";
         } finally {
             response = new ExemptCateDetailResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/drop-down-list/report-status")
+    public ResponseEntity<CommonDropDownResponse> getReportStatus()  {
+        CommonDropDownResponse response = new CommonDropDownResponse();
+        List<CommonDropdownListDto> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.getReportStatus();
+            if(resultList.isEmpty()){
+                errorMsg= "Report Status not found";
+            }else{
+                response.setResultList(resultList);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception getReportStatus : {}", e.getMessage(), e);
+            errorMsg = "Get ReportStatus Internal server Error process";
+        } finally {
+            response = new CommonDropDownResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/drop-down-list/company-code")
+    public ResponseEntity<CommonDropDownResponse> getCompanyCode(@RequestParam(name = "sectionName") String sectionName)  {
+        CommonDropDownResponse response = new CommonDropDownResponse();
+        List<CommonDropdownListDto> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.getCompanyCode(sectionName);
+            if(resultList.isEmpty()){
+                errorMsg= "Company Code not found";
+            }else{
+                response.setResultList(resultList);
+            }
+        } catch (Exception e) {
+            log.error("Exception getCompanyCode : {}", e.getMessage(), e);
+            errorMsg = "Get CompanyCode Internal server Error process";
+        } finally {
+            response = new CommonDropDownResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/drop-down-list/exempt-status")
+    public ResponseEntity<CommonDropDownResponse> getExemptStatus(@RequestParam(name = "sectionName") String sectionName)  {
+        CommonDropDownResponse response = new CommonDropDownResponse();
+        List<CommonDropdownListDto> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.getExemptStatus(sectionName);
+            if(resultList.isEmpty()){
+                errorMsg= "Exempt Status not found";
+            }else{
+                response.setResultList(resultList);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception getExemptStatus : {}", e.getMessage(), e);
+            errorMsg = "Get ExemptStatus Internal server Error process";
+        } finally {
+            response = new CommonDropDownResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/drop-down-list/exempt-format")
+    public ResponseEntity<CommonDropDownResponse> getExemptFormat(@RequestParam(name = "sectionName") String sectionName)  {
+        CommonDropDownResponse response = new CommonDropDownResponse();
+        List<CommonDropdownListDto> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.getExemptFormat(sectionName);
+            if(resultList.isEmpty()){
+                errorMsg= "Exempt Format not found";
+            }else{
+                response.setResultList(resultList);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception getExemptFormat : {}", e.getMessage(), e);
+            errorMsg = "Get ExemptFormat Internal server Error process";
+        } finally {
+            response = new CommonDropDownResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/drop-down-list/group-by-for-summary")
+    public ResponseEntity<CommonDropDownResponse> getGroupByForSummary(@RequestParam(name = "sectionName") String sectionName)  {
+        CommonDropDownResponse response = new CommonDropDownResponse();
+        List<CommonDropdownListDto> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.getGroupByForSummary(sectionName);
+            if(resultList.isEmpty()){
+                errorMsg= "Group By For Summary not found";
+            }else{
+                response.setResultList(resultList);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception getGroupByForSummary : {}", e.getMessage(), e);
+            errorMsg = "Get GroupByForSummary Internal server Error process";
+        } finally {
+            response = new CommonDropDownResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/drop-down-list/exempt-mode-rep")
+    public ResponseEntity<CommonDropDownResponse> getExemptModeRep()  {
+        CommonDropDownResponse response = new CommonDropDownResponse();
+        List<CommonDropdownListDto> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.getExemptModeRep();
+            if(resultList.isEmpty()){
+                errorMsg= "Exempt Mode Rep not found";
+            }else{
+                response.setResultList(resultList);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception getExemptModeRep : {}", e.getMessage(), e);
+            errorMsg = "Get Exempt Mode Rep Internal server Error process";
+        } finally {
+            response = new CommonDropDownResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/drop-down-list/exempt-mode")
+    public ResponseEntity<CommonDropDownResponse> getExemptMode()  {
+        CommonDropDownResponse response = new CommonDropDownResponse();
+        List<CommonDropdownListDto> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.getExemptMode();
+            if(resultList.isEmpty()){
+                errorMsg= "Exempt Mode not found";
+            }else{
+                response.setResultList(resultList);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception getExemptMode : {}", e.getMessage(), e);
+            errorMsg = "Get Exempt Mode Internal server Error process";
+        } finally {
+            response = new CommonDropDownResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/drop-down-list/exempt-level")
+    public ResponseEntity<CommonDropDownResponse> getExemptLevel(@RequestParam(name = "sectionName") String sectionName)  {
+        CommonDropDownResponse response = new CommonDropDownResponse();
+        List<CommonDropdownListDto> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.getExemptLevel(sectionName);
+            if(resultList.isEmpty()){
+                errorMsg= "Exempt Level not found";
+            }else{
+                response.setResultList(resultList);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception getExemptLevel : {}", e.getMessage(), e);
+            errorMsg = "Get Exempt Level Internal server Error process";
+        } finally {
+            response = new CommonDropDownResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/drop-down-list/exempt-action")
+    public ResponseEntity<CommonDropDownResponse> getExemptActionCaseDropdown()  {
+        CommonDropDownResponse response = new CommonDropDownResponse();
+        List<CommonDropdownListDto> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.getExemptActionCaseDropdown();
+            if(resultList.isEmpty()){
+                errorMsg= "Exempt Action not found";
+            }else{
+                response.setResultList(resultList);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception getExemptAction : {}", e.getMessage(), e);
+            errorMsg = "Get Exempt Action Internal server Error process";
+        } finally {
+            response = new CommonDropDownResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/drop-down-list/mobile-status")
+    public ResponseEntity<CommonDropDownResponse> getMobileStatusCaseDropdown(@RequestParam(name = "sectionName") String sectionName)  {
+        CommonDropDownResponse response = new CommonDropDownResponse();
+        List<CommonDropdownListDto> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.getMobileStatusCaseDropdown(sectionName);
+            if(resultList.isEmpty()){
+                errorMsg= "Mobile Status not found";
+            }else{
+                response.setResultList(resultList);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception getMobileStatus : {}", e.getMessage(), e);
+            errorMsg = "Get Mobile Status Internal server Error process";
+        } finally {
+            response = new CommonDropDownResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/drop-down-list/exempt-mobile-status")
+    public ResponseEntity<CommonDropDownResponse> getExemptMobileStatus()  {
+        CommonDropDownResponse response = new CommonDropDownResponse();
+        List<CommonDropdownListDto> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.getExemptMobileStatus();
+            if(resultList.isEmpty()){
+                errorMsg= "Mobile Status not found";
+            }else{
+                response.setResultList(resultList);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception getExemptMobileStatus : {}", e.getMessage(), e);
+            errorMsg = "Get Mobile Status Internal server Error process";
+        } finally {
+            response = new CommonDropDownResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/check-list/account-category")
+    public ResponseEntity<CommonCheckListResponse> getAccountCategory()  {
+        CommonCheckListResponse response = new CommonCheckListResponse();
+        List<CommonCheckListDto> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.getAccountCategory();
+            if(resultList.isEmpty()){
+                errorMsg= "Account Category not found";
+            }else{
+                response.setResultList(resultList);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception getAccountCategory : {}", e.getMessage(), e);
+            errorMsg = "Get Account Category Internal server Error process";
+        } finally {
+            response = new CommonCheckListResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/check-list/account-sub-category")
+    public ResponseEntity<CommonCheckListResponse> getAccountSubCategory(@RequestParam(name = "category") String category)  {
+        CommonCheckListResponse response = new CommonCheckListResponse();
+        List<CommonCheckListDto> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.getAccountSubCategory(category);
+            if(resultList.isEmpty()){
+                errorMsg= "Account Sub Category not found";
+            }else{
+                response.setResultList(resultList);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception getAccountSubCategory : {}", e.getMessage(), e);
+            errorMsg = "Get Account Sub Category Internal server Error process";
+        } finally {
+            response = new CommonCheckListResponse(resultList,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    @GetMapping(value = "/asc-location-list")
+    public ResponseEntity<AscLocationListResponse> getASCLocationList(@RequestHeader("x-userId") String username)  {
+        AscLocationListResponse response = new AscLocationListResponse();
+        Integer result = null;
+        String errorMsg = null;
+
+        try {
+            result = commonService.getASCLocationList(username);
+            if(result == null){
+                errorMsg= "ASCLocationList not found";
+            }else{
+                response.setResult(result);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception getASCLocationList : {}", e.getMessage(), e);
+            errorMsg = "Get ASCLocationList Internal server Error process";
+        } finally {
+            response = new AscLocationListResponse(result,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/location-list")
+    public ResponseEntity<LocationListResponse> getLocationList(@RequestParam(name = "filterLocation") boolean filterLocation, @RequestHeader("x-location-id") Integer locationId)  {
+        LocationListResponse response = new LocationListResponse();
+        List<CpLocationDto> result = new ArrayList<CpLocationDto>();
+        String errorMsg = null;
+
+        try {
+            if(filterLocation) {
+                result = commonService.getLocationList(locationId);
+            } else {
+                result = commonService.getLocationList(null);
+            }
+            
+            if(result.isEmpty()){
+                errorMsg= "getLocationList not found";
+            }else{
+                response.setResultList(result);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception getLocationList : {}", e.getMessage(), e);
+            errorMsg = "Get LocationList Internal server Error process";
+        } finally {
+            response = new LocationListResponse(result,errorMsg);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/global-parameter-dropdown/{keyword}/{sectionName}")
+    public ResponseEntity<CommonDropDownResponse> getInfoByKeyWordAndSectionNameCaseDropdown(@PathVariable(name = "keyword") String keyword, @PathVariable(name = "sectionName") String sectionName)  {
+        CommonDropDownResponse response = new CommonDropDownResponse();
+        List<CommonDropdownListDto> resultList = null;
+        String errorMsg = null;
+        try {
+            resultList = commonService.getInfoByKeyWordAndSectionNameCaseDropdown(keyword,sectionName);
+            if(resultList.isEmpty()){
+                errorMsg= "keyword "+keyword+" and sectionName + "+sectionName +" not found";
+            }else{
+                response.setResultList(resultList);
+            }
+
+        } catch (Exception e) {
+            log.error("Exception getInfoByKeyWordAndSectionNameCaseDropdown : {}", e.getMessage(), e);
+            errorMsg = "Get InfoByKeyWordAndSectionNameCaseDropdown Internal server Error process";
+        } finally {
+            response = new CommonDropDownResponse(resultList,errorMsg);
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

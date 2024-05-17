@@ -5,8 +5,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,12 +21,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "DCC_REPORT_EM_CRITERIA")
 public class DccReportExemptCriteria implements Serializable {
 
-	@Id
-    @Column(name = "REPORT_ID")
-    private String reportId;
-
-    @Column(name = "REPORT_SEQ")
-    private String reportSeq;
+	@EmbeddedId
+    DccReportExemptCriteriaId id;
 
     @Column(name = "CRITERIA_DTM")
     private Date criteriaDtm;
@@ -35,7 +31,7 @@ public class DccReportExemptCriteria implements Serializable {
     private String criteriaBy;
 
     @Column(name = "CRITERIA_LOCATION")
-    private String criteriaLocation;
+    private Integer criteriaLocation;
 
     @Column(name = "PROCESS_DAT")
     private Date processDate;

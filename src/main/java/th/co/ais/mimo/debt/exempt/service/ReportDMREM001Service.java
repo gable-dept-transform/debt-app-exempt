@@ -2,6 +2,7 @@ package th.co.ais.mimo.debt.exempt.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -16,8 +17,10 @@ import th.co.ais.mimo.debt.exempt.constant.AppConstant;
 import th.co.ais.mimo.debt.exempt.dao.ReportDMREM001Dao;
 import th.co.ais.mimo.debt.exempt.dto.GenReportSeqDto;
 import th.co.ais.mimo.debt.exempt.entity.DccCalendarTransaction;
+import th.co.ais.mimo.debt.exempt.entity.DccCalendarTransactionId;
 import th.co.ais.mimo.debt.exempt.entity.DccPrivacyLog;
 import th.co.ais.mimo.debt.exempt.entity.DccReportExemptCriteria;
+import th.co.ais.mimo.debt.exempt.entity.DccReportExemptCriteriaId;
 import th.co.ais.mimo.debt.exempt.exception.ExemptException;
 import th.co.ais.mimo.debt.exempt.model.DataDMREM001;
 import th.co.ais.mimo.debt.exempt.model.DeleteReportDMREM001Request;
@@ -76,6 +79,7 @@ public class ReportDMREM001Service {
     public DataDMREM001 saveOrUpdateInfo(SaveORUpdateDMREM001Request request) throws Exception {
         String errorMsg = null;
         try {
+            System.out.println("Call saveOrUpdateInfo");
             log.info("Call saveOrUpdateInfo");
             // Search report Data
             DataDMREM001 resultModel = new DataDMREM001();
@@ -113,10 +117,10 @@ public class ReportDMREM001Service {
                             "EM",
                             0,
                             dccReportExemptCriteria.getProcessDate(),
-                            dccReportExemptCriteria.getReportId(),
-                            Integer.parseInt(dccReportExemptCriteria.getReportSeq()),
-                            dccReportExemptCriteria.getReportSeq(),
-                            dccReportExemptCriteria.getReportSeq(),
+                            dccReportExemptCriteria.getId().getReportId(),
+                            Integer.parseInt(dccReportExemptCriteria.getId().getReportSeq()),
+                            dccReportExemptCriteria.getId().getReportSeq(),
+                            dccReportExemptCriteria.getId().getReportSeq(),
                             "N",
                             "Nothing",
                             "",
@@ -130,7 +134,8 @@ public class ReportDMREM001Service {
 
                     dccCalendarTransactionRepository.updateCalendarTransaction(dccReportExemptCriteria.getProcessDate(),
                             "N", dccReportExemptCriteria.getLastUpdateBy(), 0,
-                            "EM", 0, dccReportExemptCriteria.getReportSeq(), dccReportExemptCriteria.getReportId());
+                            "EM", 0, dccReportExemptCriteria.getId().getReportSeq(),
+                            dccReportExemptCriteria.getId().getReportId());
 
                     // Insert DCC Privacy Log
                     // DccPrivacyLog dccPrivacyLogRequest = new DccPrivacyLog();
@@ -139,9 +144,9 @@ public class ReportDMREM001Service {
                     // dccPrivacyLogRequest.setReferenceType(AppConstant.REFTYPE_EXEMPT_ACTION);
                     // insertDccPrivacyLog(dccPrivacyLogRequest);
                 }
-                resultModel.builder()
-                        .reportId(dccReportExemptCriteria.getReportId())
-                        .reportSeq(dccReportExemptCriteria.getReportSeq())
+                resultModel = DataDMREM001.builder()
+                        .reportId(dccReportExemptCriteria.getId().getReportId())
+                        .reportSeq(dccReportExemptCriteria.getId().getReportSeq())
                         .criteriaDate(dccReportExemptCriteria.getCriteriaDtm())
                         .criteriaBy(dccReportExemptCriteria.getCriteriaBy())
                         .criteriaLocation(dccReportExemptCriteria.getCriteriaLocation())
@@ -149,7 +154,8 @@ public class ReportDMREM001Service {
                         .reportStatus(dccReportExemptCriteria.getReportStatus())
                         .exemptStatus(dccReportExemptCriteria.getExemptStatus())
                         .companyCode(dccReportExemptCriteria.getCompanyCodeList())
-                        .modeIdList("")
+                        .modeIdList(dccReportExemptCriteria.getExemptModeList())
+                        .exemptFormat(dccReportExemptCriteria.getExemptFormat())
                         .exemptLevelList(dccReportExemptCriteria.getExemptLevelList())
                         .effectiveDateFrom(dccReportExemptCriteria.getEffectiveDateFrom())
                         .effectiveDateTo(dccReportExemptCriteria.getEffectiveDateTo())
@@ -190,20 +196,25 @@ public class ReportDMREM001Service {
         String errorMsg = null;
         try {
             DccReportExemptCriteria dccReportExemptCriteria = dccReportExemptCriteriaRepository
-                    .getReportExemptCriteriaByReportIdandReportSeq(request.getReportId(), request.getReportSeq());
+                    .getReportExemptCriteriaByReportIdandReportSeq(request.getReportId(), request.getReportSeq())
+                    .get(0);
 
             if (dccReportExemptCriteria == null) {
                 errorMsg = "Report Em Criteria Data not found";
                 throw new ExemptException("200", errorMsg);
             } else {
-
+                System.out.println(dccReportExemptCriteria.getReportStatus());
                 if (dccReportExemptCriteria.getReportStatus() == null) {
                     dccReportExemptCriteria.setReportStatus(AppConstant.REPORT_STATUS_WT);
                 }
 
                 if (AppConstant.REPORT_STATUS_WT.equals(dccReportExemptCriteria.getReportStatus())) {
-                    dccReportExemptCriteriaRepository.deleteReportExemptCriteria(request.getReportId(),
-                            request.getReportSeq());
+                    // List<DccReportExemptCriteria> delete = dccReportExemptCriteriaRepository.deleteReportExemptCriteria(request.getReportId(),
+                    //         request.getReportSeq());
+                            
+                    dccReportExemptCriteriaRepository.deleteById(DccReportExemptCriteriaId.builder().reportId(request.getReportId()).reportSeq(request.getReportSeq()).build());
+
+                    // System.out.print("delete" + delete);
 
                     dccCalendarTransactionRepository.deleteCalendarTransaction("EM", 0, new Date(),
                             request.getReportId(), request.getReportSeq());
@@ -217,7 +228,8 @@ public class ReportDMREM001Service {
 
                     dccCalendarTransactionRepository.updateCalendarTransaction(new Date(),
                             AppConstant.FLAG_Y, dccReportExemptCriteria.getLastUpdateBy(), 0,
-                            "EM", 0, dccReportExemptCriteria.getReportSeq(), dccReportExemptCriteria.getReportId());
+                            "EM", 0, dccReportExemptCriteria.getId().getReportSeq(),
+                            dccReportExemptCriteria.getId().getReportId());
                 }
             }
 
@@ -242,13 +254,15 @@ public class ReportDMREM001Service {
             Integer priorityNo,
             String username) {
 
-        DccCalendarTransaction request = new DccCalendarTransaction();
+        DccCalendarTransactionId id = new DccCalendarTransactionId();
+        id.setModeId(modeId);
+        id.setCriteriaId(criteriaId);
+        id.setRunDate(processDate);
+        id.setJobType(jobType);
+        id.setSetSeq(setSeq);
 
-        request.setModeId(modeId);
-        request.setCriteriaId(criteriaId);
-        request.setRunDate(processDate);
-        request.setJobType(jobType);
-        request.setSetSeq(setSeq);
+        DccCalendarTransaction request = new DccCalendarTransaction();
+        request.setId(id);
         request.setPreJobId(prejobId);
         request.setJobId(jobId);
         request.setRunResultFlag(runResultFlag);
@@ -284,7 +298,7 @@ public class ReportDMREM001Service {
 
     }
 
-    private String validateDateParameter(Date dateFrom, Date dateTo, String paramName) {
+    private String validateDateParameter(Calendar dateFrom, Calendar dateTo, String paramName) {
         if (dateFrom != null && dateTo == null) {
             return paramName + " Date To required";
         } else if (dateFrom == null && dateTo != null) {
@@ -336,10 +350,12 @@ public class ReportDMREM001Service {
                 return "Unable to edit because report status is not equal to WT";
             }
         } else if (AppConstant.FLAG_A.equals(request.getOperationMode())) {
-            if (new Date().after(request.getProcessDate())) {
+            if (Calendar.getInstance().after(request.getProcessDate())) {
                 return "Process date must be greater than or equal to current date";
             }
         }
+
+        
 
         errorMsg = validateDateParameter(request.getEffectiveDateFrom(), request.getEffectiveDateTo(), "Effective");
         if (errorMsg != null) {

@@ -9,9 +9,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import th.co.ais.mimo.debt.exempt.entity.DccCalendarTransaction;
+import th.co.ais.mimo.debt.exempt.entity.DccCalendarTransactionId;
 
 @Repository
-public interface DccCalendarTransactionRepository extends JpaRepository<DccCalendarTransaction, String> {
+public interface DccCalendarTransactionRepository extends JpaRepository<DccCalendarTransaction, DccCalendarTransactionId> {
 
         @Modifying
         @Query(value = "UPDATE {h-schema}DCC_CALENDAR_TRANSACTION " +

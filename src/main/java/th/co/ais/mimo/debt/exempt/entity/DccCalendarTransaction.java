@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -20,21 +21,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "DCC_CALENDAR_TRANSACTION")
 public class DccCalendarTransaction implements Serializable {
 
-    @Id
-    @Column(name = "MODE_ID")
-    private String modeId;
-
-    @Column(name = "CRITERIA_ID")
-    private Integer criteriaId;
-
-    @Column(name = "RUN_DAT")
-    private Date runDate;
-
-    @Column(name = "JOB_TYPE")
-    private String jobType;
-
-    @Column(name = "SET_SEQ")
-    private Integer setSeq;
+    @EmbeddedId
+    DccCalendarTransactionId id;
 
     @Column(name = "PREJOB_ID")
     private String preJobId;

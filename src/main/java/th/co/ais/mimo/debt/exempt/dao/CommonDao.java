@@ -10,4 +10,6 @@ public interface CommonDao {
     public List<DccExemptCateMaster> searchExemptCateMaster() throws ExemptException;
 
     public List<DccExemptCateDetail> searchExemptCateDetail(String cateCode)throws ExemptException;
+
+    public int getASCLocationListByUsername(String username) throws ExemptException;
 }

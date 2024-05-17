@@ -1,6 +1,8 @@
 package th.co.ais.mimo.debt.exempt.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 
 import jakarta.persistence.Column;
@@ -22,10 +24,10 @@ public class DccDMREM001Tmp implements Serializable {
 
     @Id
     @Column(name = "REPORT_ID")
-    private Long reportId;
+    private String reportId;
 
     @Column(name = "REPORT_SEQ")
-    private Long reportSeq;
+    private String reportSeq;
 
     @Column(name = "COMPANY_CODE")
     private String companyCode;
@@ -70,7 +72,7 @@ public class DccDMREM001Tmp implements Serializable {
     private String addReasonDesc;
 
     @Column(name = "ADD_LOCATION")
-    private String addLocation;
+    private Integer addLocation;
 
     @Column(name = "UPDATE_REASON_CODE")
     private String updateReasonCode;
@@ -79,7 +81,7 @@ public class DccDMREM001Tmp implements Serializable {
     private String updateReasonDesc;
 
     @Column(name = "UPDATE_LOCATION")
-    private String updateLocation;
+    private Integer updateLocation;
 
     @Column(name = "EFFECTIVE_DAT")
     private Date effectiveDat;
@@ -94,7 +96,7 @@ public class DccDMREM001Tmp implements Serializable {
     private String currBaStatus;
 
     @Column(name = "CURR_DEBT_MNY")
-    private Double currDebtMny;
+    private BigDecimal currDebtMny;
 
     @Column(name = "NO_OF_EXEMPT")
     private Integer noOfExempt;
@@ -124,7 +126,7 @@ public class DccDMREM001Tmp implements Serializable {
     private String addLocationDesc;
 
     @Column(name = "CURR_ID_MNY")
-    private Double currIdMny;
+    private BigDecimal currIdMny;
 
     @Column(name = "CATE_TYPE")
     private String cateType;

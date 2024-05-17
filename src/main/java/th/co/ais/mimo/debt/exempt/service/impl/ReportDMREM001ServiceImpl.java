@@ -17,8 +17,10 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
 import lombok.Setter;
+import th.co.ais.mimo.debt.exempt.constant.AppConstant;
 import th.co.ais.mimo.debt.exempt.dao.ReportDMREM001Dao;
 import th.co.ais.mimo.debt.exempt.entity.DccReportExemptCriteria;
+import th.co.ais.mimo.debt.exempt.entity.DccReportExemptCriteriaId;
 import th.co.ais.mimo.debt.exempt.model.DataDMREM001;
 import th.co.ais.mimo.debt.exempt.model.SaveORUpdateDMREM001Request;
 import th.co.ais.mimo.debt.exempt.model.SearchReportDataDMREM001Request;
@@ -54,7 +56,7 @@ public class ReportDMREM001ServiceImpl implements ReportDMREM001Dao {
             sql.append("exempt_format as \"exemptFormat\", ");
             sql.append("group_by_list as \"groupByForSummary\", ");
             sql.append("company_code as \"companyCode\", ");
-            sql.append("mode_id_list as \"modelList\", ");
+            sql.append("mode_id_list as \"modeIdList\", ");
             sql.append("exempt_level_list as \"exemptLevelList\", ");
             sql.append("effective_dat_from as \"effectiveDateFrom\", ");
             sql.append("effective_dat_to as \"effectiveDateTo\", ");
@@ -78,12 +80,16 @@ public class ReportDMREM001ServiceImpl implements ReportDMREM001Dao {
             sql.append("FROM dcc_report_em_criteria ");
             sql.append("WHERE 1=1 ");
 
-            if (request.getFvBlnACSLocation().equals("Y")) {
+            if (AppConstant.FLAG_Y.equals(request.getFvBlnACSLocation())) {
                 sql.append(" AND criteria_location IN (:userLoctionCodeList) ");
             }
 
             if (StringUtils.isNotBlank(request.getReportId())) {
                 sql.append("AND REPORT_ID = :reportId ");
+            }
+
+            if (StringUtils.isNotBlank(request.getReportStatus())) {
+                sql.append(" AND REPORT_STATUS = :reportStatus ");
             }
 
             if (StringUtils.isNotBlank(request.getReportSeq())) {
@@ -111,9 +117,15 @@ public class ReportDMREM001ServiceImpl implements ReportDMREM001Dao {
             if (StringUtils.isNotBlank(request.getReportId())) {
                 query.setParameter("reportId", request.getReportId());
             }
+
             if (StringUtils.isNotBlank(request.getReportSeq())) {
                 query.setParameter("reportSeq", request.getReportSeq());
             }
+
+            if (StringUtils.isNotBlank(request.getReportStatus())) {
+                query.setParameter("reportStatus", request.getReportStatus());
+            }
+
             if (StringUtils.isNotBlank(request.getCriteriaBy())) {
                 query.setParameter("criteriaBy", request.getCriteriaBy());
             }
@@ -127,8 +139,8 @@ public class ReportDMREM001ServiceImpl implements ReportDMREM001Dao {
                 query.setParameter("processDateTo", request.getProcessDateTo());
             }
 
-            if (request.getFvBlnACSLocation().equals("Y")) {
-                query.setParameter("userLoctionCodeList", request.getAcsLocationList().toString());
+            if (AppConstant.FLAG_Y.equals(request.getFvBlnACSLocation())) {
+                query.setParameter("userLoctionCodeList", request.getAcsLocationList().get(0));
             }
 
             result = SqlUtils.parseResult(query.getResultList(), DataDMREM001.class);
@@ -146,11 +158,13 @@ public class ReportDMREM001ServiceImpl implements ReportDMREM001Dao {
     public DccReportExemptCriteria saveDccReportExemptCriteria(SaveORUpdateDMREM001Request request)
             throws Exception {
 
+        DccReportExemptCriteriaId id = new DccReportExemptCriteriaId().builder().reportId(request.getReportId())
+                .reportSeq(request.getReportSeq()).build();
+
         DccReportExemptCriteria dccReportExemptCriteria = new DccReportExemptCriteria()
                 .builder()
-                .reportId(request.getReportId())
+                .id(id)
                 .reportStatus(request.getReportStatus())
-                .reportSeq(request.getReportSeq())
                 .companyCodeList(request.getCompanyCodeList())
                 .exemptStatus(request.getExemptStatus())
                 .exemptFormat(request.getExemptFormatList())
@@ -162,13 +176,13 @@ public class ReportDMREM001ServiceImpl implements ReportDMREM001Dao {
                 .exemptActionList(request.getExemptActionList())
                 .mobileStatusList(request.getMobileStatusList())
                 .locationList(request.getLocationList())
-                .processDate(request.getProcessDate())
-                .effectiveDateFrom(request.getEffectiveDateFrom())
-                .effectiveDateTo(request.getEffectiveDateTo())
-                .endDateFrom(request.getEndDateFrom())
-                .endDateTo(request.getEndDateTo())
-                .expireDateFrom(request.getExpireDateFrom())
-                .expireDateTo(request.getExpireDateTo())
+                .processDate(request.getProcessDate().getTime())
+                .effectiveDateFrom(request.getEffectiveDateFrom().getTime())
+                .effectiveDateTo(request.getEffectiveDateTo().getTime())
+                .endDateFrom(request.getEndDateFrom().getTime())
+                .endDateTo(request.getEndDateTo().getTime())
+                .expireDateFrom(request.getExpireDateFrom().getTime())
+                .expireDateTo(request.getExpireDateTo().getTime())
                 .locationFrom(0)
                 .locationTo(0)
                 .debtAgeFrom(new BigDecimal(0))
@@ -182,6 +196,9 @@ public class ReportDMREM001ServiceImpl implements ReportDMREM001Dao {
                 .cateSubCateList(request.getCatSubCateList())
                 .monthPeriod(request.getMonthPeriod())
                 .durationOver(request.getDurationOver())
+                .criteriaBy(request.getUsername())
+                .criteriaDtm(new Date())
+                .criteriaLocation(request.getLocation())
                 .lastUpdateBy(request.getUsername())
                 .lastUpdateDtm(new Date())
                 .build();
@@ -195,8 +212,8 @@ public class ReportDMREM001ServiceImpl implements ReportDMREM001Dao {
         // TODO Auto-generated method stub
         List<DccReportExemptCriteria> result = new ArrayList<DccReportExemptCriteria>();
         DccReportExemptCriteria dccReportExemptCriteria = DccReportExemptCriteria.builder()
-                .reportId(request.getReportId())
-                .reportSeq(request.getReportSeq())
+                .id(DccReportExemptCriteriaId.builder().reportId(request.getReportId())
+                        .reportSeq(request.getReportSeq()).build())
                 .build();
 
         Example<DccReportExemptCriteria> example = Example.of(dccReportExemptCriteria);
