@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import th.co.ais.mimo.debt.exempt.dto.CustAccDto;
+import th.co.ais.mimo.debt.exempt.dto.ExemptDetailDto;
 
 import java.util.List;
 
@@ -18,6 +19,6 @@ public class DeleteExemptResponse {
     private String errorMsg;
     private String responseCode;
 
-    private List<CustAccDto> successList;
-    private List<CustAccDto> errorList;
+    private List<ExemptDetailDto> successList;
+    private List<ExemptDetailDto> errorList;
 }

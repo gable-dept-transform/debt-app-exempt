@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import th.co.ais.mimo.debt.exempt.entity.DccExemptModel;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -32,6 +33,7 @@ public interface DccExemptRepo extends JpaRepository<DccExemptModel,String> {
             " and exempt_level  = :exemptLevel and no_of_exempt = :noOfExempt",nativeQuery = true)
     @Modifying
     public int updateExemptByCA(@Param("updateReason") String updateReason,
+                                @Param("endDate") Date endDate,
                             @Param("updateLocation") Integer updateLocation,
                             @Param("lastUpdateBy") String lastUpdateBy,
                             @Param("sentInterfaceFlag") String sentInterfaceFlag,

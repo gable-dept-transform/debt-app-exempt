@@ -51,12 +51,14 @@ public class DMSEM002SetTreatmentExemptController {
 	}
 
 	@PostMapping(value = "/search-exempt",produces = "application/json")
-	public ResponseEntity searchExemptDetail(@RequestBody SearchRequest request){
+	public ResponseEntity<SearchResponse> searchExemptDetail(@RequestBody SearchRequest request){
         try {
             List<ExemptDetailDto> list =  this.dmsem002SetTreatmentExemptService.searchExemptDetail(request.getSearchType(), request.getParamValue());
-			return ResponseEntity.ok().body(list);
+
+			return ResponseEntity.ok().body(SearchResponse.builder().resultDetailList(list).build());
         } catch (ExemptException e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+			return ResponseEntity.ok().body(SearchResponse.builder().errorMsg("error").build());
         }
         //return ResponseEntity.ok().body("");
 	}
