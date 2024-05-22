@@ -209,10 +209,12 @@ public class ReportDMREM001Service {
                 }
 
                 if (AppConstant.REPORT_STATUS_WT.equals(dccReportExemptCriteria.getReportStatus())) {
-                    // List<DccReportExemptCriteria> delete = dccReportExemptCriteriaRepository.deleteReportExemptCriteria(request.getReportId(),
-                    //         request.getReportSeq());
-                            
-                    dccReportExemptCriteriaRepository.deleteById(DccReportExemptCriteriaId.builder().reportId(request.getReportId()).reportSeq(request.getReportSeq()).build());
+                    // List<DccReportExemptCriteria> delete =
+                    // dccReportExemptCriteriaRepository.deleteReportExemptCriteria(request.getReportId(),
+                    // request.getReportSeq());
+
+                    dccReportExemptCriteriaRepository.deleteById(DccReportExemptCriteriaId.builder()
+                            .reportId(request.getReportId()).reportSeq(request.getReportSeq()).build());
 
                     // System.out.print("delete" + delete);
 
@@ -303,7 +305,7 @@ public class ReportDMREM001Service {
             return paramName + " Date To required";
         } else if (dateFrom == null && dateTo != null) {
             return paramName + " Date From required";
-        } else if (dateFrom != null && dateTo != null && dateFrom.after(dateTo)) {
+        } else if (dateFrom != null && dateTo != null && dateFrom.compareTo(dateTo) > 0) {
             return paramName + " Date To more than or equal to " + paramName + " Date From";
         }
         return null;
@@ -311,7 +313,7 @@ public class ReportDMREM001Service {
 
     private String validateAmountParameter(BigDecimal amountFrom, BigDecimal amountTo, String paramName) {
         if (amountFrom != null && amountTo != null
-                && (amountFrom.compareTo(amountTo) >= 0)) {
+                && (amountFrom.compareTo(amountTo) > 0)) {
             return paramName + "To must be greater than or equal to " + paramName + " From";
         }
 
@@ -350,12 +352,20 @@ public class ReportDMREM001Service {
                 return "Unable to edit because report status is not equal to WT";
             }
         } else if (AppConstant.FLAG_A.equals(request.getOperationMode())) {
-            if (Calendar.getInstance().after(request.getProcessDate())) {
+            Calendar currentDate = Calendar.getInstance();
+            currentDate.set(Calendar.HOUR_OF_DAY, 0);
+            currentDate.set(Calendar.MINUTE, 0);
+            currentDate.set(Calendar.SECOND, 0);
+            currentDate.set(Calendar.MILLISECOND, 0);
+            Calendar processDate = request.getProcessDate();
+            processDate.set(Calendar.HOUR_OF_DAY, 0);
+            processDate.set(Calendar.MINUTE, 0);
+            processDate.set(Calendar.SECOND, 0);
+            processDate.set(Calendar.MILLISECOND, 0);
+            if (currentDate.compareTo(processDate) < 0) {
                 return "Process date must be greater than or equal to current date";
             }
         }
-
-        
 
         errorMsg = validateDateParameter(request.getEffectiveDateFrom(), request.getEffectiveDateTo(), "Effective");
         if (errorMsg != null) {
@@ -376,8 +386,10 @@ public class ReportDMREM001Service {
             return errorMsg;
         }
 
-        if (request.getExemptFormatList().matches(AppConstant.EXEMPT_FORMAT_DETAIL)
-                || request.getExemptFormatList().matches(AppConstant.EXEMPT_FORMAT_SUMMARY)) {
+        // request.getExemptFormatList().matches(AppConstant.EXEMPT_FORMAT_DETAIL)
+        //         || 
+
+        if (request.getExemptFormatList().matches(AppConstant.EXEMPT_FORMAT_SUMMARY)) {
             if (StringUtils.isEmpty(request.getGroupForSummary())) {
                 return "Group by For Summary is required";
             }
