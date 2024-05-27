@@ -5,6 +5,10 @@ public class AppConstant {
 	public static final String SUCCESS = "success";
 
 	public static final String FAIL = "fail";
+	
+	public static final String FLAG_Y = "Y";
+	public static final String FLAG_N = "N";
+	public static final String EM = "EM";
 
 	public static final String FLAG_A = "A";
     public static final String FLAG_U = "U";
