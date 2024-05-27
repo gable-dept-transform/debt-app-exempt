@@ -12,9 +12,6 @@ public class AppConstant {
 
 	public static final String FLAG_A = "A";
     public static final String FLAG_U = "U";
-	
-	public static final String FLAG_Y = "Y";
-	public static final String FLAG_N = "N";
 
 	public static final String REPORT_STATUS_WT = "WT";
     public static final String REPORT_STATUS_DT = "DT";
