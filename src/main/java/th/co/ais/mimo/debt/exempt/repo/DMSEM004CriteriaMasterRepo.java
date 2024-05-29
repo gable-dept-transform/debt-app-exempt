@@ -117,8 +117,8 @@ public interface DMSEM004CriteriaMasterRepo extends JpaRepository<DccCriteriaMas
 			+ "       ca_amount AS caAmount   "
 			+ " FROM dcc_criteria_master "
 			+ " where mode_id = :modeId  "
-			+ " AND (NULL IS :criteriaId OR criteria_id = :criteriaId) "
-			+ " AND (NULL IS :description OR CRITERIA_DESCRIPTION LIKE :description) "
+			+ " AND  criteria_id = :criteriaId "
+			+ " AND  CRITERIA_DESCRIPTION LIKE :description "
 			+ " order by last_update_dtm desc ", nativeQuery = true)
 	DMSEM004CriteriaMasterDto  SerachData(@Param("modeId") String modeId,
 			@Param("criteriaId") Long criteriaId,
