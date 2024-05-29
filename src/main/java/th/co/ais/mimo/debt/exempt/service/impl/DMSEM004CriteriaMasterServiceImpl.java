@@ -32,13 +32,13 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 	@Override
 	public String updateInfo(String lastUpdateBy, String blacklistDatFlag, String blacklistDatFrom,
 			String blacklistDatTo, String modeId, Long criteriaId, String criteriaType) throws Exception {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	public String deleteInfo(String modeId, Long criteriaId) throws Exception {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004CriteriaMasterBean;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004SearchDataRequest;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004SearchDataResp;
+import th.co.ais.mimo.debt.exempt.model.DMSEM004UpdateInfoReq;
+import th.co.ais.mimo.debt.exempt.model.DMSEM004UpdateInfoResp;
 import th.co.ais.mimo.debt.exempt.model.DMSEM005UpdateExemptInfoRequest;
 import th.co.ais.mimo.debt.exempt.model.DMSEM005UpdateExemptInfoResponse;
 import th.co.ais.mimo.debt.exempt.service.DMSEM004CriteriaMasterService;
+import th.co.ais.mimo.debt.exempt.utils.DateUtils;
 
 
 @RestController
@@ -54,19 +58,22 @@ public class DMSEM004CriteriaMasterController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-//	@PostMapping(value = "/delete-info", produces = "application/json")
-//	public ResponseEntity<DMSEM005UpdateExemptInfoResponse> deleteInformation(
-//			@RequestBody DMSEM005UpdateExemptInfoRequest request) {
-//		String errorMsg = null;
-//		DMSEM005UpdateExemptInfoResponse response = DMSEM005UpdateExemptInfoResponse.builder().build();
-//		try {
-//			response = this.transactionDMSEM005Service.deleteInformation(request);
-//		} catch (Exception e) {
-//			log.error("Exception queryExempt : {}", e.getMessage(), e);
-//			errorMsg = "queryExempt Internal server Error process";
-//			response.setErrorMsg(errorMsg);
-//		}
-//		return new ResponseEntity<>(response, HttpStatus.OK);
-//	}
+	@PostMapping(value = "/update-info", produces = "application/json")
+	public ResponseEntity<DMSEM004UpdateInfoResp> updateInformation(
+			@RequestBody DMSEM004UpdateInfoReq request) {
+		String errorMsg = null;
+		DMSEM004UpdateInfoResp response = DMSEM004UpdateInfoResp.builder().build();
+		try {
+			String dateForm = DateUtils.toStringEngDateSimpleFormat(request.getBlacklistDatFrom(), DateUtils.DEFAULT_DATETIME_PATTERN_DATE_SLASH_YYYY_MM_DD);
+			String dateTo = DateUtils.toStringEngDateSimpleFormat(request.getBlacklistDatTo(), DateUtils.DEFAULT_DATETIME_PATTERN_DATE_SLASH_YYYY_MM_DD);
+			errorMsg = this.criteriaMasterService.updateInfo(request.getLastUpdateBy(), request.getBlacklistDatFlag(), dateForm, dateTo, request.getModeId(), Long.valueOf(request.getCriteriaId()), request.getCriteriaType());
+		} catch (Exception e) {
+			log.error("Exception queryExempt : {}", e.getMessage(), e);
+			errorMsg = "queryExempt Internal server Error process";			
+		}finally {
+			response = new DMSEM004UpdateInfoResp(errorMsg);
+		}		
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 
 }

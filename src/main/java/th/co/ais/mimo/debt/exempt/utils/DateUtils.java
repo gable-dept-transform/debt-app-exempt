@@ -2,6 +2,7 @@ package th.co.ais.mimo.debt.exempt.utils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -20,6 +21,7 @@ public class DateUtils {
 	public static final long MILLISECS_PER_DAY = 86400000;
 	private static final Locale DEFAULT_LOCALE = new Locale("th","TH");
 	private static final TimeZone DEFAULT_TIMEZONE = TimeZone.getTimeZone("GMT+07:00");
+	public static final String DEFAULT_DATETIME_PATTERN_DATE_SLASH_YYYY_MM_DD= "yyyy/MM/dd";
 	
     public static Date getCurrentDate()  {
 		return new GregorianCalendar(enLocale).getTime();
@@ -104,4 +106,17 @@ public class DateUtils {
 		return dt;
 	}
 
+	public static String convertDateStrToDateStrAnotherFormat(String formatInput,String formatOutput,String dateStr){
+		String result;
+		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy/MM/dd");
+		try {
+			Date date = inputFormat.parse(dateStr);
+			result = outputFormat.format(date);
+
+		} catch (ParseException e) {
+			return null;
+		}
+		return result;
+	}
 }
