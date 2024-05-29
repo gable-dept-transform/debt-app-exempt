@@ -19,8 +19,8 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 	
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-//	@Autowired
-//	DMSEM004CriteriaMasterRepo criteriaMasterRepo;
+	@Autowired
+	DMSEM004CriteriaMasterRepo criteriaMasterRepo;
 	
 	@Autowired
 	DMSEM004CriteriaMasterDao criteriaMasterDao;
@@ -32,13 +32,23 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 	@Override
 	public String updateInfo(String lastUpdateBy, String blacklistDatFlag, String blacklistDatFrom,
 			String blacklistDatTo, String modeId, Long criteriaId, String criteriaType) throws Exception {
-		
-		return null;
+		String errorMsg = null;
+		try {
+			 criteriaMasterRepo.updateCriteriaInfo(lastUpdateBy, blacklistDatFlag, blacklistDatFrom, blacklistDatTo, modeId, criteriaId, criteriaType);
+		}catch (Exception e) {
+			errorMsg = e.getMessage();
+		}
+		return errorMsg;
 	}
 
 	@Override
 	public String deleteInfo(String modeId, Long criteriaId) throws Exception {
-		
-		return null;
+		String errorMsg = null;
+		try {
+			 criteriaMasterRepo.deleteCriteriaInfo(modeId, criteriaId); 
+		}catch (Exception e) {
+			errorMsg = e.getMessage();
+		}
+		return errorMsg;
 	}
 }

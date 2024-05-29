@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import th.co.ais.mimo.debt.exempt.model.DMSEM004CriteriaMasterBean;
+import th.co.ais.mimo.debt.exempt.model.DMSEM004DeleteInfoReq;
+import th.co.ais.mimo.debt.exempt.model.DMSEM004DeleteInfoResp;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004SearchDataRequest;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004SearchDataResp;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004UpdateInfoReq;
@@ -68,10 +70,26 @@ public class DMSEM004CriteriaMasterController {
 			String dateTo = DateUtils.toStringEngDateSimpleFormat(request.getBlacklistDatTo(), DateUtils.DEFAULT_DATETIME_PATTERN_DATE_SLASH_YYYY_MM_DD);
 			errorMsg = this.criteriaMasterService.updateInfo(request.getLastUpdateBy(), request.getBlacklistDatFlag(), dateForm, dateTo, request.getModeId(), Long.valueOf(request.getCriteriaId()), request.getCriteriaType());
 		} catch (Exception e) {
-			log.error("Exception queryExempt : {}", e.getMessage(), e);
-			errorMsg = "queryExempt Internal server Error process";			
+			log.error("Exception updateInformation : {}", e.getMessage(), e);
+			errorMsg = "updateInformation Internal server Error process";			
 		}finally {
 			response = new DMSEM004UpdateInfoResp(errorMsg);
+		}		
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/delete-info", produces = "application/json")
+	public ResponseEntity<DMSEM004DeleteInfoResp> deleteInformation(
+			@RequestBody DMSEM004DeleteInfoReq request) {
+		String errorMsg = null;
+		DMSEM004DeleteInfoResp response = DMSEM004DeleteInfoResp.builder().build();
+		try {
+			errorMsg = this.criteriaMasterService.deleteInfo(request.getModeId(), request.getCriteriaId());
+		} catch (Exception e) {
+			log.error("Exception deleteInformation : {}", e.getMessage(), e);
+			errorMsg = "deleteInformation Internal server Error process";			
+		}finally {
+			response = new DMSEM004DeleteInfoResp(errorMsg);
 		}		
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
