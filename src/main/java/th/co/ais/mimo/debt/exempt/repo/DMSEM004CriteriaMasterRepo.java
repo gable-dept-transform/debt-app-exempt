@@ -1,6 +1,7 @@
 package th.co.ais.mimo.debt.exempt.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -123,4 +124,23 @@ public interface DMSEM004CriteriaMasterRepo extends JpaRepository<DccCriteriaMas
 	DMSEM004CriteriaMasterDto  SerachData(@Param("modeId") String modeId,
 			@Param("criteriaId") Long criteriaId,
 			@Param("description") String description );
+	
+	@Modifying
+	@Query(value = " update dcc_criteria_master set run_end_dat = trunc(SYSDATE), "
+    		+ "     last_update_by = :lastUpdateBy , last_update_dtm = sysdate, blacklist_dat_flag = :blacklistDatFlag , "
+    		+ "     blacklist_dat_from = to_date(:blacklistDatFrom,'YYYY/MM/DD'), blacklist_dat_to = to_date(:blacklistDatTo,'YYYY/MM/DD') "
+    		+ "     where mode_id = :modeId "
+    		+ "		and criteria_id = :criteriaId "
+    		+ "		and criteria_type = :criteriaType " , nativeQuery = true)
+    void updateCriteriaInfo( @Param("lastUpdateBy") String lastUpdateBy, 
+                       @Param("blacklistDatFlag") String blacklistDatFlag, 
+                       @Param("blacklistDatFrom") String blacklistDatFrom, 
+                       @Param("blacklistDatTo") String blacklistDatTo, 
+                       @Param("modeId") String modeId, 
+                       @Param("criteriaId") Long criteriaId, 
+                       @Param("criteriaType") String criteriaType);
+	
+	@Modifying
+	@Query(value = " delete from dcc_criteria_master  where criteriaId = :criteriaId and mode_id = :modeId " , nativeQuery = true)
+    void deleteCriteriaInfo(@Param("modeId")String modeId, @Param("criteriaId") Long criteriaId);
 }
