@@ -1,11 +1,17 @@
 package th.co.ais.mimo.debt.exempt.service;
 
-import th.co.ais.mimo.debt.exempt.exception.ExemptException;
-import th.co.ais.mimo.debt.exempt.model.DMSEM004CriteriaMasterDto;
+import java.util.List;
+
+import th.co.ais.mimo.debt.exempt.model.DMSEM004CriteriaMasterBean;
 
 
 public interface DMSEM004CriteriaMasterService {
 	
-	DMSEM004CriteriaMasterDto searchData( String modeId, Long criteriaId, String description) throws ExemptException;
+	List<DMSEM004CriteriaMasterBean> searchData( String modeId, Long criteriaId, String description) throws Exception;
+	
+	String updateInfo( String lastUpdateBy, String blacklistDatFlag, String blacklistDatFrom, String blacklistDatTo, String modeId, Long criteriaId, String criteriaType) throws Exception;
+	
+	String deleteInfo( String modeId, Long criteriaId) throws Exception;
+
 
 }

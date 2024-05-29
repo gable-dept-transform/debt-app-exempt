@@ -1,19 +1,14 @@
 package th.co.ais.mimo.debt.exempt.model;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @Builder
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
-public class DMSEM004SearchDataResp {
-	
+@NoArgsConstructor
+public class DMSEM004UpdateInfoResp {
 	private String errorMsg;
-	private List<DMSEM004CriteriaMasterBean> criteriaMasterDto; 
-
 }
