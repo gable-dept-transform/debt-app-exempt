@@ -92,7 +92,7 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
 	List<SubDistrictDropdownListDto> getAllSubDistrictInfoCaseDropdown() throws Exception;
 
 	@Query(value = " SELECT DISTINCT(Z.CONTINENT) AS zipCode, Z.CITY AS city" + " FROM ZIPCODE Z "
-			+ " WHERE DCCU_UTIL.FIND_LIKE_LIST('ห้วยขวาง',Z.CITY,'F') > 0 ", nativeQuery = true)
+			+ " WHERE DCCU_UTIL.FIND_LIKE_LIST(:cityCodeList ,Z.CITY,'F') > 0 ", nativeQuery = true)
 	List<ZipCodeDropdownListDto> getZipCodeInfoCaseDropdown(String cityCodeList) throws Exception;
 
 	@Query(value = " SELECT DISTINCT(Z.CONTINENT) AS zipCode, Z.CITY AS city" + " FROM ZIPCODE Z ", nativeQuery = true)
