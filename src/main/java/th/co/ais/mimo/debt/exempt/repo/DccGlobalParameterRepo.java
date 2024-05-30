@@ -166,8 +166,8 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
 			+ " order by sm.lov_name ", nativeQuery = true)
 	List<SubCategoryDto> getSubCategory(@Param("category")String category) throws Exception;	
 	
-	@Query(value = " select DISTINCT(distinct) keyword_desc, keyword_value, last_update_by, "
-			+ "	last_update_dtm, SECTION_NAME ,KEYWORD "
+	@Query(value = " select DISTINCT(keyword_desc) AS keywordDesc, keyword_value AS keywordValue, last_update_by AS lastUpdateBy, "
+			+ "	last_update_dtm AS lastUpdateDtm ,SECTION_NAME AS sectionName ,KEYWORD AS keyword "
 			+ " from dcc_global_parameter "
 			+ " where section_name = 'CRITERIA' and keyword = 'COMPANY_CODE'  "
 			+ " and instr((select company_code from dcc_criteria_history "
