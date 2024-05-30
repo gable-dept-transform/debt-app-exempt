@@ -21,21 +21,27 @@ import th.co.ais.mimo.debt.exempt.dto.DistrictDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.ProvinceDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.SubDistrictDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.ZipCodeDropdownListDto;
+import th.co.ais.mimo.debt.exempt.model.AddReasonDto;
+import th.co.ais.mimo.debt.exempt.model.CategoryDto;
+import th.co.ais.mimo.debt.exempt.model.CategoryResp;
 import th.co.ais.mimo.debt.exempt.model.CollectionSegmentDto;
 import th.co.ais.mimo.debt.exempt.model.CollectionSegmentResp;
 import th.co.ais.mimo.debt.exempt.model.CommonDropDownReq;
 import th.co.ais.mimo.debt.exempt.model.CommonDropDownResp;
 import th.co.ais.mimo.debt.exempt.model.CommonDropdownDto;
+import th.co.ais.mimo.debt.exempt.model.CompanyCodeReq;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004CriteriaMasterBean;
-import th.co.ais.mimo.debt.exempt.model.DMSEM004DeleteInfoReq;
-import th.co.ais.mimo.debt.exempt.model.DMSEM004DeleteInfoResp;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004SearchDataRequest;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004SearchDataResp;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004UpdateInfoReq;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004UpdateInfoResp;
 import th.co.ais.mimo.debt.exempt.model.DistrictInfoResp;
 import th.co.ais.mimo.debt.exempt.model.ProvinceInfoResp;
+import th.co.ais.mimo.debt.exempt.model.ReasonResp;
 import th.co.ais.mimo.debt.exempt.model.RegionInfoResp;
+import th.co.ais.mimo.debt.exempt.model.SubCategoryDto;
+import th.co.ais.mimo.debt.exempt.model.SubCategoryReq;
+import th.co.ais.mimo.debt.exempt.model.SubCategoryResp;
 import th.co.ais.mimo.debt.exempt.model.SubDistrictInfoResp;
 import th.co.ais.mimo.debt.exempt.model.ZipCodeInfoResp;
 import th.co.ais.mimo.debt.exempt.service.DMSEM004CriteriaMasterService;
@@ -280,5 +286,70 @@ public class DMSEM004CriteriaMasterController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
+	@PostMapping(value = "/company-code", produces = "application/json")
+	public ResponseEntity<CommonDropDownResp> getCompanyInformation(
+			@RequestBody CompanyCodeReq request) {
+		String errorMsg = null;
+		List<CommonDropdownDto> list = null;
+		CommonDropDownResp response = null;
+		try {
+			list = criteriaMasterService.getCompanyByCode(request.getCompayCode());
+		}catch (Exception e){
+			log.error("Exception subdistrictInformation : {}", e.getMessage(), e);
+			errorMsg = "subdistrictInformation Internal server Error process";
+		} finally {
+			response = new CommonDropDownResp(errorMsg, list);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/reason")
+	public ResponseEntity<ReasonResp> getReason() throws Exception {
+		String errorMsg = null;
+		List<AddReasonDto> listDto = null;
+		ReasonResp response = null;
+		try {
+			listDto = criteriaMasterService.getReason();
+		}catch (Exception e){
+			log.error("Exception getReason : {}", e.getMessage(), e);
+			errorMsg = "getReason Internal server Error process";
+		} finally {
+			response = new ReasonResp(errorMsg, listDto);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/category")
+	public ResponseEntity<CategoryResp> getCategory() throws Exception {
+		String errorMsg = null;
+		List<CategoryDto> listDto = null;
+		CategoryResp response = null;
+		try {
+			listDto = criteriaMasterService.getCategory();
+		}catch (Exception e){
+			log.error("Exception getReason : {}", e.getMessage(), e);
+			errorMsg = "getReason Internal server Error process";
+		} finally {
+			response = new CategoryResp(errorMsg, listDto);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/sub-category", produces = "application/json")
+	public ResponseEntity<SubCategoryResp> getSubCategory(
+			@RequestBody SubCategoryReq request) {
+		String errorMsg = null;
+		List<SubCategoryDto> list = null;
+		SubCategoryResp response = null;
+		try {
+			list = criteriaMasterService.getSubCategory(request.getCatCode());
+		}catch (Exception e){
+			log.error("Exception getSubCategory : {}", e.getMessage(), e);
+			errorMsg = "getSubCategory Internal server Error process";
+		} finally {
+			response = new SubCategoryResp(errorMsg, list);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 			
 }
