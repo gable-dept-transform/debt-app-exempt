@@ -141,6 +141,6 @@ public interface DMSEM004CriteriaMasterRepo extends JpaRepository<DccCriteriaMas
                        @Param("criteriaType") String criteriaType);
 	
 	@Modifying
-	@Query(value = " delete from dcc_criteria_master  where criteriaId = :criteriaId and mode_id = :modeId " , nativeQuery = true)
+	@Query(value = " delete from dcc_criteria_master  where criteria_id = :criteriaId and mode_id = :modeId " , nativeQuery = true)
     void deleteCriteriaInfo(@Param("modeId")String modeId, @Param("criteriaId") Long criteriaId);
 }
