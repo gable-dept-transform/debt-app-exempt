@@ -17,7 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import th.co.ais.mimo.debt.exempt.dto.CommonDropdownListDto;
+import th.co.ais.mimo.debt.exempt.dto.DistrictDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.ProvinceDropdownListDto;
+import th.co.ais.mimo.debt.exempt.dto.SubDistrictDropdownListDto;
+import th.co.ais.mimo.debt.exempt.dto.ZipCodeDropdownListDto;
 import th.co.ais.mimo.debt.exempt.model.CommonDropDownReq;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004CriteriaMasterBean;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004DeleteInfoReq;
@@ -26,8 +29,11 @@ import th.co.ais.mimo.debt.exempt.model.DMSEM004SearchDataRequest;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004SearchDataResp;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004UpdateInfoReq;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004UpdateInfoResp;
+import th.co.ais.mimo.debt.exempt.model.DistrictInfoResp;
 import th.co.ais.mimo.debt.exempt.model.ProvinceInfoResp;
 import th.co.ais.mimo.debt.exempt.model.RegionInfoResp;
+import th.co.ais.mimo.debt.exempt.model.SubDistrictInfoResp;
+import th.co.ais.mimo.debt.exempt.model.ZipCodeInfoResp;
 import th.co.ais.mimo.debt.exempt.service.DMSEM004CriteriaMasterService;
 import th.co.ais.mimo.debt.exempt.utils.DateUtils;
 
@@ -115,8 +121,8 @@ public class DMSEM004CriteriaMasterController {
 			listProvince = criteriaMasterService.getProvinceInfoCaseDropdown(request.getVal());
 			
 		}catch (Exception e){
-			log.error("Exception GetProvince : {}", e.getMessage(), e);
-			errorMsg = "GetProvince Internal server Error process";
+			log.error("Exception provinceInformation : {}", e.getMessage(), e);
+			errorMsg = "provinceInformation Internal server Error process";
 		} finally {
 			response = new ProvinceInfoResp(errorMsg, listProvince);
 		}
@@ -124,35 +130,52 @@ public class DMSEM004CriteriaMasterController {
 	}
 	
 	@PostMapping(value = "/district-info", produces = "application/json")
-	public ResponseEntity<ProvinceInfoResp> districtInformation(
+	public ResponseEntity<DistrictInfoResp> districtInformation(
 			@RequestBody CommonDropDownReq request) {
 		String errorMsg = null;
-		List<ProvinceDropdownListDto> listProvince = null;
-		ProvinceInfoResp response = null;
+		List<DistrictDropdownListDto> listDistrict = null;
+		DistrictInfoResp response = null;
 		try {
-			
+			listDistrict = criteriaMasterService.getDistrictInfoCaseDropdown(request.getVal());
 		}catch (Exception e){
-			log.error("Exception GetProvince : {}", e.getMessage(), e);
-			errorMsg = "GetProvince Internal server Error process";
+			log.error("Exception districtInformation : {}", e.getMessage(), e);
+			errorMsg = "districtInformation Internal server Error process";
 		} finally {
-			response = new ProvinceInfoResp(errorMsg, listProvince);
+			response = new DistrictInfoResp(errorMsg, listDistrict);
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@PostMapping(value = "/subdistrict-info", produces = "application/json")
-	public ResponseEntity<ProvinceInfoResp> subdistrictInformation(
+	public ResponseEntity<SubDistrictInfoResp> subdistrictInformation(
 			@RequestBody CommonDropDownReq request) {
 		String errorMsg = null;
-		List<ProvinceDropdownListDto> listProvince = null;
-		ProvinceInfoResp response = null;
+		List<SubDistrictDropdownListDto> list = null;
+		SubDistrictInfoResp response = null;
 		try {
-			
+			list = criteriaMasterService.getSubDistrictInfoCaseDropdown(request.getVal());
 		}catch (Exception e){
-			log.error("Exception GetProvince : {}", e.getMessage(), e);
-			errorMsg = "GetProvince Internal server Error process";
+			log.error("Exception subdistrictInformation : {}", e.getMessage(), e);
+			errorMsg = "subdistrictInformation Internal server Error process";
 		} finally {
-			response = new ProvinceInfoResp(errorMsg, listProvince);
+			response = new SubDistrictInfoResp(errorMsg, list);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/zipcode-info", produces = "application/json")
+	public ResponseEntity<ZipCodeInfoResp> zipCodeInformation(
+			@RequestBody CommonDropDownReq request) {
+		String errorMsg = null;
+		List<ZipCodeDropdownListDto> list = null;
+		ZipCodeInfoResp response = null;
+		try {
+			list = criteriaMasterService.getZipCodeInfoCaseDropdown(request.getVal());
+		}catch (Exception e){
+			log.error("Exception zipCodeInformation : {}", e.getMessage(), e);
+			errorMsg = "zipCodeInformation Internal server Error process";
+		} finally {
+			response = new ZipCodeInfoResp(errorMsg, list);
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}

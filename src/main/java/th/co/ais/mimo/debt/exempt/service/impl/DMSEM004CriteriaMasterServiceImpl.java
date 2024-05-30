@@ -13,7 +13,10 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import th.co.ais.mimo.debt.exempt.dao.DMSEM004CriteriaMasterDao;
 import th.co.ais.mimo.debt.exempt.dto.CommonDropdownListDto;
+import th.co.ais.mimo.debt.exempt.dto.DistrictDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.ProvinceDropdownListDto;
+import th.co.ais.mimo.debt.exempt.dto.SubDistrictDropdownListDto;
+import th.co.ais.mimo.debt.exempt.dto.ZipCodeDropdownListDto;
 import th.co.ais.mimo.debt.exempt.enums.ConfigSectionNameEnums;
 import th.co.ais.mimo.debt.exempt.enums.GlobalParameterKeywordEnums;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004CriteriaMasterBean;
@@ -88,6 +91,53 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 		 throw e;
 		}
 		return list;
+	}
+
+	@Override
+	public List<DistrictDropdownListDto> getDistrictInfoCaseDropdown(List<String> codeList) throws Exception {
+		List<DistrictDropdownListDto> list = new ArrayList<>();
+		try {
+			if(CollectionUtils.isEmpty(codeList)) {
+				list = globalParameterRepo.getdistrictAllInfoCaseDropdown();				
+			}else {
+				list = globalParameterRepo.getdistrictInfoCaseDropdown(StringUtils.join(codeList, ","));
+			}
+			
+		}catch (Exception e) {
+		 throw e;
+		}
+		return list;	
+	}
+
+	@Override
+	public List<SubDistrictDropdownListDto> getSubDistrictInfoCaseDropdown(List<String> aumphurCodeList) throws Exception {
+		
+		List<SubDistrictDropdownListDto> list = new ArrayList<>();
+		try {
+			if(CollectionUtils.isEmpty(aumphurCodeList)) {
+				list = globalParameterRepo.getAllSubDistrictInfoCaseDropdown();				
+			}else {
+				list = globalParameterRepo.getSubDistrictInfoCaseDropdown(StringUtils.join(aumphurCodeList, ","));
+			}			
+		}catch (Exception e) {
+			throw e;
+		}
+		return list;	
+	}
+
+	@Override
+	public List<ZipCodeDropdownListDto> getZipCodeInfoCaseDropdown(List<String> cityCodeList) throws Exception {
+		List<ZipCodeDropdownListDto> list = new ArrayList<>();
+		try {
+			if(CollectionUtils.isEmpty(cityCodeList)) {
+				list = globalParameterRepo.getZipCodeAllInfoCaseDropdown();				
+			}else {
+				list = globalParameterRepo.getZipCodeInfoCaseDropdown(StringUtils.join(cityCodeList, ","));
+			}			
+		}catch (Exception e) {
+			throw e;
+		}
+		return list;	
 	}
 	
 	

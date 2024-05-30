@@ -5,7 +5,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import th.co.ais.mimo.debt.exempt.dto.CommonDropdownListDto;
+import th.co.ais.mimo.debt.exempt.dto.DistrictDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.ProvinceDropdownListDto;
+import th.co.ais.mimo.debt.exempt.dto.SubDistrictDropdownListDto;
+import th.co.ais.mimo.debt.exempt.dto.ZipCodeDropdownListDto;
 import th.co.ais.mimo.debt.exempt.entity.DccGlobalParameter;
 
 import java.util.List;
@@ -71,5 +74,44 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
         		+ " ORDER BY L.LOV_VAL1 DESC ",nativeQuery = true)
     List<ProvinceDropdownListDto> getProvinceAllInfoCaseDropdown() throws Exception;
         
+       @Query(value = " SELECT DISTINCT(CC.CITY) AS city, L.DISPLAY_VAL AS dispVal ,CC.X_PROVINCE AS province"
+    		   + "  FROM ZIPCODE CC, SFF_LOV_MASTER L "
+    		   + "  WHERE CC.X_PROVINCE = L.LOV_NAME "
+    		   + "  AND L.LOV_TYPE = 'PROVINCE' "
+    		   + "  AND DCCU_UTIL.FIND_LIKE_LIST(:provinveCodeList,CC.X_PROVINCE,'F' )> 0 "
+    		   + "  ORDER BY CC.X_PROVINCE, CC.CITY ",nativeQuery = true)
+       List<DistrictDropdownListDto> getdistrictInfoCaseDropdown(String provinveCodeList) throws Exception;
+       
+       @Query(value = " SELECT DISTINCT(CC.CITY) AS city,L.DISPLAY_VAL AS dispVal ,CC.X_PROVINCE AS province"
+    	       + "  FROM ZIPCODE CC, SFF_LOV_MASTER L "
+    	       + "  WHERE CC.X_PROVINCE = L.LOV_NAME "
+    	       + "  AND L.LOV_TYPE = 'PROVINCE' "    	     
+    	       + "  ORDER BY CC.X_PROVINCE, CC.CITY ",nativeQuery = true)
+     List<DistrictDropdownListDto> getdistrictAllInfoCaseDropdown() throws Exception;
+       
+       @Query(value = " SELECT DISTINCT(CC.TUMBOL) AS tumbol,L.DISPLAY_VAL AS dispVal, CC.CITY AS city, CC.X_PROVINCE AS province"
+       		+ " FROM ZIPCODE CC, SFF_LOV_MASTER L "
+       		+ " WHERE CC.X_PROVINCE = L.LOV_NAME "
+       		+ " AND L.LOV_TYPE = 'PROVINCE' "
+       		+ " AND DCCU_UTIL.FIND_LIKE_LIST(:aumphurCodeList,CC.CITY ,'F' )> 0 "
+       		+ " ORDER BY CC.X_PROVINCE,CC.CITY,CC.TUMBOL ",nativeQuery = true)
+       List<SubDistrictDropdownListDto> getSubDistrictInfoCaseDropdown(String aumphurCodeList) throws Exception;
+       
+       @Query(value = " SELECT DISTINCT(CC.TUMBOL) AS tumbol,L.DISPLAY_VAL AS dispVal, CC.CITY AS city, CC.X_PROVINCE AS province"
+          		+ " FROM ZIPCODE CC, SFF_LOV_MASTER L "
+          		+ " WHERE CC.X_PROVINCE = L.LOV_NAME "
+          		+ " AND L.LOV_TYPE = 'PROVINCE' "          		
+          		+ " ORDER BY CC.X_PROVINCE,CC.CITY,CC.TUMBOL ",nativeQuery = true)
+       List<SubDistrictDropdownListDto> getAllSubDistrictInfoCaseDropdown() throws Exception;
+          
 
+       @Query(value = " SELECT DISTINCT(Z.CONTINENT) AS zipCode, Z.CITY AS city"
+       		+ " FROM ZIPCODE Z "
+       		+ " WHERE DCCU_UTIL.FIND_LIKE_LIST('ห้วยขวาง',Z.CITY,'F') > 0 " ,nativeQuery = true)
+       List<ZipCodeDropdownListDto> getZipCodeInfoCaseDropdown(String cityCodeList) throws Exception;
+       
+       @Query(value = " SELECT DISTINCT(Z.CONTINENT) AS zipCode, Z.CITY AS city"
+          		+ " FROM ZIPCODE Z " ,nativeQuery = true)
+          List<ZipCodeDropdownListDto> getZipCodeAllInfoCaseDropdown() throws Exception;
+       
 }
