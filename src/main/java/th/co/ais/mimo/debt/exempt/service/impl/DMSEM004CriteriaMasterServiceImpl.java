@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 import th.co.ais.mimo.debt.exempt.dao.DMSEM004CriteriaMasterDao;
 import th.co.ais.mimo.debt.exempt.dto.CommonDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.DistrictDropdownListDto;
+import th.co.ais.mimo.debt.exempt.dto.GetRefAssignDto;
 import th.co.ais.mimo.debt.exempt.dto.ProvinceDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.SubDistrictDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.ZipCodeDropdownListDto;
@@ -260,6 +261,17 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 		List<CommonDropdownDto> list = new ArrayList<>();
 		try {			
 				list = globalParameterRepo.getCompanyByCode(companyCode);									
+		}catch (Exception e) {
+			throw e;
+		}
+		return list;
+	}
+
+	@Override
+	public List<GetRefAssignDto> getRefAssignId(String assignId) throws Exception {
+		List<GetRefAssignDto> list = new ArrayList<>();
+		try {	
+			list = criteriaMasterRepo.getRefAssignId(assignId);													
 		}catch (Exception e) {
 			throw e;
 		}

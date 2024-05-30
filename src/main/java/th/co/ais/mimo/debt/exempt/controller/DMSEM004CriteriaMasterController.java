@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import th.co.ais.mimo.debt.exempt.dto.CommonDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.DistrictDropdownListDto;
+import th.co.ais.mimo.debt.exempt.dto.GetRefAssignDto;
 import th.co.ais.mimo.debt.exempt.dto.ProvinceDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.SubDistrictDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.ZipCodeDropdownListDto;
@@ -39,6 +40,8 @@ import th.co.ais.mimo.debt.exempt.model.DistrictInfoResp;
 import th.co.ais.mimo.debt.exempt.model.ProvinceInfoResp;
 import th.co.ais.mimo.debt.exempt.model.ReasonResp;
 import th.co.ais.mimo.debt.exempt.model.RegionInfoResp;
+import th.co.ais.mimo.debt.exempt.model.SearchAssignReq;
+import th.co.ais.mimo.debt.exempt.model.SearchAssignResp;
 import th.co.ais.mimo.debt.exempt.model.SubCategoryDto;
 import th.co.ais.mimo.debt.exempt.model.SubCategoryReq;
 import th.co.ais.mimo.debt.exempt.model.SubCategoryResp;
@@ -348,6 +351,23 @@ public class DMSEM004CriteriaMasterController {
 			errorMsg = "getSubCategory Internal server Error process";
 		} finally {
 			response = new SubCategoryResp(errorMsg, list);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/seach-assign", produces = "application/json")
+	public ResponseEntity<SearchAssignResp> getAssignId(
+			@RequestBody SearchAssignReq request) {
+		String errorMsg = null;
+		List<GetRefAssignDto> list = null;
+		SearchAssignResp response = null;
+		try {
+			list = criteriaMasterService.getRefAssignId(request.getAssignId());
+		}catch (Exception e){
+			log.error("Exception getSubCategory : {}", e.getMessage(), e);
+			errorMsg = "getSubCategory Internal server Error process";
+		} finally {
+			response = new SearchAssignResp(errorMsg, list);
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}

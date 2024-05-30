@@ -4,11 +4,12 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public interface GetRefAssignDto {
+	
 	String getModeId();
 	String getPreassignId();
 	Long getCriteriaId();
 	String getCriteriaType();
-	Date getAssignId();
+	String getAssignId();
 	Date getAssignDat();
 	String getAssignStatus();
 	Date getUnassignDat();
@@ -107,4 +108,5 @@ public interface GetRefAssignDto {
 	String getCpeFlag();
 	String getExemptReason();
 	String getBundlingFlag();
+	
 }
