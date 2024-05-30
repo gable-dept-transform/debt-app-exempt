@@ -2,12 +2,19 @@ package th.co.ais.mimo.debt.exempt.service;
 
 import java.util.List;
 
+import org.springframework.data.repository.query.Param;
+
 import th.co.ais.mimo.debt.exempt.dto.CommonDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.DistrictDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.ProvinceDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.SubDistrictDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.ZipCodeDropdownListDto;
+import th.co.ais.mimo.debt.exempt.model.AddReasonDto;
+import th.co.ais.mimo.debt.exempt.model.CategoryDto;
+import th.co.ais.mimo.debt.exempt.model.CollectionSegmentDto;
+import th.co.ais.mimo.debt.exempt.model.CommonDropdownDto;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004CriteriaMasterBean;
+import th.co.ais.mimo.debt.exempt.model.SubCategoryDto;
 
 
 public interface DMSEM004CriteriaMasterService {
@@ -27,4 +34,26 @@ public interface DMSEM004CriteriaMasterService {
 	List<SubDistrictDropdownListDto> getSubDistrictInfoCaseDropdown(List<String> aumphurCodeList) throws Exception;
 	
 	List<ZipCodeDropdownListDto> getZipCodeInfoCaseDropdown(List<String> cityCodeList) throws Exception;
+	
+	List<CollectionSegmentDto> getCollectionSegment() throws Exception;
+	
+	List<CommonDropdownDto> getBastatus() throws Exception;
+	
+	List<CommonDropdownDto> getMobilestatus() throws Exception;
+	
+	List<CommonDropdownDto> getModule() throws Exception;
+	
+	List<CommonDropdownDto> getExemptLevel() throws Exception;
+	
+	List<CommonDropdownDto> getMode() throws Exception;
+	
+	List<CommonDropdownDto> getBillCycle() throws Exception;
+	
+	List<AddReasonDto> getReason() throws Exception;
+	
+	List<CategoryDto> getCategory() throws Exception;
+	
+	List<SubCategoryDto> getSubCategory(String category) throws Exception;
+	
+	List<CommonDropdownDto> getCompanyByCode(String companyCode) throws Exception;
 }

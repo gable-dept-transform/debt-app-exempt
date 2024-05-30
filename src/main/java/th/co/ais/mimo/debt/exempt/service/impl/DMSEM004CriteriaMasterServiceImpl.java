@@ -19,7 +19,12 @@ import th.co.ais.mimo.debt.exempt.dto.SubDistrictDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.ZipCodeDropdownListDto;
 import th.co.ais.mimo.debt.exempt.enums.ConfigSectionNameEnums;
 import th.co.ais.mimo.debt.exempt.enums.GlobalParameterKeywordEnums;
+import th.co.ais.mimo.debt.exempt.model.AddReasonDto;
+import th.co.ais.mimo.debt.exempt.model.CategoryDto;
+import th.co.ais.mimo.debt.exempt.model.CollectionSegmentDto;
+import th.co.ais.mimo.debt.exempt.model.CommonDropdownDto;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004CriteriaMasterBean;
+import th.co.ais.mimo.debt.exempt.model.SubCategoryDto;
 import th.co.ais.mimo.debt.exempt.repo.DMSEM004CriteriaMasterRepo;
 import th.co.ais.mimo.debt.exempt.repo.DccGlobalParameterRepo;
 import th.co.ais.mimo.debt.exempt.service.DMSEM004CriteriaMasterService;
@@ -139,6 +144,126 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 		}
 		return list;	
 	}
-	
+
+	@Override
+	public List<CollectionSegmentDto> getCollectionSegment() throws Exception {
+		List<CollectionSegmentDto> list = new ArrayList<>();
+		try {			
+				list = globalParameterRepo.getCollectionSegment();									
+		}catch (Exception e) {
+			throw e;
+		}
+		return list;
+	}
+
+	@Override
+	public List<CommonDropdownDto> getBastatus() throws Exception {
+		List<CommonDropdownDto> list = new ArrayList<>();
+		try {			
+				list = globalParameterRepo.getBastatus();									
+		}catch (Exception e) {
+			throw e;
+		}
+		return list;
+	}
+
+	@Override
+	public List<CommonDropdownDto> getMobilestatus() throws Exception {
+		List<CommonDropdownDto> list = new ArrayList<>();
+		try {			
+				list = globalParameterRepo.getMobilestatus();									
+		}catch (Exception e) {
+			throw e;
+		}
+		return list;
+	}
+
+	@Override
+	public List<CommonDropdownDto> getModule() throws Exception {
+		List<CommonDropdownDto> list = new ArrayList<>();
+		try {			
+				list = globalParameterRepo.getModule();									
+		}catch (Exception e) {
+			throw e;
+		}
+		return list;
+	}
+
+	@Override
+	public List<CommonDropdownDto> getExemptLevel() throws Exception {
+		List<CommonDropdownDto> list = new ArrayList<>();
+		try {			
+				list = globalParameterRepo.getExemptLevel();									
+		}catch (Exception e) {
+			throw e;
+		}
+		return list;
+	}
+
+	@Override
+	public List<CommonDropdownDto> getMode() throws Exception {
+		List<CommonDropdownDto> list = new ArrayList<>();
+		try {			
+				list = globalParameterRepo.getMode();									
+		}catch (Exception e) {
+			throw e;
+		}
+		return list;
+	}
+
+	@Override
+	public List<CommonDropdownDto> getBillCycle() throws Exception {
+		List<CommonDropdownDto> list = new ArrayList<>();
+		try {			
+				list = globalParameterRepo.getBillCycle();									
+		}catch (Exception e) {
+			throw e;
+		}
+		return list;
+	}
+
+	@Override
+	public List<AddReasonDto> getReason() throws Exception {
+		List<AddReasonDto> list = new ArrayList<>();
+		try {			
+				list = globalParameterRepo.getReason();									
+		}catch (Exception e) {
+			throw e;
+		}
+		return list;
+	}
+
+	@Override
+	public List<CategoryDto> getCategory() throws Exception {
+		List<CategoryDto> list = new ArrayList<>();
+		try {			
+				list = globalParameterRepo.getCategory();									
+		}catch (Exception e) {
+			throw e;
+		}
+		return list;
+	}
+
+	@Override
+	public List<SubCategoryDto> getSubCategory(String category) throws Exception {
+		List<SubCategoryDto> list = new ArrayList<>();
+		try {			
+				list = globalParameterRepo.getSubCategory(category);									
+		}catch (Exception e) {
+			throw e;
+		}
+		return list;
+	}
+
+	@Override
+	public List<CommonDropdownDto> getCompanyByCode(String companyCode) throws Exception {
+		List<CommonDropdownDto> list = new ArrayList<>();
+		try {			
+				list = globalParameterRepo.getCompanyByCode(companyCode);									
+		}catch (Exception e) {
+			throw e;
+		}
+		return list;
+	}
 	
 }

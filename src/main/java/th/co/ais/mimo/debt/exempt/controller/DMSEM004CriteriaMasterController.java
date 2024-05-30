@@ -21,7 +21,11 @@ import th.co.ais.mimo.debt.exempt.dto.DistrictDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.ProvinceDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.SubDistrictDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.ZipCodeDropdownListDto;
+import th.co.ais.mimo.debt.exempt.model.CollectionSegmentDto;
+import th.co.ais.mimo.debt.exempt.model.CollectionSegmentResp;
 import th.co.ais.mimo.debt.exempt.model.CommonDropDownReq;
+import th.co.ais.mimo.debt.exempt.model.CommonDropDownResp;
+import th.co.ais.mimo.debt.exempt.model.CommonDropdownDto;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004CriteriaMasterBean;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004DeleteInfoReq;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004DeleteInfoResp;
@@ -179,5 +183,102 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-		
+	
+	@GetMapping(value = "/collection-segment")
+	public ResponseEntity<CollectionSegmentResp> getCollectionSegment() throws Exception {
+		String errorMsg = null;
+		List<CollectionSegmentDto> listDto = null;
+		CollectionSegmentResp response = null;
+		try {
+			listDto = criteriaMasterService.getCollectionSegment();
+		}catch (Exception e){
+			log.error("Exception GetRegion : {}", e.getMessage(), e);
+			errorMsg = "GetRegion Internal server Error process";
+		} finally {
+			response = new CollectionSegmentResp(errorMsg, listDto);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/bill-cycle")
+	public ResponseEntity<CommonDropDownResp> getBillCycle() throws Exception {
+		String errorMsg = null;
+		List<CommonDropdownDto> listDto = null;
+		CommonDropDownResp response = null;
+		try {
+			listDto = criteriaMasterService.getBillCycle();
+		}catch (Exception e){
+			log.error("Exception getBillCycle : {}", e.getMessage(), e);
+			errorMsg = "getBillCycle Internal server Error process";
+		} finally {
+			response = new CommonDropDownResp(errorMsg, listDto);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/ba-status")
+	public ResponseEntity<CommonDropDownResp> getBaStatus() throws Exception {
+		String errorMsg = null;
+		List<CommonDropdownDto> listDto = null;
+		CommonDropDownResp response = null;
+		try {
+			listDto = criteriaMasterService.getBastatus();
+		}catch (Exception e){
+			log.error("Exception getBastatus : {}", e.getMessage(), e);
+			errorMsg = "getBastatus Internal server Error process";
+		} finally {
+			response = new CommonDropDownResp(errorMsg, listDto);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/mobile-status")
+	public ResponseEntity<CommonDropDownResp> getMobileStatus() throws Exception {
+		String errorMsg = null;
+		List<CommonDropdownDto> listDto = null;
+		CommonDropDownResp response = null;
+		try {
+			listDto = criteriaMasterService.getMobilestatus();
+		}catch (Exception e){
+			log.error("Exception getMobileStatus : {}", e.getMessage(), e);
+			errorMsg = "getMobileStatus Internal server Error process";
+		} finally {
+			response = new CommonDropDownResp(errorMsg, listDto);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/module")
+	public ResponseEntity<CommonDropDownResp> getModule() throws Exception {
+		String errorMsg = null;
+		List<CommonDropdownDto> listDto = null;
+		CommonDropDownResp response = null;
+		try {
+			listDto = criteriaMasterService.getModule();
+		}catch (Exception e){
+			log.error("Exception getModule : {}", e.getMessage(), e);
+			errorMsg = "getModule Internal server Error process";
+		} finally {
+			response = new CommonDropDownResp(errorMsg, listDto);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/exempt-level")
+	public ResponseEntity<CommonDropDownResp> getExemptLevel() throws Exception {
+		String errorMsg = null;
+		List<CommonDropdownDto> listDto = null;
+		CommonDropDownResp response = null;
+		try {
+			listDto = criteriaMasterService.getExemptLevel();
+		}catch (Exception e){
+			log.error("Exception getExemptLevel : {}", e.getMessage(), e);
+			errorMsg = "getExemptLevel Internal server Error process";
+		} finally {
+			response = new CommonDropDownResp(errorMsg, listDto);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+			
 }
