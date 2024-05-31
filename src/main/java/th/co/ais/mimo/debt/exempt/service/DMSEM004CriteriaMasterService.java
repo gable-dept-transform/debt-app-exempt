@@ -15,6 +15,7 @@ import th.co.ais.mimo.debt.exempt.model.CategoryDto;
 import th.co.ais.mimo.debt.exempt.model.CollectionSegmentDto;
 import th.co.ais.mimo.debt.exempt.model.CommonDropdownDto;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004CriteriaMasterBean;
+import th.co.ais.mimo.debt.exempt.model.InsertAssignDto;
 import th.co.ais.mimo.debt.exempt.model.SubCategoryDto;
 
 
@@ -59,4 +60,6 @@ public interface DMSEM004CriteriaMasterService {
 	List<CommonDropdownDto> getCompanyByCode(String companyCode) throws Exception;
 	 
 	List<GetRefAssignDto> getRefAssignId(String assignId) throws Exception;
+	
+	String insetRefAssignId(InsertAssignDto assignDto) throws Exception;
 }
