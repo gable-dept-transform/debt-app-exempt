@@ -37,6 +37,8 @@ import th.co.ais.mimo.debt.exempt.model.DMSEM004SearchDataResp;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004UpdateInfoReq;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004UpdateInfoResp;
 import th.co.ais.mimo.debt.exempt.model.DistrictInfoResp;
+import th.co.ais.mimo.debt.exempt.model.InsertAssignIdReq;
+import th.co.ais.mimo.debt.exempt.model.InsertAssignIdResp;
 import th.co.ais.mimo.debt.exempt.model.ProvinceInfoResp;
 import th.co.ais.mimo.debt.exempt.model.ReasonResp;
 import th.co.ais.mimo.debt.exempt.model.RegionInfoResp;
@@ -368,6 +370,38 @@ public class DMSEM004CriteriaMasterController {
 			errorMsg = "getSubCategory Internal server Error process";
 		} finally {
 			response = new SearchAssignResp(errorMsg, list);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/mode")
+	public ResponseEntity<CommonDropDownResp> getMode() throws Exception {
+		String errorMsg = null;
+		List<CommonDropdownDto> listDto = null;
+		CommonDropDownResp response = null;
+		try {
+			listDto = criteriaMasterService.getMode();
+		}catch (Exception e){
+			log.error("Exception GetMode : {}", e.getMessage(), e);
+			errorMsg = "GetMode Internal server Error process";
+		} finally {
+			response = new CommonDropDownResp(errorMsg, listDto);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/insert-assign", produces = "application/json")
+	public ResponseEntity<InsertAssignIdResp> insertAssign(
+			@RequestBody InsertAssignIdReq request) {
+		String errorMsg = null;		
+		InsertAssignIdResp response = null;
+		try {
+			
+		}catch (Exception e){
+			log.error("Exception insertAssign : {}", e.getMessage(), e);
+			errorMsg = "insertAssign Internal server Error process";
+		} finally {
+			response = new InsertAssignIdResp(errorMsg);
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
