@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 
 import th.co.ais.mimo.debt.exempt.dto.CommonDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.DistrictDropdownListDto;
+import th.co.ais.mimo.debt.exempt.dto.GetRefAssignDto;
 import th.co.ais.mimo.debt.exempt.dto.ProvinceDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.SubDistrictDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.ZipCodeDropdownListDto;
@@ -56,4 +57,6 @@ public interface DMSEM004CriteriaMasterService {
 	List<SubCategoryDto> getSubCategory(String category) throws Exception;
 	
 	List<CommonDropdownDto> getCompanyByCode(String companyCode) throws Exception;
+	 
+	List<GetRefAssignDto> getRefAssignId(String assignId) throws Exception;
 }
