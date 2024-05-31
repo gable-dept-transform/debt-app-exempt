@@ -45,72 +45,74 @@ public class ReportDMREM001ServiceImpl implements ReportDMREM001Dao {
         try {
             StringBuffer sql = new StringBuffer();
             sql.append("SELECT ");
-            sql.append("report_id as \"reportId\", ");
-            sql.append("report_seq as \"reportSeq\", ");
-            sql.append("criteria_dtm as \"criteriaDate\", ");
-            sql.append("criteria_by as \"criteriaBy\", ");
-            sql.append("criteria_location as \"criteriaLocation\", ");
-            sql.append("process_dat as \"processDate\", ");
-            sql.append("report_status as \"reportStatus\", ");
-            sql.append("exempt_status as \"exemptStatus\", ");
-            sql.append("exempt_format as \"exemptFormat\", ");
-            sql.append("group_by_list as \"groupByForSummary\", ");
-            sql.append("company_code as \"companyCode\", ");
-            sql.append("mode_id_list as \"modeIdList\", ");
-            sql.append("exempt_level_list as \"exemptLevelList\", ");
-            sql.append("effective_dat_from as \"effectiveDateFrom\", ");
-            sql.append("effective_dat_to as \"effectiveDateTo\", ");
-            sql.append("end_dat_from as \"endDateFrom\", ");
-            sql.append("end_dat_to as \"endDateTo\", ");
-            sql.append("expire_dat_from as \"expireDateFrom\", ");
-            sql.append("expire_dat_to as \"expireDateTo\", ");
-            sql.append("cate_code as \"exemptCategory\", ");
-            sql.append("payment_type_list as \"exemptAction\", ");
-            sql.append("mobile_status_list as \"mobileStatusList\", ");
-            sql.append("location_code_list as \"locationCodeList\", ");
-            sql.append("debt_mny_from as \"debtMnyFrom\", ");
-            sql.append("debt_mny_to as \"debtMnyTo\", ");
-            sql.append("add_reason_list as \"addReason\", ");
-            sql.append("cate_subcate_list as \"catSubCatList\", ");
-            sql.append("month_period as \"monthPeriod\", ");
-            sql.append("day_over as \"dayOver\", ");
-            sql.append("duration_over as \"durationOver\", ");
-            sql.append("location_from as \"locationFrom\", ");
-            sql.append("location_to as \"locationTo\" ");
-            sql.append("FROM dcc_report_em_criteria ");
-            sql.append("WHERE 1=1 ");
+            sql.append("r.report_id as \"reportId\", ");
+            sql.append("r.report_seq as \"reportSeq\", ");
+            sql.append("r.criteria_dtm as \"criteriaDate\", ");
+            sql.append("r.criteria_by as \"criteriaBy\", ");
+            sql.append("r.criteria_location as \"criteriaLocation\", ");
+            sql.append("r.process_dat as \"processDate\", ");
+            sql.append("r.report_status as \"reportStatus\", ");
+            sql.append("g.keyword_desc as \"reportStatusDesc\", ");
+            sql.append("r.exempt_status as \"exemptStatus\", ");
+            sql.append("r.exempt_format as \"exemptFormat\", ");
+            sql.append("r.group_by_list as \"groupByForSummary\", ");
+            sql.append("r.company_code as \"companyCode\", ");
+            sql.append("r.mode_id_list as \"modeIdList\", ");
+            sql.append("r.exempt_level_list as \"exemptLevelList\", ");
+            sql.append("r.effective_dat_from as \"effectiveDateFrom\", ");
+            sql.append("r.effective_dat_to as \"effectiveDateTo\", ");
+            sql.append("r.end_dat_from as \"endDateFrom\", ");
+            sql.append("r.end_dat_to as \"endDateTo\", ");
+            sql.append("r.expire_dat_from as \"expireDateFrom\", ");
+            sql.append("r.expire_dat_to as \"expireDateTo\", ");
+            sql.append("r.cate_code as \"exemptCategory\", ");
+            sql.append("r.payment_type_list as \"exemptAction\", ");
+            sql.append("r.mobile_status_list as \"mobileStatusList\", ");
+            sql.append("r.location_code_list as \"locationCodeList\", ");
+            sql.append("r.debt_mny_from as \"debtMnyFrom\", ");
+            sql.append("r.debt_mny_to as \"debtMnyTo\", ");
+            sql.append("r.add_reason_list as \"addReason\", ");
+            sql.append("r.cate_subcate_list as \"catSubCatList\", ");
+            sql.append("r.month_period as \"monthPeriod\", ");
+            sql.append("r.day_over as \"dayOver\", ");
+            sql.append("r.duration_over as \"durationOver\", ");
+            sql.append("r.location_from as \"locationFrom\", ");
+            sql.append("r.location_to as \"locationTo\" ");
+            sql.append("FROM dcc_report_em_criteria r ");
+            sql.append("LEFT JOIN DCC_GLOBAL_PARAMETER g ON r.report_status = g.KEYWORD ");
+            sql.append("WHERE 1=1 AND g.SECTION_NAME = 'REPORT_STATUS' ");
 
             if (AppConstant.FLAG_Y.equals(request.getFvBlnACSLocation())) {
-                sql.append(" AND criteria_location IN (:userLoctionCodeList) ");
+                sql.append(" AND r.criteria_location IN (:userLoctionCodeList) ");
             }
 
             if (StringUtils.isNotBlank(request.getReportId())) {
-                sql.append("AND REPORT_ID = :reportId ");
+                sql.append("AND r.REPORT_ID = :reportId ");
             }
 
             if (StringUtils.isNotBlank(request.getReportStatus())) {
-                sql.append(" AND REPORT_STATUS = :reportStatus ");
+                sql.append(" AND g.KEYWORD_VALUE = :reportStatus ");
             }
 
             if (StringUtils.isNotBlank(request.getReportSeq())) {
-                sql.append(" AND REPORT_SEQ = :reportSeq ");
+                sql.append(" AND r.REPORT_SEQ = :reportSeq ");
             }
 
             if (StringUtils.isNotBlank(request.getCriteriaBy())) {
-                sql.append(" AND CRITERIA_BY = :criteriaBy ");
+                sql.append(" AND r.CRITERIA_BY = :criteriaBy ");
             }
 
             if (request.getCriteriaDateFrom() != null && request.getCriteriaDateTo() != null) {
-                sql.append(" AND CRITERIA_DTM >= TRUNC(:criteriaDateFrom) ");
-                sql.append(" AND CRITERIA_DTM <= TRUNC(:criteriaDateTo) + INTERVAL '1' DAY - INTERVAL '1' SECOND ");
+                sql.append(" AND r.CRITERIA_DTM >= TRUNC(:criteriaDateFrom) ");
+                sql.append(" AND r.CRITERIA_DTM <= TRUNC(:criteriaDateTo) + INTERVAL '1' DAY - INTERVAL '1' SECOND ");
             }
 
             if (request.getProcessDateFrom() != null && request.getProcessDateTo() != null) {
-                sql.append(" AND PROCESS_DAT >= TRUNC(:processDateFrom) ");
-                sql.append(" AND PROCESS_DAT <= TRUNC(:processDateTo) + INTERVAL '1' DAY - INTERVAL '1' SECOND ");
+                sql.append(" AND r.PROCESS_DAT >= TRUNC(:processDateFrom) ");
+                sql.append(" AND r.PROCESS_DAT <= TRUNC(:processDateTo) + INTERVAL '1' DAY - INTERVAL '1' SECOND ");
             }
 
-            sql.append(" ORDER BY report_seq DESC ");
+            sql.append(" ORDER BY r.report_seq DESC ");
 
             Query query = entityManager.createNativeQuery(sql.toString(), Tuple.class);
 
