@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import th.co.ais.mimo.debt.exempt.dto.CommonDropdownListDto;
@@ -375,12 +376,12 @@ public class DMSEM004CriteriaMasterController {
 	}
 	
 	@GetMapping(value = "/mode")
-	public ResponseEntity<CommonDropDownResp> getMode() throws Exception {
+	public ResponseEntity<CommonDropDownResp> getMode(@RequestParam(name="module") String module) throws Exception {
 		String errorMsg = null;
 		List<CommonDropdownDto> listDto = null;
 		CommonDropDownResp response = null;
 		try {
-			listDto = criteriaMasterService.getMode();
+			listDto = criteriaMasterService.getMode(module);
 		}catch (Exception e){
 			log.error("Exception GetMode : {}", e.getMessage(), e);
 			errorMsg = "GetMode Internal server Error process";

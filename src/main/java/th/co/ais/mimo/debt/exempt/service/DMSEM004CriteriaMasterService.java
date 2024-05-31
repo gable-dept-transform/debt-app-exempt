@@ -46,7 +46,7 @@ public interface DMSEM004CriteriaMasterService {
 	
 	List<CommonDropdownDto> getExemptLevel() throws Exception;
 	
-	List<CommonDropdownDto> getMode() throws Exception;
+	List<CommonDropdownDto> getMode(String module) throws Exception;
 	
 	List<CommonDropdownDto> getBillCycle() throws Exception;
 	

@@ -202,10 +202,10 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 	}
 
 	@Override
-	public List<CommonDropdownDto> getMode() throws Exception {
+	public List<CommonDropdownDto> getMode(String module) throws Exception {
 		List<CommonDropdownDto> list = new ArrayList<>();
 		try {			
-				list = globalParameterRepo.getMode();									
+				list = globalParameterRepo.getMode(module);									
 		}catch (Exception e) {
 			throw e;
 		}
