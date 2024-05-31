@@ -22,7 +22,9 @@ import lombok.NoArgsConstructor;
 @Table(name = "DCC_DMREM001_TMP")
 public class DccDMREM001Tmp implements Serializable {
 
-    @Id
+	private static final long serialVersionUID = -3794273550717758341L;
+
+	@Id
     @Column(name = "REPORT_ID")
     private String reportId;
 

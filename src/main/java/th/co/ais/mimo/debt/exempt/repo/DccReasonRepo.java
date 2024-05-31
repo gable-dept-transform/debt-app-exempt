@@ -6,11 +6,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import th.co.ais.mimo.debt.exempt.dto.CommonDropdownListDto;
 import th.co.ais.mimo.debt.exempt.entity.DccReason;
+import th.co.ais.mimo.debt.exempt.entity.DccReasonId;
 
 import java.util.List;
 
 @Repository
-public interface DccReasonRepo extends JpaRepository<DccReason,String> {
+public interface DccReasonRepo extends JpaRepository<DccReason,DccReasonId> {
 
     @Query(value =" select reason_code val , reason_description label\n" +
             "from {h-schema}dcc_reason\n" +
