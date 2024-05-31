@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 import th.co.ais.mimo.debt.exempt.dto.CommonDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.DccExemptCateDetailDto;
 import th.co.ais.mimo.debt.exempt.dto.DccExemptCateMasterDto;
+import th.co.ais.mimo.debt.exempt.exception.ExemptException;
 import th.co.ais.mimo.debt.exempt.model.CommonDropDownResponse;
 import th.co.ais.mimo.debt.exempt.model.ExemptCateDetailResponse;
 import th.co.ais.mimo.debt.exempt.model.ExemptCateMasterResponse;
+import th.co.ais.mimo.debt.exempt.model.ReservePackResponse;
 import th.co.ais.mimo.debt.exempt.service.impl.CommonService;
 
 import java.util.List;
@@ -211,4 +213,23 @@ public class CommonController {
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+
+    @GetMapping(value = "/reserved-pack")
+    public ResponseEntity<ReservePackResponse> getReservedPack()  {
+        ReservePackResponse response = new ReservePackResponse();
+
+
+        String errorMsg = null;
+        try {
+            String packCodeList = commonService.getReservePack();
+            response.setReservePackCodeList(packCodeList);
+        } catch (ExemptException e) {
+            log.error("Exception get cate : {}", e.getMessage(), e);
+            errorMsg = "Get cate Internal server Error process";
+            response = ReservePackResponse.builder().errorMsg(errorMsg).build();
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }

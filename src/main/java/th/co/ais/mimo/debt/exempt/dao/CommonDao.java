@@ -13,4 +13,5 @@ public interface CommonDao {
 
     public String getBillingSystem(String billingAccNum)throws ExemptException;
 
+    public String getReservePack()throws ExemptException;
 }

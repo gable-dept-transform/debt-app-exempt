@@ -114,4 +114,8 @@ public class CommonService {
     public String getBillingSystem(String billingAccNum) throws ExemptException{
         return commonDao.getBillingSystem(billingAccNum);
     }
+
+    public String getReservePack()throws ExemptException{
+        return commonDao.getReservePack();
+    }
 }
