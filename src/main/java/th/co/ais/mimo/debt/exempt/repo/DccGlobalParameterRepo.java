@@ -56,12 +56,12 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
 
 	@Query(value = "  SELECT distinct keyword_desc AS label, keyword_value AS val "
 			+ " FROM dcc_global_parameter WHERE SECTION_NAME  = :sectionName AND KEYWORD = :keyWord ", nativeQuery = true)
-	List<CommonDropdownListDto> getRegionInfoCaseDropdown(String sectionName, String keyWord) throws Exception;
+	List<CommonDropdownListDto> getRegionInfoCaseDropdown(@Param("sectionName")String sectionName, @Param("keyWord")String keyWord) throws Exception;
 
 	@Query(value = "  SELECT DISTINCT(L.LOV_NAME) AS val, L.DISPLAY_VAL AS label , L.LOV_VAL1 AS lovVal1 "
 			+ " FROM SFF_LOV_MASTER L " + " WHERE L.LOV_TYPE = 'PROVINCE' "
 			+ " AND INSTR (:provinveCodeList , L.LOV_VAL5) > 0 " + " ORDER BY L.LOV_VAL1 DESC ", nativeQuery = true)
-	List<ProvinceDropdownListDto> getProvinceInfoCaseDropdown(String provinveCodeList) throws Exception;
+	List<ProvinceDropdownListDto> getProvinceInfoCaseDropdown(@Param("provinveCodeList")String provinveCodeList) throws Exception;
 
 	@Query(value = "  SELECT DISTINCT(L.LOV_NAME) AS val, L.DISPLAY_VAL AS label , L.LOV_VAL1 AS lovVal1 "
 			+ " FROM SFF_LOV_MASTER L " + " WHERE L.LOV_TYPE = 'PROVINCE' "
@@ -73,7 +73,7 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
 			+ "  AND L.LOV_TYPE = 'PROVINCE' "
 			+ "  AND DCCU_UTIL.FIND_LIKE_LIST(:provinveCodeList,CC.X_PROVINCE,'F' )> 0 "
 			+ "  ORDER BY CC.X_PROVINCE, CC.CITY ", nativeQuery = true)
-	List<DistrictDropdownListDto> getdistrictInfoCaseDropdown(String provinveCodeList) throws Exception;
+	List<DistrictDropdownListDto> getdistrictInfoCaseDropdown(@Param("provinveCodeList")String provinveCodeList) throws Exception;
 
 	@Query(value = " SELECT DISTINCT(CC.CITY) AS city,L.DISPLAY_VAL AS dispVal ,CC.X_PROVINCE AS province"
 			+ "  FROM ZIPCODE CC, SFF_LOV_MASTER L " + "  WHERE CC.X_PROVINCE = L.LOV_NAME "
@@ -84,7 +84,7 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
 			+ " FROM ZIPCODE CC, SFF_LOV_MASTER L " + " WHERE CC.X_PROVINCE = L.LOV_NAME "
 			+ " AND L.LOV_TYPE = 'PROVINCE' " + " AND DCCU_UTIL.FIND_LIKE_LIST(:aumphurCodeList,CC.CITY ,'F' )> 0 "
 			+ " ORDER BY CC.X_PROVINCE,CC.CITY,CC.TUMBOL ", nativeQuery = true)
-	List<SubDistrictDropdownListDto> getSubDistrictInfoCaseDropdown(String aumphurCodeList) throws Exception;
+	List<SubDistrictDropdownListDto> getSubDistrictInfoCaseDropdown(@Param("aumphurCodeList")String aumphurCodeList) throws Exception;
 
 	@Query(value = " SELECT DISTINCT(CC.TUMBOL) AS tumbol,L.DISPLAY_VAL AS dispVal, CC.CITY AS city, CC.X_PROVINCE AS province"
 			+ " FROM ZIPCODE CC, SFF_LOV_MASTER L " + " WHERE CC.X_PROVINCE = L.LOV_NAME "
@@ -93,7 +93,7 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
 
 	@Query(value = " SELECT DISTINCT(Z.CONTINENT) AS zipCode, Z.CITY AS city" + " FROM ZIPCODE Z "
 			+ " WHERE DCCU_UTIL.FIND_LIKE_LIST(:cityCodeList ,Z.CITY,'F') > 0 ", nativeQuery = true)
-	List<ZipCodeDropdownListDto> getZipCodeInfoCaseDropdown(String cityCodeList) throws Exception;
+	List<ZipCodeDropdownListDto> getZipCodeInfoCaseDropdown(@Param("cityCodeList")String cityCodeList) throws Exception;
 
 	@Query(value = " SELECT DISTINCT(Z.CONTINENT) AS zipCode, Z.CITY AS city" + " FROM ZIPCODE Z ", nativeQuery = true)
 	List<ZipCodeDropdownListDto> getZipCodeAllInfoCaseDropdown() throws Exception;
@@ -130,9 +130,9 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
 	
 	@Query(value = " select DISTINCT(keyword_desc) AS keywordDesc, keyword_value AS keywordValue, last_update_by AS lastUpdateBy, "
 			+ " last_update_dtm AS lastUpdateDtm ,SECTION_NAME AS sectionName ,KEYWORD AS keyword"
-			+ " from dcc_global_parameter " + " where section_name = 'CRITERIA' " + " and keyword = 'EXEMPT_BACKOFFICE_LOCATION' "
-			+ " order by keyword_value ", nativeQuery = true)
-	List<CommonDropdownDto> getMode() throws Exception;
+			+ " from dcc_global_parameter " 
+			+ " where section_name = 'EXEMPT_MODE' and keyword = :module " , nativeQuery = true)
+	List<CommonDropdownDto> getMode(@Param("module")String module) throws Exception;
 	
 	@Query(value = " select DISTINCT(keyword_desc) AS keywordDesc, keyword_value AS keywordValue, last_update_by AS lastUpdateBy, "
 			+ "	last_update_dtm AS lastUpdateDtm ,SECTION_NAME AS sectionName ,KEYWORD AS keyword "
