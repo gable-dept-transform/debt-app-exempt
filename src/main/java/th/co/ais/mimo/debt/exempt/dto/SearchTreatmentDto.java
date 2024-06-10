@@ -1,5 +1,6 @@
 package th.co.ais.mimo.debt.exempt.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,7 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SearchTreatmentDto implements Serializable {
 
     private static final long serialVersionUID = 1L;

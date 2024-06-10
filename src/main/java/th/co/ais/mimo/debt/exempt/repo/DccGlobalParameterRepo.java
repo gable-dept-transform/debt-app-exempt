@@ -27,12 +27,12 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
 	List<CommonDropdownListDto> getInfoByKeyWordAndSectionName(@Param("keyword") String keyword,
 			@Param("sectionName") String sectionName) throws Exception;
 
-	@Query(value = "select keyword_value AS val ,keyword_desc AS label\n" + "from dcc_global_parameter\n"
+	@Query(value = "select keyword_value AS val ,keyword_desc AS label\n" + "from {h-schema}dcc_global_parameter\n"
 			+ "where section_name = :sectionName and keyword = :keyword and keyword_value <> :keywordValue\n  ", nativeQuery = true)
 	List<CommonDropdownListDto> getInfoByKeyWordAndSectionNameIgnoreKeyword(@Param("keyword") String keyword,
 			@Param("sectionName") String sectionName, @Param("keywordValue") String keywordValue) throws Exception;
 
-	@Query(value = "    select keyword_value AS val ,keyword_desc AS label\n" + "    from dcc_global_parameter\n"
+	@Query(value = "    select keyword_value AS val ,keyword_desc AS label\n" + "    from {h-schema}dcc_global_parameter\n"
 			+ "    where section_name = :sectionName and keyword = :keyword\n"
 			+ "    and ( :touchPointModeList  is null or instr(','||:touchPointModeList ||',',','||keyword_value||',' ) > 0 ) ", nativeQuery = true)
 	List<CommonDropdownListDto> getInfoByKeyWordAndSectionNameIncludeKeyword(@Param("keyword") String keyword,
@@ -115,25 +115,25 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
 			+ " from dcc_global_parameter " + " where section_name = 'CRITERIA' " + " and keyword = 'MOBILE_STATUS' "
 			+ " order by keyword_value ", nativeQuery = true)
 	List<CommonDropdownDto> getMobilestatus() throws Exception;
-	
+
 	@Query(value = " select DISTINCT(keyword_desc) AS keywordDesc, keyword_value AS keywordValue, last_update_by AS lastUpdateBy, "
 			+ " last_update_dtm AS lastUpdateDtm ,SECTION_NAME AS sectionName ,KEYWORD AS keyword"
 			+ " from dcc_global_parameter " + " where section_name = 'CRITERIA' " + " and keyword = 'MODULE_CODE' "
 			+ " order by keyword_value ", nativeQuery = true)
 	List<CommonDropdownDto> getModule() throws Exception;
-	
+
 	@Query(value = " select DISTINCT(keyword_desc) AS keywordDesc, keyword_value AS keywordValue, last_update_by AS lastUpdateBy, "
 			+ " last_update_dtm AS lastUpdateDtm ,SECTION_NAME AS sectionName ,KEYWORD AS keyword"
 			+ " from dcc_global_parameter " + " where section_name = 'CRITERIA' " + " and keyword = 'EXEMPT_LEVEL' "
 			+ " order by keyword_value ", nativeQuery = true)
 	List<CommonDropdownDto> getExemptLevel() throws Exception;
-	
+
 	@Query(value = " select DISTINCT(keyword_desc) AS keywordDesc, keyword_value AS keywordValue, last_update_by AS lastUpdateBy, "
 			+ " last_update_dtm AS lastUpdateDtm ,SECTION_NAME AS sectionName ,KEYWORD AS keyword"
-			+ " from dcc_global_parameter " 
+			+ " from dcc_global_parameter "
 			+ " where section_name = 'EXEMPT_MODE' and keyword = :module " , nativeQuery = true)
 	List<CommonDropdownDto> getMode(@Param("module")String module) throws Exception;
-	
+
 	@Query(value = " select DISTINCT(keyword_desc) AS keywordDesc, keyword_value AS keywordValue, last_update_by AS lastUpdateBy, "
 			+ "	last_update_dtm AS lastUpdateDtm ,SECTION_NAME AS sectionName ,KEYWORD AS keyword "
 			+ " from dcc_global_parameter "
@@ -142,19 +142,19 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
 			+ " and ('' IS NULL OR instr('',KEYWORD_VALUE) >0 ) "
 			+ " order by keyword_value " , nativeQuery = true)
 	List<CommonDropdownDto> getBillCycle() throws Exception;
-	
+
 	@Query(value = " select reason_code AS reasonCode, reason_type AS reasonType, reason_subtype AS reasonSubtype, reason_description AS reasonDescription, last_update_by AS lastUpdateBy, "
 			+ " last_update_dtm AS lastUpdateDtm from dcc_reason "
 			+ " where reason_type = 'WATCHLIST' and reason_subtype like 'WATCHLIST_REASON' order by reason_type, reason_code " , nativeQuery = true)
 	List<AddReasonDto> getReason() throws Exception;
-	
+
 	@Query(value = " select lov_name AS name, s.display_val AS val "
 			+ " from SFF_LOV_MASTER s "
 			+ " where  s.LOV_TYPE = 'ACCOUNT_CATEGORY' "
 			+ " and s.active_flg = 'Y' "
 			+ " order by lov_name " , nativeQuery = true)
 	List<CategoryDto> getCategory() throws Exception;
-	
+
 	@Query(value = " select sm.lov_name AS name,sm.display_val AS val "
 			+ " from sff_lov_master s,sff_lov_master sm  "
 			+ " where s.row_id = sm.par_row_id  "
@@ -164,8 +164,8 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
 			+ " and s.active_flg = 'Y' "
 			+ " and s.lov_name = :category "
 			+ " order by sm.lov_name ", nativeQuery = true)
-	List<SubCategoryDto> getSubCategory(@Param("category")String category) throws Exception;	
-	
+	List<SubCategoryDto> getSubCategory(@Param("category")String category) throws Exception;
+
 	@Query(value = " select DISTINCT(keyword_desc) AS keywordDesc, keyword_value AS keywordValue, last_update_by AS lastUpdateBy, "
 			+ "	last_update_dtm AS lastUpdateDtm ,SECTION_NAME AS sectionName ,KEYWORD AS keyword "
 			+ " from dcc_global_parameter "

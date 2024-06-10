@@ -76,8 +76,6 @@ public class SqlUtils {
                     arrayList.add(map.readValue(mapToString, objClass));
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e.getMessage());
-                } catch (IOException e) {
-                    throw new RuntimeException(e.getMessage());
                 }
 
             });
