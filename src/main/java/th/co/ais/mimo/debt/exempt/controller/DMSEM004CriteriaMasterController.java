@@ -38,6 +38,8 @@ import th.co.ais.mimo.debt.exempt.model.DMSEM004SearchDataResp;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004UpdateInfoReq;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004UpdateInfoResp;
 import th.co.ais.mimo.debt.exempt.model.DistrictInfoResp;
+import th.co.ais.mimo.debt.exempt.model.GetBillAccNumByMobileNumReq;
+import th.co.ais.mimo.debt.exempt.model.GetBillAccNumByMobileNumResp;
 import th.co.ais.mimo.debt.exempt.model.InsertAssignIdReq;
 import th.co.ais.mimo.debt.exempt.model.InsertAssignIdResp;
 import th.co.ais.mimo.debt.exempt.model.ProvinceInfoResp;
@@ -53,25 +55,25 @@ import th.co.ais.mimo.debt.exempt.model.ZipCodeInfoResp;
 import th.co.ais.mimo.debt.exempt.service.DMSEM004CriteriaMasterService;
 import th.co.ais.mimo.debt.exempt.utils.DateUtils;
 
-
 @RestController
 @RequestMapping("${api.path}/transaction/dmsem004")
 public class DMSEM004CriteriaMasterController {
-	 private final Logger log = LoggerFactory.getLogger(this.getClass());
-	 
-	 @Autowired
-	 private DMSEM004CriteriaMasterService criteriaMasterService;
-	
+	private final Logger log = LoggerFactory.getLogger(this.getClass());
+
+	@Autowired
+	private DMSEM004CriteriaMasterService criteriaMasterService;
+
 	@PostMapping(value = "/search-data", produces = "application/json")
 	public ResponseEntity<DMSEM004SearchDataResp> searchData(@RequestBody DMSEM004SearchDataRequest request) {
 
-		String errorMsg = null;	
+		String errorMsg = null;
 		List<DMSEM004CriteriaMasterBean> criteriaMasterDto = null;
 		DMSEM004SearchDataResp response = DMSEM004SearchDataResp.builder().build();
 		try {
 			if (!StringUtils.isEmpty(request.getModeId())) {
-				criteriaMasterDto = criteriaMasterService.searchData(request.getModeId(), request.getCriteriaId(), request.getDescription());
-				if(CollectionUtils.isEmpty(criteriaMasterDto)) {
+				criteriaMasterDto = criteriaMasterService.searchData(request.getModeId(), request.getCriteriaId(),
+						request.getDescription());
+				if (CollectionUtils.isEmpty(criteriaMasterDto)) {
 					errorMsg = "Data not found";
 				}
 			} else {
@@ -85,31 +87,33 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@PostMapping(value = "/delete-info", produces = "application/json")
-	public ResponseEntity<DMSEM004UpdateInfoResp> updateInformation(
-			@RequestBody DMSEM004UpdateInfoReq request) {
+	public ResponseEntity<DMSEM004UpdateInfoResp> updateInformation(@RequestBody DMSEM004UpdateInfoReq request) {
 		String errorMsg = null;
 		DMSEM004UpdateInfoResp response = DMSEM004UpdateInfoResp.builder().build();
 		try {
 			Date currentDate = new Date();
-			String dateForm = DateUtils.toStringEngDateSimpleFormat(request.getBlacklistDatFrom(), DateUtils.DEFAULT_DATETIME_PATTERN_DATE_SLASH_YYYY_MM_DD);
-			String dateTo = DateUtils.toStringEngDateSimpleFormat(request.getBlacklistDatTo(), DateUtils.DEFAULT_DATETIME_PATTERN_DATE_SLASH_YYYY_MM_DD);
-			if(currentDate.after(request.getRunAt())) {
-				errorMsg = this.criteriaMasterService.updateInfo(request.getLastUpdateBy(), request.getBlacklistDatFlag(), dateForm, dateTo, request.getModeId(), Long.valueOf(request.getCriteriaId()), request.getCriteriaType());
-			}else {
+			String dateForm = DateUtils.toStringEngDateSimpleFormat(request.getBlacklistDatFrom(),
+					DateUtils.DEFAULT_DATETIME_PATTERN_DATE_SLASH_YYYY_MM_DD);
+			String dateTo = DateUtils.toStringEngDateSimpleFormat(request.getBlacklistDatTo(),
+					DateUtils.DEFAULT_DATETIME_PATTERN_DATE_SLASH_YYYY_MM_DD);
+			if (currentDate.after(request.getRunAt())) {
+				errorMsg = this.criteriaMasterService.updateInfo(request.getLastUpdateBy(),
+						request.getBlacklistDatFlag(), dateForm, dateTo, request.getModeId(),
+						Long.valueOf(request.getCriteriaId()), request.getCriteriaType());
+			} else {
 				errorMsg = this.criteriaMasterService.deleteInfo(request.getModeId(), request.getCriteriaId());
-			}		
+			}
 		} catch (Exception e) {
 			log.error("Exception updateInformation : {}", e.getMessage(), e);
-			errorMsg = "updateInformation Internal server Error process";			
-		}finally {
+			errorMsg = "updateInformation Internal server Error process";
+		} finally {
 			response = new DMSEM004UpdateInfoResp(errorMsg);
-		}		
+		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
-	
+
 	@GetMapping(value = "/region-info")
 	public ResponseEntity<RegionInfoResp> getRegion() throws Exception {
 		String errorMsg = null;
@@ -117,7 +121,7 @@ public class DMSEM004CriteriaMasterController {
 		RegionInfoResp response = null;
 		try {
 			listDto = criteriaMasterService.getRegionInfoCaseDropdown();
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Exception GetRegion : {}", e.getMessage(), e);
 			errorMsg = "GetRegion Internal server Error process";
 		} finally {
@@ -125,18 +129,17 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@PostMapping(value = "/province-info", produces = "application/json")
-	public ResponseEntity<ProvinceInfoResp> provinceInformation(
-			@RequestBody CommonDropDownReq request) {
+	public ResponseEntity<ProvinceInfoResp> provinceInformation(@RequestBody CommonDropDownReq request) {
 		String errorMsg = null;
 		List<ProvinceDropdownListDto> listProvince = null;
 		ProvinceInfoResp response = null;
 		try {
-			
+
 			listProvince = criteriaMasterService.getProvinceInfoCaseDropdown(request.getVal());
-			
-		}catch (Exception e){
+
+		} catch (Exception e) {
 			log.error("Exception provinceInformation : {}", e.getMessage(), e);
 			errorMsg = "provinceInformation Internal server Error process";
 		} finally {
@@ -144,16 +147,15 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@PostMapping(value = "/district-info", produces = "application/json")
-	public ResponseEntity<DistrictInfoResp> districtInformation(
-			@RequestBody CommonDropDownReq request) {
+	public ResponseEntity<DistrictInfoResp> districtInformation(@RequestBody CommonDropDownReq request) {
 		String errorMsg = null;
 		List<DistrictDropdownListDto> listDistrict = null;
 		DistrictInfoResp response = null;
 		try {
 			listDistrict = criteriaMasterService.getDistrictInfoCaseDropdown(request.getVal());
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Exception districtInformation : {}", e.getMessage(), e);
 			errorMsg = "districtInformation Internal server Error process";
 		} finally {
@@ -161,16 +163,15 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@PostMapping(value = "/subdistrict-info", produces = "application/json")
-	public ResponseEntity<SubDistrictInfoResp> subdistrictInformation(
-			@RequestBody CommonDropDownReq request) {
+	public ResponseEntity<SubDistrictInfoResp> subdistrictInformation(@RequestBody CommonDropDownReq request) {
 		String errorMsg = null;
 		List<SubDistrictDropdownListDto> list = null;
 		SubDistrictInfoResp response = null;
 		try {
 			list = criteriaMasterService.getSubDistrictInfoCaseDropdown(request.getVal());
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Exception subdistrictInformation : {}", e.getMessage(), e);
 			errorMsg = "subdistrictInformation Internal server Error process";
 		} finally {
@@ -178,16 +179,15 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@PostMapping(value = "/zipcode-info", produces = "application/json")
-	public ResponseEntity<ZipCodeInfoResp> zipCodeInformation(
-			@RequestBody CommonDropDownReq request) {
+	public ResponseEntity<ZipCodeInfoResp> zipCodeInformation(@RequestBody CommonDropDownReq request) {
 		String errorMsg = null;
 		List<ZipCodeDropdownListDto> list = null;
 		ZipCodeInfoResp response = null;
 		try {
 			list = criteriaMasterService.getZipCodeInfoCaseDropdown(request.getVal());
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Exception zipCodeInformation : {}", e.getMessage(), e);
 			errorMsg = "zipCodeInformation Internal server Error process";
 		} finally {
@@ -195,7 +195,7 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "/collection-segment")
 	public ResponseEntity<CollectionSegmentResp> getCollectionSegment() throws Exception {
 		String errorMsg = null;
@@ -203,7 +203,7 @@ public class DMSEM004CriteriaMasterController {
 		CollectionSegmentResp response = null;
 		try {
 			listDto = criteriaMasterService.getCollectionSegment();
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Exception GetRegion : {}", e.getMessage(), e);
 			errorMsg = "GetRegion Internal server Error process";
 		} finally {
@@ -211,7 +211,7 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "/bill-cycle")
 	public ResponseEntity<CommonDropDownResp> getBillCycle() throws Exception {
 		String errorMsg = null;
@@ -219,7 +219,7 @@ public class DMSEM004CriteriaMasterController {
 		CommonDropDownResp response = null;
 		try {
 			listDto = criteriaMasterService.getBillCycle();
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Exception getBillCycle : {}", e.getMessage(), e);
 			errorMsg = "getBillCycle Internal server Error process";
 		} finally {
@@ -227,7 +227,7 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "/ba-status")
 	public ResponseEntity<CommonDropDownResp> getBaStatus() throws Exception {
 		String errorMsg = null;
@@ -235,7 +235,7 @@ public class DMSEM004CriteriaMasterController {
 		CommonDropDownResp response = null;
 		try {
 			listDto = criteriaMasterService.getBastatus();
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Exception getBastatus : {}", e.getMessage(), e);
 			errorMsg = "getBastatus Internal server Error process";
 		} finally {
@@ -243,7 +243,7 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "/mobile-status")
 	public ResponseEntity<CommonDropDownResp> getMobileStatus() throws Exception {
 		String errorMsg = null;
@@ -251,7 +251,7 @@ public class DMSEM004CriteriaMasterController {
 		CommonDropDownResp response = null;
 		try {
 			listDto = criteriaMasterService.getMobilestatus();
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Exception getMobileStatus : {}", e.getMessage(), e);
 			errorMsg = "getMobileStatus Internal server Error process";
 		} finally {
@@ -259,7 +259,7 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "/module")
 	public ResponseEntity<CommonDropDownResp> getModule() throws Exception {
 		String errorMsg = null;
@@ -267,7 +267,7 @@ public class DMSEM004CriteriaMasterController {
 		CommonDropDownResp response = null;
 		try {
 			listDto = criteriaMasterService.getModule();
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Exception getModule : {}", e.getMessage(), e);
 			errorMsg = "getModule Internal server Error process";
 		} finally {
@@ -275,7 +275,7 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "/exempt-level")
 	public ResponseEntity<CommonDropDownResp> getExemptLevel() throws Exception {
 		String errorMsg = null;
@@ -283,7 +283,7 @@ public class DMSEM004CriteriaMasterController {
 		CommonDropDownResp response = null;
 		try {
 			listDto = criteriaMasterService.getExemptLevel();
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Exception getExemptLevel : {}", e.getMessage(), e);
 			errorMsg = "getExemptLevel Internal server Error process";
 		} finally {
@@ -291,16 +291,15 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@PostMapping(value = "/company-code", produces = "application/json")
-	public ResponseEntity<CommonDropDownResp> getCompanyInformation(
-			@RequestBody CompanyCodeReq request) {
+	public ResponseEntity<CommonDropDownResp> getCompanyInformation(@RequestBody CompanyCodeReq request) {
 		String errorMsg = null;
 		List<CommonDropdownDto> list = null;
 		CommonDropDownResp response = null;
 		try {
 			list = criteriaMasterService.getCompanyByCode(request.getCompayCode());
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Exception subdistrictInformation : {}", e.getMessage(), e);
 			errorMsg = "subdistrictInformation Internal server Error process";
 		} finally {
@@ -308,7 +307,7 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "/reason")
 	public ResponseEntity<ReasonResp> getReason() throws Exception {
 		String errorMsg = null;
@@ -316,7 +315,7 @@ public class DMSEM004CriteriaMasterController {
 		ReasonResp response = null;
 		try {
 			listDto = criteriaMasterService.getReason();
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Exception getReason : {}", e.getMessage(), e);
 			errorMsg = "getReason Internal server Error process";
 		} finally {
@@ -324,7 +323,7 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "/category")
 	public ResponseEntity<CategoryResp> getCategory() throws Exception {
 		String errorMsg = null;
@@ -332,7 +331,7 @@ public class DMSEM004CriteriaMasterController {
 		CategoryResp response = null;
 		try {
 			listDto = criteriaMasterService.getCategory();
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Exception getReason : {}", e.getMessage(), e);
 			errorMsg = "getReason Internal server Error process";
 		} finally {
@@ -340,16 +339,15 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@PostMapping(value = "/sub-category", produces = "application/json")
-	public ResponseEntity<SubCategoryResp> getSubCategory(
-			@RequestBody SubCategoryReq request) {
+	public ResponseEntity<SubCategoryResp> getSubCategory(@RequestBody SubCategoryReq request) {
 		String errorMsg = null;
 		List<SubCategoryDto> list = null;
 		SubCategoryResp response = null;
 		try {
 			list = criteriaMasterService.getSubCategory(request.getCatCode());
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Exception getSubCategory : {}", e.getMessage(), e);
 			errorMsg = "getSubCategory Internal server Error process";
 		} finally {
@@ -357,16 +355,15 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@PostMapping(value = "/seach-assign", produces = "application/json")
-	public ResponseEntity<SearchAssignResp> getAssignId(
-			@RequestBody SearchAssignReq request) {
+	public ResponseEntity<SearchAssignResp> getAssignId(@RequestBody SearchAssignReq request) {
 		String errorMsg = null;
 		List<GetRefAssignDto> list = null;
 		SearchAssignResp response = null;
 		try {
 			list = criteriaMasterService.getRefAssignId(request.getAssignId());
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Exception getSubCategory : {}", e.getMessage(), e);
 			errorMsg = "getSubCategory Internal server Error process";
 		} finally {
@@ -374,15 +371,15 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "/mode")
-	public ResponseEntity<CommonDropDownResp> getMode(@RequestParam(name="module") String module) throws Exception {
+	public ResponseEntity<CommonDropDownResp> getMode(@RequestParam(name = "module") String module) throws Exception {
 		String errorMsg = null;
 		List<CommonDropdownDto> listDto = null;
 		CommonDropDownResp response = null;
 		try {
 			listDto = criteriaMasterService.getMode(module);
-		}catch (Exception e){
+		} catch (Exception e) {
 			log.error("Exception GetMode : {}", e.getMessage(), e);
 			errorMsg = "GetMode Internal server Error process";
 		} finally {
@@ -390,15 +387,15 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@PostMapping(value = "/insert-assign", produces = "application/json")
-	public ResponseEntity<InsertAssignIdResp> insertAssign(
-			@RequestBody InsertAssignIdReq request) {
-		String errorMsg = null;		
+	public ResponseEntity<InsertAssignIdResp> insertAssign(@RequestBody InsertAssignIdReq request) {
+		String errorMsg = null;
 		InsertAssignIdResp response = null;
 		try {
-			
-		}catch (Exception e){
+			response = criteriaMasterService.insertCriteriaMaster(request);
+			errorMsg = response.getErrorMsg();
+		} catch (Exception e) {
 			log.error("Exception insertAssign : {}", e.getMessage(), e);
 			errorMsg = "insertAssign Internal server Error process";
 		} finally {
@@ -406,5 +403,22 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-			
+
+	@PostMapping(value = "/validate-mobilenum", produces = "application/json")
+	public ResponseEntity<GetBillAccNumByMobileNumResp> validateGetBillAccNumByMobileNum(@RequestBody GetBillAccNumByMobileNumReq request) {
+		String errorMsg = null;
+		GetBillAccNumByMobileNumResp response = null;
+		try {
+			response = criteriaMasterService.validateGetBillAccNumByMobileNum(request);
+			errorMsg = response.getErrorMsg();
+		} catch (Exception e) {
+			log.error("Exception insertAssign : {}", e.getMessage(), e);
+			errorMsg = "insertAssign Internal server Error process";
+			response = new GetBillAccNumByMobileNumResp(null, errorMsg);
+		} finally {
+//			response = new GetBillAccNumByMobileNumResp(response, errorMsg);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
 }

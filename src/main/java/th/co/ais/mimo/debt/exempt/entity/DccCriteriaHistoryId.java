@@ -13,8 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Embeddable
-public class DccCriteriaMasterId  implements Serializable {
-
+public class DccCriteriaHistoryId implements Serializable{
 	private static final long serialVersionUID = 5945588701041358744L;
 
 	@Column(name = "MODE_ID")
