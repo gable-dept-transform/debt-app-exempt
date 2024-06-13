@@ -378,4 +378,20 @@ public class DMSEM002SetTreatmentExemptDaoImpl implements DMSEM002SetTreatmentEx
         return null;
     }
 
+    public String getDCBOSSeq() throws ExemptException{
+        String sql = "select TO_CHAR(ADD_MONTHS(SYSDATE,6516),'YYMM')||'9'||LTRIM(TO_CHAR(dcc_exempt_gen_bos_seq.nextval,'099999')) exempt_bos_seq FROM DUAL ";
+        try{
+            Query query = entityManager.createNativeQuery(sql);
+            List list = query.getResultList();
+            if(list != null && !list.isEmpty()){
+                return (String)list.get(0);
+            }
+
+        }catch (PersistenceException | IllegalArgumentException e){
+            log.error("error occured when search exempt detail ",e);
+            throw new ExemptException(AppConstant.FAIL, e.getMessage());
+        }
+        return null;
+    }
+
 }

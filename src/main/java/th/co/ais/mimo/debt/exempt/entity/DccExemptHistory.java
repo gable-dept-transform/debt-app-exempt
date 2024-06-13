@@ -40,10 +40,10 @@ public class DccExemptHistory {
     private String cateCode;
 
     @Column(name = "ADD_LOCATION")
-    private Long addLocation;
+    private Integer addLocation;
 
     @Column(name = "UPDATE_LOCATION")
-    private Long updateLocation;
+    private Integer updateLocation;
 
     @Column(name = "ADD_REASON")
     private String addReason;

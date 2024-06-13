@@ -7,7 +7,7 @@ import lombok.Data;
 @Builder
 @Data
 @AllArgsConstructor
-public class DccExemptCateMaster {
+public class DccExemptCateMasterDto {
     private String cateCode;
     private String cateDescription;
     private String exemptReason;

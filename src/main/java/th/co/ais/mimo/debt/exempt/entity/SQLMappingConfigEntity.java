@@ -159,7 +159,7 @@ import java.util.Date;
 @SqlResultSetMapping(
         name = "searchExemptCateMasterDtoMapping",
         classes = @ConstructorResult(
-                targetClass = DccExemptCateMaster.class,
+                targetClass = DccExemptCateMasterDto.class,
                 columns = {
                         @ColumnResult(name = "cate_code",type = String.class),
                         @ColumnResult(name = "cate_description",type = String.class),
@@ -172,7 +172,7 @@ import java.util.Date;
 @SqlResultSetMapping(
         name = "searchExemptCateDetailDtoMapping",
         classes = @ConstructorResult(
-                targetClass = DccExemptCateDetail.class,
+                targetClass = DccExemptCateDetailDto.class,
                 columns = {
                         @ColumnResult(name = "mode_id",type = String.class),
                         @ColumnResult(name = "module_code",type = String.class),

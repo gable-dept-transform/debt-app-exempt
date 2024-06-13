@@ -108,5 +108,8 @@ public interface GetRefAssignDto {
 	String getCpeFlag();
 	String getExemptReason();
 	String getBundlingFlag();
+	String getActionReasonListDesc();
+	String getAssignTypeDesc();
+	String getOrderLevelDesc();
 	
 }

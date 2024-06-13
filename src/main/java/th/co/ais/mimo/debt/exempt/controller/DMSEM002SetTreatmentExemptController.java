@@ -6,14 +6,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import th.co.ais.mimo.debt.exempt.dto.ExemptDetailDto;
 import th.co.ais.mimo.debt.exempt.exception.ExemptException;
-import th.co.ais.mimo.debt.exempt.model.SearchRequest;
-import th.co.ais.mimo.debt.exempt.model.SearchResponse;
+import th.co.ais.mimo.debt.exempt.model.*;
 import th.co.ais.mimo.debt.exempt.service.DMSEM002SetTreatmentExemptService;
 
 import java.util.List;
@@ -55,14 +51,81 @@ public class DMSEM002SetTreatmentExemptController {
 	}
 
 	@PostMapping(value = "/search-exempt",produces = "application/json")
-	public ResponseEntity searchExemptDetail(@RequestBody SearchRequest request){
+	public ResponseEntity<SearchResponse> searchExemptDetail(@RequestBody SearchRequest request){
         try {
             List<ExemptDetailDto> list =  this.dmsem002SetTreatmentExemptService.searchExemptDetail(request.getSearchType(), request.getParamValue());
-			return ResponseEntity.ok().body(list);
+
+			return ResponseEntity.ok().body(SearchResponse.builder().resultDetailList(list).build());
         } catch (ExemptException e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+			return ResponseEntity.ok().body(SearchResponse.builder().errorMsg("error").build());
         }
         //return ResponseEntity.ok().body("");
 	}
-	
+
+
+	@PostMapping(value = "/add-exempt",produces = "application/json")
+	public ResponseEntity<AddExemptResponse> addExempt(@RequestBody AddExemptRequest request,
+													   @RequestHeader(name = "x-user-id") String userId,
+													   @RequestHeader(name = "x-location") Integer location){
+		try {
+			AddExemptResponse response = this.dmsem002SetTreatmentExemptService.insertExempt(request,location,userId);
+			return ResponseEntity.ok().body(response);
+		} catch (ExemptException e) {
+			throw new RuntimeException(e);
+		}
+
+	}
+
+	@PostMapping(value = "/validate-add-exempt",produces = "application/json")
+	public ResponseEntity<AddExemptResponse> preAddExempt(@RequestBody AddExemptRequest request){
+		try {
+			AddExemptResponse response = this.dmsem002SetTreatmentExemptService.validateAddExempt(request);
+			return ResponseEntity.ok().body(response);
+		} catch (ExemptException e) {
+			return ResponseEntity.ok().body(AddExemptResponse.builder()
+					.responseCode(e.getCode())
+					.errorMsg(e.getMessage())
+					.build());
+		}
+
+	}
+
+
+	@PostMapping(value = "/update-exempt",produces = "application/json")
+	public ResponseEntity<UpdateExemptResponse> updateExempt(@RequestBody UpdateExemptRequest request,
+															 @RequestHeader(name = "x-user-id") String userId,
+															 @RequestHeader(name = "x-location") Integer location){
+		try {
+			UpdateExemptResponse response = this.dmsem002SetTreatmentExemptService.updateExempt(request,location,userId);
+			return ResponseEntity.ok().body(response);
+		} catch (ExemptException e) {
+			return ResponseEntity.ok().body(UpdateExemptResponse.builder()
+					.responseCode(e.getCode())
+					.errorMsg(e.getMessage())
+					.build());
+		}
+
+	}
+
+	@PostMapping(value = "/delete-exempt",produces = "application/json")
+	public ResponseEntity<DeleteExemptResponse> deleteExempt(@RequestBody DeleteExemptRequest request,
+															 @RequestHeader(name = "x-user-id") String userId,
+															 @RequestHeader(name = "x-location") Integer location){
+		try {
+			DeleteExemptResponse response = this.dmsem002SetTreatmentExemptService.deleteExempt(request,location,userId);
+			return ResponseEntity.ok().body(response);
+		} catch (ExemptException e) {
+			return ResponseEntity.ok().body(DeleteExemptResponse.builder()
+					.responseCode(e.getCode())
+					.errorMsg(e.getMessage())
+					.build());
+		}
+
+	}
+
+
+
+
+
 }

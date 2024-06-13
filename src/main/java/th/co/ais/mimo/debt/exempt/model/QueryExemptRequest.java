@@ -17,17 +17,22 @@ public class QueryExemptRequest {
 
     private String mobileNum;
 
+
     private String effectiveDateFrom;
 
     private String effectiveDateTo;
+
 
     private String endDateFrom;
 
     private String endDateTo;
 
+
     private String expireDateFrom;
 
     private String expireDateTo;
+
+
 
     private String mobileStatus;
 
