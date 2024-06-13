@@ -25,7 +25,8 @@ import th.co.ais.mimo.debt.exempt.repo.DccCalendarTransactionRepository;
 import th.co.ais.mimo.debt.exempt.repo.DccDMREM001TmpRepository;
 import th.co.ais.mimo.debt.exempt.repo.DccPrivacyLogRepository;
 import th.co.ais.mimo.debt.exempt.repo.DccReportExemptCriteriaRepository;
-import th.co.ais.mimo.debt.exempt.service.CommonService;
+import th.co.ais.mimo.debt.exempt.service.impl.CommonService;
+
 @Service
 @Transactional
 public class ReportDMREM001Service {
