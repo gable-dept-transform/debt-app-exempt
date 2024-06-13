@@ -138,9 +138,11 @@ public class CommonController {
 
 
     @GetMapping(value = "/mode/{module}/{level}")
-    public ResponseEntity<CommonDropDownResponse> getMode(@PathVariable(name="module") String module,@PathVariable(name="level") String level)  {
+    public ResponseEntity<CommonDropDownResponse> getMode(@PathVariable(name="module") String module
+            ,@PathVariable(name="level") String level
+            ,@RequestHeader(name = "x-location") Integer location)  {
         CommonDropDownResponse response = new CommonDropDownResponse();
-        String userLocationId = "";
+        String userLocationId = location == null ? "" : location.toString();
         List<CommonDropdownListDto> resultList = null;
         String errorMsg = null;
         try {

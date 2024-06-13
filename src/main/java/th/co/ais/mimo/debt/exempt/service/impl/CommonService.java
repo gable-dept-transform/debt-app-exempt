@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,8 @@ import th.co.ais.mimo.debt.exempt.repo.SffLovMasterRepository;
 @Service
 @Transactional
 public class CommonService {
+
+    Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private DccGlobalParameterRepo dccGlobalParameterRepo;
@@ -95,6 +99,8 @@ public class CommonService {
         // else
         // touchpoint = ''
         String touchPointList = "";
+        log.info("location : "+locations);
+        log.info("userLocationId"+userLocationId);
         if (!locations.contains(userLocationId)) {
             String sectionName = "EXEMPT_LOCATION_MODE";
             String keyword = "EXEMPT_" + module + "_LOCATION_MODE";
