@@ -1,7 +1,7 @@
 package th.co.ais.mimo.debt.exempt.model;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,9 +19,9 @@ public class InsertAssignIdReq {
 	private Long criteriaId;
 	private String criteriaType;
 	private String assignId;
-	private Date assignDat;
+	private String assignDat;
 	private String assignStatus;
-	private Date unassignDat;
+	private String unassignDat;
 	private String companyCode;
 	private String collectionSegmentList;
 	private String paymentTypeList;
@@ -44,10 +44,10 @@ public class InsertAssignIdReq {
 	private Long statusAgeTo;
 	private Long serviceAgeFrom;
 	private Long serviceAgeTo;
-	private Date firstArDatFrom;
-	private Date firstArDatTo;
-	private Date baInactiveDatFrom;
-	private Date baInactiveDatTo;
+	private String firstArDatFrom;
+	private String firstArDatTo;
+	private String baInactiveDatFrom;
+	private String baInactiveDatTo;
 	private String statusReasonList;
 	private String actionReasonList;
 	private String negoFlag;
@@ -63,13 +63,13 @@ public class InsertAssignIdReq {
 	private Long maxCall;
 	private Long maxRedial;
 	private String templateId;
-	private Date checkDatFrom;
-	private Date checkDatTo;
-	private Date invoiceBackDat;
+	private String checkDatFrom;
+	private String checkDatTo;
+	private String invoiceBackDat;
 	private Long invoiceInterval;
 	private String autoAssignFlag;
 	private String lastUpdateBy;
-	private Date lastUpdateDtm;
+	private String lastUpdateDtm;
 	private String orderLevel;
 	private String collectionSegmentAllFlag;
 	private String mobileStatusAllFlag;
@@ -81,25 +81,25 @@ public class InsertAssignIdReq {
 	private String statusReasonAllFlag;
 	private String paymentTypeAllFlag;
 	private String billCycleAllFlag;
-	private Date createDtm;
+	private String createDtm;
 	private Long runDb;
-	private Character criteriaDescription;
+	private String criteriaDescription;
 	private String cancelAssignFlag;
 	private String blacklistType;
 	private String blacklistSubtype;
 	private String letterLevel;
 	private String letterAddressType;
-	private Date letterDat;
+	private String letterDat;
 	private Long letterPaymentDue;
 	private String valueSegmentList;
 	private String orderType;
 	private String reasonCodeList;
-	private Date confirmDat;
+	private String confirmDat;
 	private String processStatus;
-	private Date dfDatFrom;
-	private Date dfDatTo;
-	private Date caInactiveDatFrom;
-	private Date caInactiveDatTo;
+	private String dfDatFrom;
+	private String dfDatTo;
+	private String caInactiveDatFrom;
+	private String caInactiveDatTo;
 	private String callType;
 	private String assignJob;
 	private String provinceList;
@@ -117,5 +117,19 @@ public class InsertAssignIdReq {
 	private String cpeFlag;
 	private String exemptReason;
 	private String bundlingFlag;
+
+	private String effectiveDate;
+	private String effectiveEndDate;
+	private String processDate;
+	private boolean selectEfficetiveDate;
+	private boolean selectDuration;
+
+	private String refAssignId;
+	private String refReasonExempt;
 	
+	private List<String> billingAccNumList;
+	private List<String> mobileNumList;
+	
+	private List<DMSEM004GetLoadTextDataDto> LoadTextData;
+	private String typeLoadText;
 }
