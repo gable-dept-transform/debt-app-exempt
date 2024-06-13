@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import th.co.ais.mimo.debt.exempt.dto.*;
 import th.co.ais.mimo.debt.exempt.exception.ExemptException;
 import th.co.ais.mimo.debt.exempt.model.*;
-import th.co.ais.mimo.debt.exempt.service.CommonService;
+import th.co.ais.mimo.debt.exempt.service.impl.CommonService;
+
 
 import java.util.ArrayList;
 import java.util.List;
