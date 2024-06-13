@@ -100,6 +100,7 @@ public interface DccExemptRepo extends JpaRepository<DccExemptModel,String> {
     @Modifying
     public int updateSONBR(@Param("so_nbr") String soNbr,@Param("billing_acc_num") String billingAccNum,@Param("mobile_num") String mobileNum,@Param("module_code") String moduleCode,@Param("mode_id") String modeId);
 
-    @Query(value = "CALL DCCFNG_EXEMPT_SFF_ASYNC('D_GetNGExemSFF',:ca,:ba,:mobile,:mode,to_date(:startdate,'YYYY/MM/DD'),to_date(:enddate,'YYYY/MM/DD'),:exempt_level);", nativeQuery = true)
-    public void ffGetNegoExemSff(@Param("ca") String custAccNum,@Param("ba") String billingAccNum,@Param("mobile") String mobileNum,@Param("mode") String mode,@Param("startdate") String startdate,@Param("enddate") String enddate,@Param("exempt_level") String exemptLevel);
+//    @Query(value = "SELECT DCCFNG_EXEMPT_SFF_ASYNC_WP('D_GetNGExemSFF',:ca,:ba,:mobile,:mode,to_date(:startdate,'YYYY/MM/DD'),to_date(:enddate,'YYYY/MM/DD'),:exempt_level) FROM DUAL", nativeQuery = true)
+//    @Query(value = "CALL DCCFNG_EXEMPT_SFF_ASYNC_WP('D_GetNGExemSFF',:ca,:ba,:mobile,:mode,to_date(:startdate,'YYYY/MM/DD'),to_date(:enddate,'YYYY/MM/DD'),:exempt_level) ", nativeQuery = true)
+//    public int ffGetNegoExemSff(@Param("ca") String custAccNum,@Param("ba") String billingAccNum,@Param("mobile") String mobileNum,@Param("mode") String mode,@Param("startdate") String startdate,@Param("enddate") String enddate,@Param("exempt_level") String exemptLevel);
 }

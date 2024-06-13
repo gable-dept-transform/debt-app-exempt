@@ -15,7 +15,7 @@ import th.co.ais.mimo.debt.exempt.repo.DccExemptBosRepo;
 import th.co.ais.mimo.debt.exempt.repo.DccExemptHistoryRepo;
 import th.co.ais.mimo.debt.exempt.repo.DccExemptRepo;
 import th.co.ais.mimo.debt.exempt.repo.DccGlobalParameterRepo;
-
+import th.co.ais.mimo.debt.exempt.repo.impl.DccExemptProcRepoImpl;
 import th.co.ais.mimo.debt.exempt.service.DMSEM002SetTreatmentExemptService;
 import th.co.ais.mimo.debt.exempt.utils.DateUtils;
 
@@ -84,7 +84,11 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
                 //find unique ca
                 Map<String, AddExemptCustAccDto> caMap = new HashMap<>();
                 addExemptRequest.getCustAccNo().forEach(custAccDto -> {
-                    caMap.putIfAbsent(custAccDto.getCustAccNum(), custAccDto);
+//                    caMap.putIfAbsent(custAccDto.getCustAccNum(), custAccDto);
+                    if(caMap.putIfAbsent(custAccDto.getCustAccNum(), custAccDto) != null){
+                        //duplicate
+                        custAccDto.setResult("DUPLICATE");
+                    }
                 });
                 listCustAccDto = caMap.values().stream().toList();
             } else if (EXEMPT_LEVEL_BA.equals(addExemptRequest.getExemptLevel())) {
@@ -95,7 +99,10 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
                 Map<String, AddExemptCustAccDto> caMap = new HashMap<>();
                 addExemptRequest.getCustAccNo().forEach(custAccDto -> {
                     String key = custAccDto.getCustAccNum() + ":" + custAccDto.getBillingAccNum();
-                    caMap.putIfAbsent(key, custAccDto);
+                    if(caMap.putIfAbsent(key, custAccDto) != null){
+                        //duplicate
+                        custAccDto.setResult("DUPLICATE");
+                    }
                 });
                 listCustAccDto = caMap.values().stream().toList();
             }else{
@@ -171,8 +178,12 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
 //
 //                    }
                 }
+
+                // add result
+                custAccDto.setResult("Complete: "+addExemptRequest.getExemptMode());
             }
         }else if(EXEMPT_BY_CATE.equals(addExemptRequest.getExemptBy())) {
+            Map<String,List<String>> resultMap = new HashMap<>();
             for(DccExemptCateDetailDto exemptCateDetailDto:addExemptRequest.getExemptCateDetails()){
             //addExemptRequest.getExemptCateDetails().forEach(exemptCateDetailDto -> {
 
@@ -246,6 +257,15 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
                             EXEMPT_ACTION_TYPE_ADD
                     );
 
+                    String keyResult = custAccDto.getCustAccNum()+":"+custAccDto.getBillingAccNum()+":"+custAccDto.getServiceNum();
+                    if(resultMap.get(keyResult)==null){
+                        List<String> listMode = new ArrayList<>();
+                        listMode.add(exemptCateDetailDto.getModeId());
+                        resultMap.put(keyResult,listMode);
+                    }else{
+                        resultMap.get(keyResult).add(exemptCateDetailDto.getModeId());
+                    }
+
                     // cancel BOS by user requirement
 
 //                    if("CCS".equalsIgnoreCase(addExemptRequest.getModule()) && "DC".equalsIgnoreCase(exemptCateDetailDto.getModeId())){
@@ -261,11 +281,39 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
 
                 }
             }
+
+            //add result to response
+            for(AddExemptCustAccDto dto:addExemptRequest.getCustAccNo()){
+                String key = dto.getCustAccNum()+":"+dto.getBillingAccNum()+":"+dto.getServiceNum();
+                if(resultMap.get(key)!=null){
+                    String mode = String.join(",", resultMap.get(key));
+                    dto.setResult("Complete: "+mode);
+                }else{
+                    //DUPLICATE
+                    dto.setResult("DUPLICATE");
+                }
+            }
+
         }
 
-        return AddExemptResponse.builder().responseCode(AppConstant.SUCCESS).build();
+        AddExemptResponse response = AddExemptResponse.builder().responseCode(AppConstant.SUCCESS).build();
+        response.setCustAccNo(addExemptRequest.getCustAccNo());
+        return response;
     }
 
+    /*
+    ffCheckEvent
+      ffBlnCheckLevel
+       ffLstExemptCate
+        ffLstExemptLevelCate D_LstDCExempt sql = "G"
+
+      if not bln nego
+        // loop by mode
+         ffCheckSave
+         ffLstExemptDescCate
+         //พบข้อมูลการ Exempt จาก Exempt Legal Camplaint ต้องการที่จะบันทึกเก็บไว้หรือไม่ ?
+
+     */
     @Override
     public AddExemptResponse validateAddExempt(AddExemptRequest addExemptRequest) throws ExemptException {
         /*
@@ -517,9 +565,14 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
         return null;
     }
 
+    @Autowired
+    DccExemptProcRepoImpl exemptProcRepo;
+
     private void ffGetNegoExemSff(String custAccNo, String billingAccNo, String mobileNo, String mode, String startdate, String enddate, String exemptLevel) {
 //                   PLUGIN.DCCFNG_EXEMPT_SFF_ASYNC('D_GetNGExemSFF',:ca,:ba,:mobile,:mode,to_date(:startdate,'YYYY/MM/DD'),to_date(:enddate,'YYYY/MM/DD'),:exempt_level);
-        dccExemptRepo.ffGetNegoExemSff(custAccNo,billingAccNo,mobileNo,mode,startdate,enddate,exemptLevel);
+        Date startDateType = DateUtils.getDateByFormatEnLocale(startdate,"YYYY/MM/DD");
+        Date endDateType = DateUtils.getDateByFormatEnLocale(enddate,"YYYY/MM/DD");
+        exemptProcRepo.callDGetNGExemSFF(custAccNo,billingAccNo,mobileNo,mode,startDateType,endDateType,exemptLevel);
     }
 
     @Override
