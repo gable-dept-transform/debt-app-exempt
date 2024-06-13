@@ -1,6 +1,7 @@
 package th.co.ais.mimo.debt.exempt.model;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -125,5 +126,10 @@ public class InsertAssignIdReq {
 
 	private String refAssignId;
 	private String refReasonExempt;
-
+	
+	private List<String> billingAccNumList;
+	private List<String> mobileNumList;
+	
+	private List<DMSEM004GetLoadTextDataDto> LoadTextData;
+	private String typeLoadText;
 }

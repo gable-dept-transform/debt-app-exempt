@@ -372,7 +372,7 @@ public interface DMSEM004CriteriaMasterRepo extends JpaRepository<DccCriteriaMas
 	Long getMaxDccCriteriaId(@Param("modeId") String modeId);
 	
 	@Query(value = "select nvl(max(preassign_id), to_char(sysdate,'YYMM')||'0000') from dcc_criteria_history "
-			+ "where mode_id = 'EM' and preassign_id like to_char(sysdate,'YYMM')", nativeQuery = true)
+			+ "where mode_id = 'EM' and preassign_id like to_char(sysdate,'YYMM') || '%'", nativeQuery = true)
 	Long getMaxPreAssignId();
 	
 	@Query(value = "SELECT"
