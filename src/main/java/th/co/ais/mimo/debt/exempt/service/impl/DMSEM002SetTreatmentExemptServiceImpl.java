@@ -15,7 +15,7 @@ import th.co.ais.mimo.debt.exempt.repo.DccExemptBosRepo;
 import th.co.ais.mimo.debt.exempt.repo.DccExemptHistoryRepo;
 import th.co.ais.mimo.debt.exempt.repo.DccExemptRepo;
 import th.co.ais.mimo.debt.exempt.repo.DccGlobalParameterRepo;
-import th.co.ais.mimo.debt.exempt.service.CommonService;
+
 import th.co.ais.mimo.debt.exempt.service.DMSEM002SetTreatmentExemptService;
 import th.co.ais.mimo.debt.exempt.utils.DateUtils;
 
