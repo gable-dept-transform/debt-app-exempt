@@ -1,26 +1,46 @@
 package th.co.ais.mimo.debt.exempt.service.impl;
 
-import jakarta.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import jakarta.transaction.Transactional;
 import th.co.ais.mimo.debt.exempt.constant.AppConstant;
 import th.co.ais.mimo.debt.exempt.dao.DMSEM002SetTreatmentExemptDao;
-import th.co.ais.mimo.debt.exempt.dto.*;
-import th.co.ais.mimo.debt.exempt.entity.*;
+import th.co.ais.mimo.debt.exempt.dto.AddExemptCustAccDto;
+import th.co.ais.mimo.debt.exempt.dto.CommonDropdownListDto;
+import th.co.ais.mimo.debt.exempt.dto.DccExemptCateDetailDto;
+import th.co.ais.mimo.debt.exempt.dto.ExemptDetailDto;
+import th.co.ais.mimo.debt.exempt.dto.SearchTreatmentDto;
+import th.co.ais.mimo.debt.exempt.entity.DccBosExempt;
+import th.co.ais.mimo.debt.exempt.entity.DccBosExemptId;
+import th.co.ais.mimo.debt.exempt.entity.DccExemptHistory;
+import th.co.ais.mimo.debt.exempt.entity.DccExemptHistoryId;
+import th.co.ais.mimo.debt.exempt.entity.DccExemptModel;
+import th.co.ais.mimo.debt.exempt.entity.DccExemptModelId;
 import th.co.ais.mimo.debt.exempt.exception.ExemptException;
-import th.co.ais.mimo.debt.exempt.model.*;
+import th.co.ais.mimo.debt.exempt.model.AddExemptRequest;
+import th.co.ais.mimo.debt.exempt.model.AddExemptResponse;
+import th.co.ais.mimo.debt.exempt.model.DeleteExemptRequest;
+import th.co.ais.mimo.debt.exempt.model.DeleteExemptResponse;
+import th.co.ais.mimo.debt.exempt.model.SearchRequest;
+import th.co.ais.mimo.debt.exempt.model.UpdateExemptRequest;
+import th.co.ais.mimo.debt.exempt.model.UpdateExemptResponse;
 import th.co.ais.mimo.debt.exempt.repo.DccExemptBosRepo;
 import th.co.ais.mimo.debt.exempt.repo.DccExemptHistoryRepo;
 import th.co.ais.mimo.debt.exempt.repo.DccExemptRepo;
 import th.co.ais.mimo.debt.exempt.repo.DccGlobalParameterRepo;
-import th.co.ais.mimo.debt.exempt.service.CommonService;
 import th.co.ais.mimo.debt.exempt.service.DMSEM002SetTreatmentExemptService;
 import th.co.ais.mimo.debt.exempt.utils.DateUtils;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional

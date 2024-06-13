@@ -1,4 +1,4 @@
-package th.co.ais.mimo.debt.exempt.service;
+package th.co.ais.mimo.debt.exempt.service.impl;
 
 import java.util.List;
 import java.util.stream.Collectors;

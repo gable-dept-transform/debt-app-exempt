@@ -39,7 +39,7 @@ public class SaveORUpdateDMREM001Request {
     private BigDecimal amountFrom;
     private BigDecimal amountTo;
     private String catSubCateList;
-    private Boolean selectAllCate;
+    private String selectAllCate;
     private Integer monthPeriod;
     private Integer exemptTime;
     private Integer durationOver;
