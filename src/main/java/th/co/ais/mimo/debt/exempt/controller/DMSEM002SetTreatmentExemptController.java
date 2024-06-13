@@ -8,10 +8,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import th.co.ais.mimo.debt.exempt.dto.ExemptDetailDto;
+import th.co.ais.mimo.debt.exempt.dto.SearchTreatmentDto;
 import th.co.ais.mimo.debt.exempt.exception.ExemptException;
 import th.co.ais.mimo.debt.exempt.model.*;
+import th.co.ais.mimo.debt.exempt.repo.DccExemptRepo;
+import th.co.ais.mimo.debt.exempt.repo.impl.DccExemptProcRepoImpl;
 import th.co.ais.mimo.debt.exempt.service.DMSEM002SetTreatmentExemptService;
+import th.co.ais.mimo.debt.exempt.utils.DateUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -50,6 +55,62 @@ public class DMSEM002SetTreatmentExemptController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
+	@PostMapping(value = "/search-load-text-data",produces = "application/json")
+	public ResponseEntity<SearchLoadTextResponse> searchLoadTextData(@RequestBody SearchLoadTextRequest request){
+
+		String errorMsg = null;
+		int total = 0;
+		int totalFail = 0;
+		int totalSuccess = 0;
+		SearchLoadTextResponse response = SearchLoadTextResponse.builder().build();
+		try {
+			if(!StringUtils.isEmpty(request.getSearchType())) {
+				if(request.getParamValue() != null) {
+					List<SearchTreatmentDto> resultList = new ArrayList<>();
+					List<ExemptDetailDto> exemptDetailDtoList = new ArrayList<>();
+					List<String> errorList = new ArrayList<>();
+					for (String param: request.getParamValue())
+					{
+						total++;
+						SearchRequest searchRequest = new SearchRequest();
+						searchRequest.setSearchType(request.getSearchType());
+						searchRequest.setParamValue(param);
+
+						List<SearchTreatmentDto> list =  this.dmsem002SetTreatmentExemptService.searchData(searchRequest);
+						resultList.addAll(list);
+						//response.getResultList().addAll(list);
+						if (!list.isEmpty()) {
+							totalSuccess++;
+							List<ExemptDetailDto> listDetail = dmsem002SetTreatmentExemptService.searchExemptDetail(searchRequest.getSearchType(), searchRequest.getParamValue());
+//							response.getResultDetailList().addAll(listDetail);
+							exemptDetailDtoList.addAll(listDetail);
+						}else{
+							totalFail++;
+							errorList.add(param);
+						}
+
+					}
+					response.setTotal(total);
+					response.setTotalFail(totalFail);
+					response.setTotalSuccess(totalSuccess);
+					response.setErrorList(errorList);
+					response.setResultList(resultList);
+					response.setResultDetailList(exemptDetailDtoList);
+				}
+
+			}else{
+				errorMsg = "search Type is require";
+			}
+		} catch (ExemptException e) {
+			log.error("Exception Treatment searchData : {}", e.getMessage(), e);
+			errorMsg = "Treatment searchData Internal server Error process";
+		} finally {
+			response.setErrorMsg(errorMsg);
+
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
 	@PostMapping(value = "/search-exempt",produces = "application/json")
 	public ResponseEntity<SearchResponse> searchExemptDetail(@RequestBody SearchRequest request){
         try {
@@ -61,6 +122,23 @@ public class DMSEM002SetTreatmentExemptController {
 			return ResponseEntity.ok().body(SearchResponse.builder().errorMsg("error").build());
         }
         //return ResponseEntity.ok().body("");
+	}
+
+	@PostMapping(value = "/search-exempt-load-text",produces = "application/json")
+	public ResponseEntity<SearchResponse> searchLoadTextExemptDetail(@RequestBody SearchLoadTextRequest request){
+		try {
+			List<ExemptDetailDto> resultList = new ArrayList<>();
+			for(String param: request.getParamValue()) {
+				List<ExemptDetailDto> list = this.dmsem002SetTreatmentExemptService.searchExemptDetail(request.getSearchType(), param);
+				resultList.addAll(list);
+			}
+
+			return ResponseEntity.ok().body(SearchResponse.builder().resultDetailList(resultList).build());
+		} catch (ExemptException e) {
+			log.error("search load text exempt detail error ",e);
+			return ResponseEntity.ok().body(SearchResponse.builder().errorMsg("error").build());
+		}
+
 	}
 
 
@@ -124,8 +202,21 @@ public class DMSEM002SetTreatmentExemptController {
 
 	}
 
+	@Autowired
+	DccExemptRepo exemptRepo;
 
-
-
+	@Autowired
+	DccExemptProcRepoImpl exemptProcRepo;
+	@GetMapping(value = "/test-proc")
+	public ResponseEntity getCateDetail() {
+//		exemptRepo.ffGetNegoExemSff("32100070221632"
+//				,"32100070221638"
+//				,"8870004434","DC","2024/05/01","2024/05/29","CA");
+		String res = exemptProcRepo.callDGetNGExemSFF("321000702216321111"
+				,"32100070221638"
+				,"8870004434","DC", DateUtils.getCurrentDate(),DateUtils.getCurrentDate(),"CA");
+		log.debug(" Res : {}",res);
+		return ResponseEntity.ok("success");
+	}
 
 }
