@@ -17,4 +17,5 @@ public interface DMSEM003QueryExemptService {
 
     List<BillingAccDto> getBillingAccNum(GetBillingRequest request) throws ExemptException;
 
+
 }

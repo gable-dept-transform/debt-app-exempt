@@ -1,7 +1,6 @@
 package th.co.ais.mimo.debt.exempt.service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -16,11 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import th.co.ais.mimo.debt.exempt.constant.AppConstant;
 import th.co.ais.mimo.debt.exempt.dao.ReportDMREM001Dao;
 import th.co.ais.mimo.debt.exempt.dto.GenReportSeqDto;
-import th.co.ais.mimo.debt.exempt.entity.DccCalendarTransaction;
-import th.co.ais.mimo.debt.exempt.entity.DccCalendarTransactionId;
-import th.co.ais.mimo.debt.exempt.entity.DccPrivacyLog;
-import th.co.ais.mimo.debt.exempt.entity.DccReportExemptCriteria;
-import th.co.ais.mimo.debt.exempt.entity.DccReportExemptCriteriaId;
+import th.co.ais.mimo.debt.exempt.entity.*;
 import th.co.ais.mimo.debt.exempt.exception.ExemptException;
 import th.co.ais.mimo.debt.exempt.model.DataDMREM001;
 import th.co.ais.mimo.debt.exempt.model.DeleteReportDMREM001Request;
@@ -30,7 +25,7 @@ import th.co.ais.mimo.debt.exempt.repo.DccCalendarTransactionRepository;
 import th.co.ais.mimo.debt.exempt.repo.DccDMREM001TmpRepository;
 import th.co.ais.mimo.debt.exempt.repo.DccPrivacyLogRepository;
 import th.co.ais.mimo.debt.exempt.repo.DccReportExemptCriteriaRepository;
-
+import th.co.ais.mimo.debt.exempt.service.CommonService;
 @Service
 @Transactional
 public class ReportDMREM001Service {
@@ -56,10 +51,10 @@ public class ReportDMREM001Service {
     private DccDMREM001TmpRepository dccDMREM001TmpRepository;
 
     public List<DataDMREM001> searchReportData(SearchReportDataDMREM001Request request) throws Exception {
-        String errorMsg = null;
+        String errorMsg;
         try {
             // Search report Data
-            List<DataDMREM001> resultList = new ArrayList<DataDMREM001>();
+            List<DataDMREM001> resultList;
             errorMsg = validateSearchParameter(request);
             if (StringUtils.isEmpty(errorMsg)) {
                 log.info("Call searchReportData");
@@ -277,10 +272,7 @@ public class ReportDMREM001Service {
         return dccCalendarTransactionRepository.save(request);
     }
 
-    private void insertDccPrivacyLog(DccPrivacyLog dccPrivacyLogRequest) {
 
-        dccPrivacyLogRepository.save(dccPrivacyLogRequest);
-    }
 
     private String validateSearchParameter(SearchReportDataDMREM001Request request) {
         String errorMsg = null;

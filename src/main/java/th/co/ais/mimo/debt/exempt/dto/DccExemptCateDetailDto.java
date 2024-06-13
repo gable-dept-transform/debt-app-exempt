@@ -1,5 +1,6 @@
 package th.co.ais.mimo.debt.exempt.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,7 +8,8 @@ import lombok.Data;
 @Builder
 @Data
 @AllArgsConstructor
-public class DccExemptCateDetail {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class DccExemptCateDetailDto {
     private String modeId;
     private String moduleCode;
     private Long exemptDuration;

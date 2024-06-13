@@ -12,10 +12,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor; 
  
-@Data 
+@Data
 @NoArgsConstructor 
 @AllArgsConstructor 
-@Builder 
+@Builder
 @Entity 
 @Table(name = "dcc_criteria_history")
 public class DccCriteriaHistory implements Serializable{ 

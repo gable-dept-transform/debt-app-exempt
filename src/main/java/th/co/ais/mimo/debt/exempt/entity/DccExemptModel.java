@@ -56,7 +56,7 @@ public class DccExemptModel {
 
 
     @Column(name = "NO_OF_EXEMPT")
-    private Integer noOfExempt;
+    private Long noOfExempt;
 
     @Column(name = "SENT_INTERFACE_FLAG")
     private String sentIntefaceFlag;

@@ -1,0 +1,236 @@
+name: UAT-Build Pipeline
+
+on:  
+  push:
+    branches: [ "uat" ]
+    paths-ignore:
+     - '.github/**'
+     - '*.md'
+  workflow_dispatch:
+
+env:  
+  PROJECT_BRANCH: uat
+  PIPELINE_ENV: uat
+  POM_VERSION_LINE_NO: 14
+  CD_PIPELINE_REPO: corp-ais/debt-pipeline
+  ACTION_TEMPLATE_REPO: corp-ais/debt-action-template
+
+jobs:
+
+  unitest:
+    name: Unit Testing
+    runs-on: ubuntu-latest
+    environment:
+      name: uat
+
+    steps:
+      - name: Checkout Action Template
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.ACTION_TEMPLATE_REPO }}
+          ref: ${{ env.PIPELINE_ENV }}
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+          path: action_template
+          
+      - name: Setup Home Directories
+        run: |
+          echo "sourcecode_dir=project_src" >> $GITHUB_ENV
+          echo "manage_ci_dir=manage_ci" >> $GITHUB_ENV 
+
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.PROJECT_BRANCH }}
+          path: ${{ env.sourcecode_dir }}
+          
+      - name: Checkout CI config
+        uses: actions/checkout@v4
+        with:          
+          ref: ci
+          path: ${{ env.manage_ci_dir }}
+          
+      - name: Setup Action Template
+        run: |
+          mkdir -p pipeline/.github/actions
+          ls -l
+          cp -R action_template/actions/${{ env.PIPELINE_ENV }}/* pipeline/.github/actions/
+          
+      - name: Unit Testing
+        uses: ./pipeline/.github/actions/CI-UnitTest-Springboot-Action
+        with:
+          workflow_user: ${{ secrets.WORKFLOW_USER }}
+          workflow_token: ${{ secrets.WORKFLOW_TOKEN }}
+        
+  analyze:
+    name: SAST CodeQL
+    runs-on: ubuntu-latest    
+    environment:
+      name: uat
+      url: ${{ steps.scan-result.outputs.codeql_url }}
+
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+ 
+    steps:
+      - name: Setup Result URL
+        id: scan-result
+        shell: bash
+        run: |
+          echo "::set-output name=codeql_url::https://github.com/${{ github.repository }}/security/code-scanning"
+
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.PROJECT_BRANCH }}
+          
+      - name: Checkout Action Template
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.ACTION_TEMPLATE_REPO }}
+          ref: ${{ env.PIPELINE_ENV }}
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+          path: action_template
+          
+      - name: Setup Action Template
+        run: |
+          mkdir -p pipeline/.github/actions
+          ls -l
+          cp -R action_template/actions/${{ env.PIPELINE_ENV }}/* pipeline/.github/actions/
+
+      - name: SAST CodeQL
+        uses: ./pipeline/.github/actions/CI-SASTCodeQL-Springboot-Action
+        with:
+          workflow_user: ${{ secrets.WORKFLOW_USER }}
+          workflow_token: ${{ secrets.WORKFLOW_TOKEN }}
+          
+  build:
+      name: Build Package
+      runs-on: ubuntu-latest
+      needs: [unitest,analyze]
+      environment:
+        name: uat
+        url: ${{ steps.build-package-result.outputs.package_url }}
+
+      steps:
+      - name: Checkout Action Template
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.ACTION_TEMPLATE_REPO }}
+          ref: ${{ env.PIPELINE_ENV }}
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+          path: action_template
+
+      - name: Setup Home Directories
+        run: |
+          echo "sourcecode_dir=project_src" >> $GITHUB_ENV
+          echo "manage_ci_dir=manage_ci" >> $GITHUB_ENV
+
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.PROJECT_BRANCH }}
+          path: ${{ env.sourcecode_dir }}
+
+      - name: Checkout CI config
+        uses: actions/checkout@v4
+        with:          
+          ref: ci
+          path: ${{ env.manage_ci_dir }}
+
+      - name: Setup Action Template
+        run: |
+          mkdir -p pipeline/.github/actions
+          ls -l
+          cp -R action_template/actions/${{ env.PIPELINE_ENV }}/* pipeline/.github/actions/
+
+      - name: Build Package Pipeline
+        uses: ./pipeline/.github/actions/CI-BuildPipeline-SpringBoot-Action
+        with:
+          workflow_user: ${{ secrets.WORKFLOW_USER }}
+          workflow_token: ${{ secrets.WORKFLOW_TOKEN }}
+
+      - name: Setup Build Package URL
+        id: build-package-result
+        shell: bash
+        run: |
+          echo "::set-output name=package_url::https://github.com/orgs/corp-ais/packages/container/package/${{ env.PROJECT_NAME }}/${{ env.APP_NAME }}"
+
+  image-scan:
+    name: Image Scan by Trivy
+    runs-on: ubuntu-latest
+    needs: [build]
+    environment:
+      name: uat
+      url: ${{ steps.scan-result.outputs.security_dashboard_url }}
+
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+      pull-requests: read     
+ 
+    steps:
+      - name: Setup Result URL
+        id: scan-result
+        shell: bash
+        run: |
+          echo "::set-output name=security_dashboard_url::https://github.com/${{ github.repository }}/security/code-scanning"
+
+      - name: Setup Home Directories
+        run: |          
+          echo "manage_ci_dir=manage_ci" >> $GITHUB_ENV
+
+      - name: Checkout CI config
+        uses: actions/checkout@v4
+        with:
+          ref: ci
+          path: ${{ env.manage_ci_dir }}
+
+      - name: Checkout Action Template
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.ACTION_TEMPLATE_REPO }}
+          ref: ${{ env.PIPELINE_ENV }}
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+          path: action_template
+          
+      - name: Setup Action Template
+        run: |
+          mkdir -p pipeline/.github/actions
+          ls -l
+          cp -R action_template/actions/${{ env.PIPELINE_ENV }}/* pipeline/.github/actions/
+
+      - name: Image Scan Trivy
+        uses: ./pipeline/.github/actions/CI-ImageScanTrivy-Action
+        with:
+          workflow_user: ${{ secrets.WORKFLOW_USER }}
+          workflow_token: ${{ secrets.WORKFLOW_TOKEN }}
+          
+  repo-dispatch:
+    name: Repository Dispatch
+    runs-on: ubuntu-latest
+    needs: [image-scan]
+    environment:
+      name: uat
+      url: ${{ steps.dispatch-result.outputs.cd_pipeline_url }}
+      
+    steps:
+      - name: Setup CD Pipeline URL
+        id: dispatch-result
+        shell: bash
+        run: |
+          project_name=$(echo ${{ github.repository }} | awk -F '/' '{print($2)}')
+          echo "PROJECT_NAME=${project_name}" >> $GITHUB_ENV          
+          CD_EVENT_TYPE=repo-dispatch-${{ env.PIPELINE_ENV }}-deploy-app-image
+          echo "CD_EVENT_TYPE=${CD_EVENT_TYPE}" >> $GITHUB_ENV
+          echo "::set-output name=cd_pipeline_url::https://github.com/${{ env.CD_PIPELINE_REPO }}/actions/workflows/${CD_EVENT_TYPE}.yml"
+          
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+          repository: ${{ env.CD_PIPELINE_REPO }}
+          event-type: ${{ env.CD_EVENT_TYPE }}
+          client-payload: '{"ref": "${{ env.PROJECT_BRANCH }}", "sha": "${{ github.sha }}","repo_name":"${{ env.PROJECT_NAME }}"}'

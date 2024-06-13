@@ -259,7 +259,7 @@ public class DccCriteriaMaster  implements Serializable{
 	private Date caInactiveDatTo;
 
 	@Column(name = "CREDIT_TERM_FLAG")
-	private Character creditTermFlag;
+	private char creditTermFlag;
 
 	@Column(name = "THAI_LETTER_FLAG")
 	private Character thaiLetterFlag;

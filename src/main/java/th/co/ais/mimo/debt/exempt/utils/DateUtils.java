@@ -22,6 +22,7 @@ public class DateUtils {
 	private static final Locale DEFAULT_LOCALE = new Locale("th","TH");
 	private static final TimeZone DEFAULT_TIMEZONE = TimeZone.getTimeZone("GMT+07:00");
 	public static final String DEFAULT_DATETIME_PATTERN_DATE_SLASH_YYYY_MM_DD= "yyyy/MM/dd";
+	public static final String DEFAULT_DATETIME_PATTERN_DATE_HYPHEN_YYYY_MM_DD = "yyyy-MM-dd";
 	
     public static Date getCurrentDate()  {
 		return new GregorianCalendar(enLocale).getTime();
