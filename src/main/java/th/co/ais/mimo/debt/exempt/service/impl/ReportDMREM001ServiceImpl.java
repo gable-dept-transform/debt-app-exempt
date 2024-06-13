@@ -195,7 +195,7 @@ public class ReportDMREM001ServiceImpl implements ReportDMREM001Dao {
                 .baDebtMnyTo(new BigDecimal(0))
                 .amountFrom(request.getAmountFrom())
                 .amountTo(request.getAmountTo())
-                .cateSubCateList(request.getSelectAllCate() ? "ALL" : request.getCatSubCateList())
+                .cateSubCateList(AppConstant.FLAG_Y.equals(request.getSelectAllCate()) ? "ALL" : request.getCatSubCateList())
                 .monthPeriod(request.getMonthPeriod())
                 .durationOver(request.getDurationOver())
                 .criteriaBy(request.getUsername())
