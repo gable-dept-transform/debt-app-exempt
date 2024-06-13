@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import th.co.ais.mimo.debt.exempt.dto.AddExemptCustAccDto;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -19,4 +22,6 @@ public class AddExemptResponse {
     private String custAccNum;
     private String mode;
     private Long countExempt;
+
+    private List<AddExemptCustAccDto> custAccNo;
 }

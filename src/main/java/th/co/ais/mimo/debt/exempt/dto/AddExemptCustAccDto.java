@@ -14,4 +14,6 @@ public class AddExemptCustAccDto {
     private String baStatus;
     private String serviceNum;
     private String mobileStatus;
+    // result to show when add complete
+    private String result;
 }
