@@ -878,7 +878,7 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 					DccTempTransaction tempTransaction = new DccTempTransaction();
 
 					tempTransactionId.setModeId(req.getModeId());
-					tempTransactionId.setPreassignId(Long.toString(newPreAssignId));
+					tempTransactionId.setPreAssignId(Long.toString(newPreAssignId));
 					tempTransactionId.setBillingAccNum(tempTransactionList.getBillAccNum());
 					tempTransactionId.setMobileNum(tempTransactionList.getMobileNum() != null ? tempTransactionList.getMobileNum() : "0000000000");
 					tempTransaction.setId(tempTransactionId);

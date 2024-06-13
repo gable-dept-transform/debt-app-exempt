@@ -37,7 +37,6 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 	@Autowired
 	DMSEM004CriteriaMasterRepo criteriaMasterRepo;
 
-
 	@Override
 	public List<DMSEM004CriteriaMasterBean> searchData(String modeId, Long criteriaId, String description) throws Exception {
 		List<DMSEM004CriteriaMasterBean> result = null;
@@ -212,47 +211,6 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 	@Override
 	public void insertCriteriaMaster(InsertAssignIdReq req, Long newCriteriaId) throws Exception {
 		try {
-			//			criteriaMasterRepo.insertCriteriaMaster(req.getOrderType(), 
-			//					req.getReasonCodeList(),
-			//					req.getModeId(),
-			//					newCriteriaId, 
-			//					req.getCriteriaType(), 
-			//					req.getCriteriaDescription(), 
-			//					req.getCompanyCode(), 
-			//					req.getCollectionSegmentList(),
-			//					req.getBillCycleList(), 
-			//					req.getRegionList(),
-			//					req.getMobileStatusList(),
-			//					req.getCateSubcateList(), 
-			//					req.getBaStatusList(), 
-			//					req.getArMnyFrom(), 
-			//					req.getArMnyTo(), 
-			//					req.getBaInactiveDatFrom(),
-			//					req.getBaInactiveDatTo(), 
-			//					req.getActionReasonList(),
-			//					req.getAssignDuration(), 
-			//					req.getAgentType(), 
-			//					req.getAssignType(), 
-			//					req.getAssignJob(), 
-			//					null, // credit LIMIT(ยกเลิกแล้ว)
-			//					req.getCheckDatFrom(),
-			//					req.getCheckDatTo(), 
-			//					req.getProcessDate(), 
-			//					req.getEffectiveDate(), 
-			//					req.getEffectiveEndDate(),
-			//					req.getAutoAssignFlag(),
-			//					req.getLastUpdateBy(),
-			//					req.getOrderLevel(),
-			//					req.getBlacklistType(),
-			//					req.getBlacklistSubtype(),
-			//					req.getProvinceList(), 
-			//					null, // req.getTpDebtType()
-			//					req.getDfDatFrom(), 
-			//					req.getDfDatTo(), 
-			//					req.getCreateBy(), 
-			//					req.getCaInactiveDatFrom(),
-			//					req.getCaInactiveDatTo());
-
 			DccCriteriaMaster criteriaMaster = new DccCriteriaMaster();
 			DccCriteriaMasterId criteriaMasterId = new DccCriteriaMasterId();
 

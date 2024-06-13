@@ -145,7 +145,7 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
 
 	@Query(value = " select reason_code AS reasonCode, reason_type AS reasonType, reason_subtype AS reasonSubtype, reason_description AS reasonDescription, last_update_by AS lastUpdateBy, "
 			+ " last_update_dtm AS lastUpdateDtm from dcc_reason "
-			+ " where reason_type = 'WATCHLIST' and reason_subtype like 'WATCHLIST_REASON' order by reason_type, reason_code " , nativeQuery = true)
+			+ " where reason_type = 'EXEMPT_ADD' and reason_subtype like 'EXEMPT_ADD' order by reason_type, reason_code " , nativeQuery = true)
 	List<AddReasonDto> getReason() throws Exception;
 
 	@Query(value = " select lov_name AS name, s.display_val AS val "
