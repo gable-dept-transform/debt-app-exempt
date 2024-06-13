@@ -15,6 +15,7 @@ import th.co.ais.mimo.debt.exempt.dto.DcExemptCurrentDtoMapping;
 import th.co.ais.mimo.debt.exempt.exception.ExemptException;
 import th.co.ais.mimo.debt.exempt.model.GetBillingRequest;
 import th.co.ais.mimo.debt.exempt.model.QueryExemptRequest;
+import th.co.ais.mimo.debt.exempt.repo.AccountHasMobileRepo;
 import th.co.ais.mimo.debt.exempt.repo.DMSEM003NativeQueryService;
 import th.co.ais.mimo.debt.exempt.service.DMSEM003QueryExemptService;
 
@@ -45,7 +46,11 @@ public class DMSEM003QueryExemptServiceImpl implements DMSEM003QueryExemptServic
     }
 
     @Autowired
+    AccountHasMobileRepo accountHasMobileRepo;
+    @Autowired
     DMSEM003NativeQueryService dmsem003NativeQueryService;
+
+
 
     public List<DcExemptCurrentDtoMapping> queryExempt(QueryExemptRequest request) throws ExemptException {
         log.info("queryExempt request : {}",request);
@@ -58,7 +63,6 @@ public class DMSEM003QueryExemptServiceImpl implements DMSEM003QueryExemptServic
 
                 return  this.dmsem003NativeQueryService.getExemptByBilling(request.getCustAccNum(),request.getBillingAccNum(), request.getMobileStatus(), request.getStartRow(), request.getEndRow());
             }else if("CNO".equals(request.getSelectType())) {
-
                 return this.dmsem003NativeQueryService.getExemptByCustAccNum(request.getCustAccNum(), request.getMobileStatus(), request.getStartRow(), request.getEndRow());
             }else if("EFD".equals(request.getSelectType())) {
 

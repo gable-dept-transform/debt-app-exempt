@@ -1,8 +1,6 @@
 package th.co.ais.mimo.debt.exempt.dao.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -15,23 +13,18 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
-import lombok.Setter;
 import th.co.ais.mimo.debt.exempt.dao.DMSEM004CriteriaMasterDao;
-import th.co.ais.mimo.debt.exempt.entity.DccCriteriaHistory;
-import th.co.ais.mimo.debt.exempt.entity.DccCriteriaHistoryId;
-import th.co.ais.mimo.debt.exempt.entity.DccTempTransaction;
-import th.co.ais.mimo.debt.exempt.entity.DccTempTransactionId;
+import th.co.ais.mimo.debt.exempt.entity.DccCriteriaMaster;
+import th.co.ais.mimo.debt.exempt.entity.DccCriteriaMasterId;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004CriteriaMasterBean;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004GetBaByMobileNumDto;
-import th.co.ais.mimo.debt.exempt.model.GetBillAccNumByMobileNumReq;
-import th.co.ais.mimo.debt.exempt.model.GetBillAccNumByMobileNumResp;
 import th.co.ais.mimo.debt.exempt.model.InsertAssignIdReq;
-import th.co.ais.mimo.debt.exempt.model.InsertAssignIdResp;
 import th.co.ais.mimo.debt.exempt.repo.DMSEM004CriteriaMasterRepo;
-import th.co.ais.mimo.debt.exempt.repo.DccCriteriaHistoryRepository;
-import th.co.ais.mimo.debt.exempt.repo.DccTempTransactionRepository;
 import th.co.ais.mimo.debt.exempt.utils.SqlUtils;
+
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Repository
 public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao {
@@ -44,17 +37,9 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 	@Autowired
 	DMSEM004CriteriaMasterRepo criteriaMasterRepo;
 
-	@Autowired
-	@Setter
-	private DccCriteriaHistoryRepository dccCriteriaHistoryRepository;
-	
-	@Autowired
-	@Setter
-	private DccTempTransactionRepository dccTempTransactionRepository;
 
 	@Override
-	public List<DMSEM004CriteriaMasterBean> searchData(String modeId, Long criteriaId, String description)
-			throws Exception {
+	public List<DMSEM004CriteriaMasterBean> searchData(String modeId, Long criteriaId, String description) throws Exception {
 		List<DMSEM004CriteriaMasterBean> result = null;
 		try {
 			StringBuffer sql = new StringBuffer();
@@ -71,8 +56,7 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 		return result;
 	}
 
-	private StringBuffer searchDataQuerySql(StringBuffer sql, String modeId, Long criteriaId, String description)
-			throws Exception {
+	private StringBuffer searchDataQuerySql(StringBuffer sql, String modeId, Long criteriaId, String description) throws Exception {
 		try {
 			if (sql != null) {
 
@@ -179,12 +163,9 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 				sql.append(" bundling_flag AS \"bundlingFlag\",   ");
 				sql.append(" ca_amount_flag AS \"caAmountFlag\",   ");
 				sql.append(" ca_amount AS \"caAmount\",  ");
-				sql.append(
-						" (select  distinct keyword_desc  from dcc_global_parameter where section_name = 'CRITERIA' and keyword = 'MODULE_CODE' AND KEYWORD_VALUE = assign_Type) AS \"assignTypeDesc\"  ,");
-				sql.append(
-						" (select distinct keyword_desc from dcc_global_parameter where section_name = 'CRITERIA' and keyword = 'EXEMPT_LEVEL' AND KEYWORD_VALUE = order_Level) AS \"orderLevelDesc\"  ,");
-				sql.append(
-						"(select reason_description from dcc_reason where reason_type = 'EXEMPT_ADD' and reason_subtype like 'EXEMPT_ADD' AND REASON_CODE = ACTION_REASON_LIST) AS \"actionReasonListDesc\" ");
+				sql.append(" (select  distinct keyword_desc  from dcc_global_parameter where section_name = 'CRITERIA' and keyword = 'MODULE_CODE' AND KEYWORD_VALUE = assign_Type) AS \"assignTypeDesc\"  ,");
+				sql.append(" (select distinct keyword_desc from dcc_global_parameter where section_name = 'CRITERIA' and keyword = 'EXEMPT_LEVEL' AND KEYWORD_VALUE = order_Level) AS \"orderLevelDesc\"  ,");
+				sql.append("(select reason_description from dcc_reason where reason_type = 'EXEMPT_ADD' and reason_subtype like 'EXEMPT_ADD' AND REASON_CODE = ACTION_REASON_LIST) AS \"actionReasonListDesc\" ");
 				sql.append("  FROM dcc_criteria_master ");
 				sql.append("  where 1=1 ");
 
@@ -197,6 +178,7 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 				if (StringUtils.isNotEmpty(description)) {
 					sql.append("   AND CRITERIA_DESCRIPTION LIKE :description  ");
 				}
+				sql.append("  ORDER BY criteria_id DESC");
 
 			}
 		} catch (Exception e) {
@@ -206,8 +188,7 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 		return sql;
 	}
 
-	private Query searchDataQueryParam(Query query, String modeId, Long criteriaId, String description)
-			throws Exception {
+	private Query searchDataQueryParam(Query query, String modeId, Long criteriaId, String description) throws Exception {
 		try {
 			if (query != null) {
 
@@ -229,159 +210,128 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 	}
 
 	@Override
-	public InsertAssignIdResp insertCriteriaMaster(InsertAssignIdReq req) throws Exception {
-		InsertAssignIdResp response = new InsertAssignIdResp();
+	public void insertCriteriaMaster(InsertAssignIdReq req, Long newCriteriaId) throws Exception {
 		try {
-			response = validateInsertAssignIdResp(req);
-			if (response.getErrorMsg() == null) {
-				Long maxCriteriaId = criteriaMasterRepo.getMaxDccCriteriaId(req.getModeId());
-				if (maxCriteriaId != null) {
-					Long newCriteriaId = maxCriteriaId + 1;
+			//			criteriaMasterRepo.insertCriteriaMaster(req.getOrderType(), 
+			//					req.getReasonCodeList(),
+			//					req.getModeId(),
+			//					newCriteriaId, 
+			//					req.getCriteriaType(), 
+			//					req.getCriteriaDescription(), 
+			//					req.getCompanyCode(), 
+			//					req.getCollectionSegmentList(),
+			//					req.getBillCycleList(), 
+			//					req.getRegionList(),
+			//					req.getMobileStatusList(),
+			//					req.getCateSubcateList(), 
+			//					req.getBaStatusList(), 
+			//					req.getArMnyFrom(), 
+			//					req.getArMnyTo(), 
+			//					req.getBaInactiveDatFrom(),
+			//					req.getBaInactiveDatTo(), 
+			//					req.getActionReasonList(),
+			//					req.getAssignDuration(), 
+			//					req.getAgentType(), 
+			//					req.getAssignType(), 
+			//					req.getAssignJob(), 
+			//					null, // credit LIMIT(ยกเลิกแล้ว)
+			//					req.getCheckDatFrom(),
+			//					req.getCheckDatTo(), 
+			//					req.getProcessDate(), 
+			//					req.getEffectiveDate(), 
+			//					req.getEffectiveEndDate(),
+			//					req.getAutoAssignFlag(),
+			//					req.getLastUpdateBy(),
+			//					req.getOrderLevel(),
+			//					req.getBlacklistType(),
+			//					req.getBlacklistSubtype(),
+			//					req.getProvinceList(), 
+			//					null, // req.getTpDebtType()
+			//					req.getDfDatFrom(), 
+			//					req.getDfDatTo(), 
+			//					req.getCreateBy(), 
+			//					req.getCaInactiveDatFrom(),
+			//					req.getCaInactiveDatTo());
 
-					criteriaMasterRepo.insertCriteriaMaster(req.getOrderType(), req.getReasonCodeList(),
-							req.getModeId(), newCriteriaId, req.getCriteriaType(), req.getCriteriaDescription(),
-							req.getCompanyCode(), req.getCollectionSegmentList(), req.getBillCycleList(),
-							req.getRegionList(), req.getMobileStatusList(), req.getCateSubcateList(),
-							req.getBaStatusList(), req.getArMnyFrom(), req.getArMnyTo(), req.getBaInactiveDatFrom(),
-							req.getBaInactiveDatTo(), req.getActionReasonList(), req.getAssignDuration(),
-							req.getAgentType(), req.getAssignType(), req.getAssignJob(), null, // credit
-																								// LIMIT(ยกเลิกแล้ว)
-							req.getCheckDatFrom(), req.getCheckDatTo(), req.getProcessDate(), req.getEffectiveDate(),
-							req.getEffectiveEndDate(), req.getAutoAssignFlag(), req.getLastUpdateBy(),
-							req.getOrderLevel(), req.getBlacklistType(), req.getBlacklistSubtype(),
-							req.getProvinceList(), null, // req.getTpDebtType()
-							req.getDfDatFrom(), req.getDfDatTo(), req.getCreateBy(), req.getCaInactiveDatFrom(),
-							req.getCaInactiveDatTo());
-					if (StringUtils.isNotEmpty(req.getRefAssignId())) {
-						insertDccCriteriaHistory(req, newCriteriaId);
-					}
-				}
-			}
+			DccCriteriaMaster criteriaMaster = new DccCriteriaMaster();
+			DccCriteriaMasterId criteriaMasterId = new DccCriteriaMasterId();
 
+			criteriaMasterId.setModeId(req.getModeId());
+			criteriaMasterId.setCriteriaId(newCriteriaId);
+			criteriaMaster.setId(criteriaMasterId);
+
+			criteriaMaster.setOrderType(req.getOrderType());
+			criteriaMaster.setReasonCodeList(req.getReasonCodeList());
+
+			criteriaMaster.setCriteriaType(req.getCriteriaType());
+			criteriaMaster.setCriteriaDescription(req.getCriteriaDescription());
+			criteriaMaster.setCompanyCode(req.getCompanyCode());
+			criteriaMaster.setCollectionSegmentList(req.getCollectionSegmentList());
+			criteriaMaster.setBillCycleList(req.getBillCycleList());
+			criteriaMaster.setRegionList(req.getRegionList());
+			criteriaMaster.setMobileStatusList(req.getMobileStatusList());
+			criteriaMaster.setCateSubcateList(req.getCateSubcateList());
+			criteriaMaster.setBaStatusList(req.getBaStatusList());
+			criteriaMaster.setArMnyFrom(req.getArMnyFrom());
+			criteriaMaster.setArMnyTo(req.getArMnyTo());
+			criteriaMaster.setBaInactiveDatFrom(convertStringToDate(req.getBaInactiveDatFrom()));
+			criteriaMaster.setBaInactiveDatTo(convertStringToDate(req.getBaInactiveDatTo()));
+			criteriaMaster.setActionReasonList(req.getActionReasonList());
+			criteriaMaster.setAssignDuration(req.getAssignDuration());
+			criteriaMaster.setAgentType(req.getAgentType());
+			criteriaMaster.setAssignType(req.getAssignType());
+			criteriaMaster.setAssignJob(req.getAssignJob());
+			criteriaMaster.setCallType(req.getCallType());
+			criteriaMaster.setCheckDatFrom(convertStringToDate(req.getCheckDatFrom()));
+			criteriaMaster.setCheckDatTo(convertStringToDate(req.getCheckDatTo()));
+			criteriaMaster.setRunAt(req.getProcessDate());
+			criteriaMaster.setRunStartDat(convertStringToDate(req.getEffectiveDate()));
+			criteriaMaster.setRunEndDat(convertStringToDate(req.getEffectiveEndDate()));
+			criteriaMaster.setAutoAssignFlag(req.getAutoAssignFlag());
+			criteriaMaster.setLastUpdateBy(req.getLastUpdateBy());
+			criteriaMaster.setOrderLevel(req.getOrderLevel());
+			criteriaMaster.setBlacklistType(req.getBlacklistType());
+			criteriaMaster.setBlacklistSubtype(req.getBlacklistSubtype());
+			criteriaMaster.setProvinceList(req.getProvinceList());
+			criteriaMaster.setDfDatFrom(convertStringToDate(req.getDfDatFrom()));
+			criteriaMaster.setDfDatTo(convertStringToDate(req.getDfDatTo()));
+			criteriaMaster.setCreateBy(req.getCreateBy());
+			criteriaMaster.setCaInactiveDatFrom(convertStringToDate(req.getCaInactiveDatFrom()));
+			criteriaMaster.setCaInactiveDatTo(convertStringToDate(req.getCaInactiveDatTo()));
+			criteriaMaster.setLastUpdateDtm(new Date());
+			criteriaMaster.setCompanyTypeList("ALL");
+			criteriaMaster.setNegoFlag(req.getNegoFlag());
+			criteriaMasterRepo.save(criteriaMaster);
 		} catch (Exception e) {
 			log.error("Exception insertCriteriaMaster : {}", e.getMessage(), e);
 			throw e;
 		}
-		return response;
+	}
+
+	private Date convertStringToDate(String dateStr) throws ParseException {
+		if (dateStr == null || dateStr.isEmpty()) {
+			return null;
+		}
+		SimpleDateFormat formatter = new SimpleDateFormat("DD/MM/YYYY");
+		return formatter.parse(dateStr);
 	}
 
 	@Override
-	public DccCriteriaHistory insertDccCriteriaHistory(InsertAssignIdReq req, Long newCriteriaId) throws Exception {
-		long preAssignId = criteriaMasterRepo.getMaxPreAssignId();
-		long newPreAssignId = preAssignId + 1;
-
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		Date processDate = formatter.parse(req.getProcessDate());
-		Date baInactiveDatFrom = formatter.parse(req.getBaInactiveDatFrom());
-		Date baInactiveDatTo = formatter.parse(req.getBaInactiveDatTo());
-		Date checkDatFrom = formatter.parse(req.getCheckDatFrom());
-		Date checkDatTo = formatter.parse(req.getCheckDatTo());
-		Date caInactiveDatFrom = formatter.parse(req.getCaInactiveDatFrom());
-		Date caInactiveDatTo = formatter.parse(req.getCaInactiveDatTo());
-		Date dfDatFrom = formatter.parse(req.getDfDatFrom());
-		Date dfDatTo = formatter.parse(req.getDfDatTo());
-
-		DccCriteriaHistoryId id = new DccCriteriaHistoryId("EM", newCriteriaId);
-		DccCriteriaHistory entity = DccCriteriaHistory.builder().id(id).preAssignId(Long.toString(newPreAssignId))
-				.confirmDat(processDate).orderType(req.getOrderLevel()).reasonCodeList(req.getReasonCodeList())
-				.blacklistSeq(0L).valueSegmentList(null).criteriaType(req.getCriteriaType()).preAssignDat(new Date())
-				.assignStatus("").companyCode(req.getCompanyCode())
-				.collectionSegmentList(req.getCollectionSegmentList()).paymentTypeList(null)
-				.billCycleList(req.getBillCycleList()).regionList(req.getRegionList())
-				.mobileStatusList(req.getMobileStatusList()).productGroupList(null)
-				.cateSubcateList(req.getCateSubcateList()).baStatusList(req.getBaStatusList())
-				.minInvoiceMny(BigDecimal.ZERO).invoiceCount(0L).debtMnyFrom(BigDecimal.ZERO).debtMnyTo(BigDecimal.ZERO)
-				.arMnyFrom(BigDecimal.ZERO).arMnyTo(BigDecimal.ZERO).debtAgeFrom(0L).debtAgeTo(0L).statusAgeFrom(0L)
-				.statusAgeTo(0L).serviceAgeFrom(0L).serviceAgeTo(0L).firstArDatFrom(new Date()).firstArDatTo(new Date())
-				.baInactiveDatFrom(baInactiveDatFrom).baInactiveDatTo(baInactiveDatTo).statusReasonList(null)
-				.actionReasonList(req.getActionReasonList()).negoFlag("S").exemptFlag(null).maxAccount(0L)
-				.maxAmount(BigDecimal.ZERO).assignDuration(0L).assignType(req.getAssignType()).agentType("agentType")
-				.campaignCode(null).dueDay(0L).messageId("").maxCall(0L).maxRedial(0L).templateId(null)
-				.checkDatFrom(checkDatFrom).checkDatTo(checkDatTo).invoiceBackDat(null).invoiceInterval(0L)
-				.autoAssignFlag(req.getAutoAssignFlag()).lastUpdateBy(req.getLastUpdateBy()).lastUpdateDtm(new Date())
-				.orderLevel(req.getOrderLevel())
-				.collectionSegmentAllFlag(req.getCollectionSegmentList().equals("ALL") ? "Y" : "N")
-				.mobileStatusAllFlag(req.getMobileStatusList().equals("ALL") ? "Y" : "N")
-				.regionAllFlag(req.getRegionList().equals("ALL") ? "Y" : "N").productGroupAllFlag("N")
-				.cateSubcateAllFlag("N").baStatusAllFlag(req.getBaStatusList().equals("ALL") ? "Y" : "N")
-				.actionReasonAllFlag(req.getActionReasonList().equals("ALL") ? "Y" : "N").statusReasonAllFlag("N")
-				.paymentTypeAllFlag("N").billCycleAllFlag(req.getBillCycleList().equals("ALL") ? "Y" : "N")
-				.createDtm(new Date()).runDb((long) 1).provinceList(req.getProvinceList()).tpDebtType(null)
-				.letterPaymentDue(0L).letterDat(null).letterAddressType(null).letterLevel(null).dfDatFrom(dfDatFrom)
-				.dfDatTo(dfDatTo).blacklistType(req.getBlacklistType()).blacklistSubtype(req.getBlacklistSubtype())
-				.assignId(null).valueSegmentAllFlag(null).assignDat(new Date()).blacklistDatFlag(null)
-				.blacklistDatFrom(new Date()).blacklistDatTo(new Date()).caInactiveDatFrom(caInactiveDatFrom)
-				.caInactiveDatTo(caInactiveDatTo).assignJob(req.getAssignJob()).creditTermFlag(null).thaiLetterFlag('Y')
-				.incEnvelopeFlag('N').unlockModeFlag('N').companyTypeList("ALL").messageIdFbb(null)
-				.templateIdCtype(null).superDealFlag(null).fixCompanyTypeFlag(null).deviceDiscountFrom(BigDecimal.ZERO)
-				.deviceDiscountTo(BigDecimal.ZERO).createBy(null).genDetailRptFlag(null).billSystemList(null)
-				.autoSmsFlag('N').cpeBrandList(null).cpeFlag(null).ivrRobotFlag(null).cpePenaltyFlag(null)
-				.cpePenaltyAmount(BigDecimal.ZERO).bundlingFlag(null).caAmountFlag(null).caAmount(BigDecimal.ZERO)
-				.build();
-
-		return dccCriteriaHistoryRepository.save(entity);
-	}
-	
-//	public DccTempTransaction insertDccTempTransaction(InsertAssignIdReq req, Long newCriteriaId) throws Exception {
-//		long preAssignId = criteriaMasterRepo.getMaxPreAssignId();
-//		long newPreAssignId = preAssignId + 1;
-//
-////		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-////		Date processDate = formatter.parse(req.getProcessDate());
-////		Date baInactiveDatFrom = formatter.parse(req.getBaInactiveDatFrom());
-////		Date baInactiveDatTo = formatter.parse(req.getBaInactiveDatTo());
-////		Date checkDatFrom = formatter.parse(req.getCheckDatFrom());
-////		Date checkDatTo = formatter.parse(req.getCheckDatTo());
-////		Date caInactiveDatFrom = formatter.parse(req.getCaInactiveDatFrom());
-////		Date caInactiveDatTo = formatter.parse(req.getCaInactiveDatTo());
-////		Date dfDatFrom = formatter.parse(req.getDfDatFrom());
-////		Date dfDatTo = formatter.parse(req.getDfDatTo());
-//
-//		DccTempTransactionId id = new DccTempTransactionId("EM", "","","");
-//		DccTempTransaction entity = DccTempTransaction.builder().id(id);
-//		return dccTempTransactionRepository.save(entity);
-//	}
-
-	@Override
-	public InsertAssignIdResp updateCriteriaMaster(InsertAssignIdReq req) throws Exception {
-		InsertAssignIdResp response = new InsertAssignIdResp();
-
+	public void updateCriteriaMaster(InsertAssignIdReq req) throws Exception {
 		try {
-			response = validateInsertAssignIdResp(req);
-			if (response.getErrorMsg() == null) {
-				StringBuffer sql = new StringBuffer();
-				sql = updateCriteriaMasterQuerySql(sql, req.isSelectEfficetiveDate(), req.isSelectDuration());
-				Query query = entityManager.createNativeQuery(sql.toString(), Tuple.class);
-				query = updateCriteriaMasterQueryParam(query, req.getCriteriaDescription(), req.getCompanyCode(),
-						req.getCollectionSegmentList(), req.getBillCycleList(), req.getRegionList(),
-						req.getMobileStatusList(), req.getCateSubcateList(), req.getBaStatusList(), req.getArMnyFrom(),
-						req.getArMnyTo(), req.getBaInactiveDatFrom(), req.getBaInactiveDatTo(),
-						req.getActionReasonList(), req.getAssignDuration(), req.getAgentType(), req.getAssignType(),
-						req.getAssignJob(), req.getCheckDatFrom(), req.getCheckDatTo(), req.getModeId(),
-						req.getCriteriaId(), req.getCriteriaType(), req.isSelectEfficetiveDate(),
-						req.isSelectDuration(), req.getDfDatFrom(), req.getDfDatTo(), req.getProcessDate(),
-						req.getCaInactiveDatFrom(), req.getCaInactiveDatTo(), req.getProvinceList(),
-						req.getBlacklistType(), req.getBlacklistSubtype(), req.getOrderType(), req.getOrderLevel(),
-						req.getAutoAssignFlag());
-				query.executeUpdate();
-
-//				criteriaMasterRepo.updateCriteriaMaster(req.getCriteriaDescription(), req.getCompanyCode(),
-//						req.getCollectionSegmentList(), req.getBillCycleList(), req.getRegionList(),
-//						req.getMobileStatusList(), req.getCateSubcateList(), req.getBaStatusList(), req.getArMnyFrom(),
-//						req.getArMnyTo(), req.getBaInactiveDatFrom(), req.getBaInactiveDatTo(),
-//						req.getActionReasonList(), req.getAssignDuration(), req.getAgentType(), req.getAssignType(),
-//						req.getAssignJob(), req.getCheckDatFrom(), req.getCheckDatTo(), req.getModeId(),
-//						req.getCriteriaId(), req.getCriteriaType());
-			}
+			StringBuffer sql = new StringBuffer();
+			sql = updateCriteriaMasterQuerySql(sql, req.isSelectEfficetiveDate(), req.isSelectDuration());
+			Query query = entityManager.createNativeQuery(sql.toString(), Tuple.class);
+			query = updateCriteriaMasterQueryParam(query, req.getCriteriaDescription(), req.getCompanyCode(), req.getCollectionSegmentList(), req.getBillCycleList(), req.getRegionList(), req.getMobileStatusList(), req.getCateSubcateList(), req.getBaStatusList(), req.getArMnyFrom(), req.getArMnyTo(), req.getBaInactiveDatFrom(), req.getBaInactiveDatTo(), req.getActionReasonList(), req.getAssignDuration(), req.getAgentType(), req.getAssignType(), req.getAssignJob(), req.getCheckDatFrom(), req.getCheckDatTo(), req.getModeId(), req.getCriteriaId(), req.getCriteriaType(), req.isSelectEfficetiveDate(), req.isSelectDuration(), req.getDfDatFrom(), req.getDfDatTo(), req.getProcessDate(), req.getCaInactiveDatFrom(), req.getCaInactiveDatTo(), req.getProvinceList(), req.getBlacklistType(),
+					req.getBlacklistSubtype(), req.getOrderType(), req.getOrderLevel(), req.getAutoAssignFlag());
+			query.executeUpdate();
 		} catch (Exception e) {
 			log.error("Exception insertCriteriaMaster : {}", e.getMessage(), e);
 			throw e;
 		}
-		return response;
 	}
 
-	private StringBuffer updateCriteriaMasterQuerySql(StringBuffer sql, boolean selectEfficetiveDate,
-			boolean selectDuration) throws Exception {
+	private StringBuffer updateCriteriaMasterQuerySql(StringBuffer sql, boolean selectEfficetiveDate, boolean selectDuration) throws Exception {
 		if (sql != null) {
 
 			sql.append("UPDATE dcc_criteria_master SET ");
@@ -430,14 +380,7 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 		return sql;
 	}
 
-	private Query updateCriteriaMasterQueryParam(Query query, String criteriaDescription, String companyCode,
-			String collectionSegmentList, String billCycleList, String regionList, String mobileStatusList,
-			String cateSubcateList, String baStatusList, BigDecimal arMnyFrom, BigDecimal arMnyTo,
-			String baInactiveDatFrom, String baInactiveDatTo, String actionReasonList, Long assignDuration,
-			String agentType, String assignType, String assignJob, String checkDatFrom, String checkDatTo,
-			String modeId, Long criteriaId, String criteriaType, boolean selectEfficetiveDate, boolean selectDuration,
-			String dfDatFrom, String dfDatTo, String runAt, String caInactiveDatFrom, String caInactiveDatTo,
-			String provinceList, String blacklistType, String blacklistSubtype, String orderType, String orderLevel,
+	private Query updateCriteriaMasterQueryParam(Query query, String criteriaDescription, String companyCode, String collectionSegmentList, String billCycleList, String regionList, String mobileStatusList, String cateSubcateList, String baStatusList, BigDecimal arMnyFrom, BigDecimal arMnyTo, String baInactiveDatFrom, String baInactiveDatTo, String actionReasonList, Long assignDuration, String agentType, String assignType, String assignJob, String checkDatFrom, String checkDatTo, String modeId, Long criteriaId, String criteriaType, boolean selectEfficetiveDate, boolean selectDuration, String dfDatFrom, String dfDatTo, String runAt, String caInactiveDatFrom, String caInactiveDatTo, String provinceList, String blacklistType, String blacklistSubtype, String orderType, String orderLevel,
 			String autoAssignFlag) throws Exception {
 		try {
 			if (query != null) {
@@ -492,116 +435,11 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 		return query;
 	}
 
-	public InsertAssignIdResp validateInsertAssignIdResp(InsertAssignIdReq req) throws Exception {
-		InsertAssignIdResp response = new InsertAssignIdResp();
-		String msgError = null;
-		try {
-			if (StringUtils.isBlank(req.getOrderType())) {
-				msgError = "OrderType is invalid";
-			} else if (StringUtils.isBlank(req.getReasonCodeList())) {
-				msgError = "ReasonCodeList is invalid";
-			} else if (StringUtils.isBlank(req.getModeId())) {
-				msgError = "ModeId is invalid";
-			} else if (StringUtils.isBlank(req.getCriteriaType())) {
-				msgError = "CriteriaType is invalid";
-			} else
-//				if (StringUtils.isBlank(req.getCriteriaDescription())) {
-//				msgError = "CriteriaDescription is invalid";
-//			} else 
-			if (StringUtils.isBlank(req.getCompanyCode())) {
-				msgError = "CompanyCode is invalid";
-			} else if (StringUtils.isBlank(req.getCollectionSegmentList())) {
-				msgError = "CollectionSegmentList is invalid";
-			} else if (StringUtils.isBlank(req.getBillCycleList())) {
-				msgError = "BillCycleList is invalid";
-			} else if (StringUtils.isBlank(req.getRegionList())) {
-				msgError = "RegionList is invalid";
-			} else if (StringUtils.isBlank(req.getMobileStatusList())) {
-				msgError = "MobileStatusList is invalid";
-			} else if (StringUtils.isBlank(req.getCateSubcateList())) {
-				msgError = "CateSubcateList is invalid";
-			} else if (StringUtils.isBlank(req.getBaStatusList())) {
-				msgError = "BaStatusList is invalid";
-			} else if (req.getArMnyFrom() == null) {
-				msgError = "ArMnyFrom is invalid";
-			} else if (req.getArMnyTo() == null) {
-				msgError = "ArMnyTo is invalid";
-			} else if (StringUtils.isBlank(req.getBaInactiveDatFrom())) {
-				msgError = "BaInactiveDatFrom is invalid";
-			} else if (StringUtils.isBlank(req.getBaInactiveDatTo())) {
-				msgError = "BaInactiveDatTo is invalid";
-			} else if (StringUtils.isBlank(req.getActionReasonList())) {
-				msgError = "ActionReasonList is invalid";
-			} else if (req.getAssignDuration() == null) {
-				msgError = "AssignDuration is invalid";
-			} else if (StringUtils.isBlank(req.getAgentType())) {
-				msgError = "AgentType is invalid";
-			} else if (StringUtils.isBlank(req.getAssignType())) {
-				msgError = "AssignType is invalid";
-			} else if (StringUtils.isBlank(req.getAssignJob())) {
-				msgError = "AssignJob is invalid";
-			} else if (StringUtils.isBlank(req.getCheckDatFrom())) {
-				msgError = "CheckDatFrom is invalid";
-			} else if (StringUtils.isBlank(req.getCheckDatTo())) {
-				msgError = "CheckDatTo is invalid";
-			} else if (StringUtils.isBlank(req.getProcessDate())) {
-				msgError = "ProcessDate is invalid";
-			} else if (StringUtils.isBlank(req.getEffectiveDate())) {
-				msgError = "EffectiveDate is invalid";
-			} else if (StringUtils.isBlank(req.getEffectiveEndDate())) {
-				msgError = "EffectiveEndDate is invalid";
-			} else if (StringUtils.isBlank(req.getAutoAssignFlag())) {
-				msgError = "AutoAssignFlag is invalid";
-			} else if (StringUtils.isBlank(req.getLastUpdateBy())) {
-				msgError = "LastUpdateBy is invalid";
-			} else if (StringUtils.isBlank(req.getOrderLevel())) {
-				msgError = "OrderLevel is invalid";
-			} else if (StringUtils.isBlank(req.getBlacklistType())) {
-				msgError = "BlacklistType is invalid";
-			} else if (StringUtils.isBlank(req.getBlacklistSubtype())) {
-				msgError = "BlacklistSubtype is invalid";
-			} else if (StringUtils.isBlank(req.getProvinceList())) {
-				msgError = "ProvinceList is invalid";
-			} else if (StringUtils.isBlank(req.getDfDatFrom())) {
-				msgError = "DfDatFrom is invalid";
-			} else if (StringUtils.isBlank(req.getDfDatTo())) {
-				msgError = "DfDatTo is invalid";
-			} else if (StringUtils.isBlank(req.getCreateBy())) {
-				msgError = "CreateBy is invalid";
-			} else if (StringUtils.isBlank(req.getCaInactiveDatFrom())) {
-				msgError = "CaInactiveDatFrom is invalid";
-			} else if (StringUtils.isBlank(req.getCaInactiveDatTo())) {
-				msgError = "CaInactiveDatTo is invalid";
-			}
-			response.setErrorMsg(msgError);
-		} catch (Exception e) {
-			log.error("Exception insertCriteriaMaster : {}", e.getMessage(), e);
-			throw e;
-		}
-		return response;
-	}
-
 	@Override
-	public GetBillAccNumByMobileNumResp validateGetBillAccNumByMobileNum(GetBillAccNumByMobileNumReq req)
-			throws Exception {
-		GetBillAccNumByMobileNumResp response = new GetBillAccNumByMobileNumResp();
-		List<DMSEM004GetBaByMobileNumDto> results = new ArrayList<>();
+	public DMSEM004GetBaByMobileNumDto validateGetBillAccNumByMobileNum(String mobileNum) throws Exception {
+		DMSEM004GetBaByMobileNumDto response = null;
 		try {
-			if (req.getMobileNumList().size() > 0) {
-				for (String mobileNum : req.getMobileNumList()) {
-					DMSEM004GetBaByMobileNumDto result = criteriaMasterRepo.getBaAccByMobileNum(mobileNum);
-					if (result != null) {
-						results.add(result);
-					} else {
-						DMSEM004GetBaByMobileNumDto resultNotFound = DMSEM004GetBaByMobileNumDto.createWithMobileNum(mobileNum);
-						results.add(resultNotFound);
-					}
-				}
-				response.setResultList(results);
-			} else {
-				response.setErrorMsg("Mobile Num is invalid.");
-			}
-
+			response = criteriaMasterRepo.getBaAccByMobileNum(mobileNum);
 		} catch (Exception e) {
 			log.error("Exception insertCriteriaMaster : {}", e.getMessage(), e);
 			throw e;

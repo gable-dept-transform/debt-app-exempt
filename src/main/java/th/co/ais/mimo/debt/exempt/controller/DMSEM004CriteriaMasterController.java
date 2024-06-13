@@ -388,12 +388,12 @@ public class DMSEM004CriteriaMasterController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	@PostMapping(value = "/insert-assign", produces = "application/json")
-	public ResponseEntity<InsertAssignIdResp> insertAssign(@RequestBody InsertAssignIdReq request) {
+	@PostMapping(value = "/insert-update-criteria", produces = "application/json")
+	public ResponseEntity<InsertAssignIdResp> insertOrUpdateCriteriaMaster(@RequestBody InsertAssignIdReq request) {
 		String errorMsg = null;
 		InsertAssignIdResp response = null;
 		try {
-			response = criteriaMasterService.insertCriteriaMaster(request);
+			response = criteriaMasterService.insertOrUpdateCriteriaMaster(request);
 			errorMsg = response.getErrorMsg();
 		} catch (Exception e) {
 			log.error("Exception insertAssign : {}", e.getMessage(), e);
@@ -403,6 +403,23 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	
+	@PostMapping(value = "/insert-ref-assign", produces = "application/json")
+	public ResponseEntity<InsertAssignIdResp> insertRefAssign(@RequestBody InsertAssignIdReq request) {
+		String errorMsg = null;
+		InsertAssignIdResp response = null;
+		try {
+			response = criteriaMasterService.insertRefAssign(request);
+			errorMsg = response.getErrorMsg();
+		} catch (Exception e) {
+			log.error("Exception insertAssign : {}", e.getMessage(), e);
+			errorMsg = "insertAssign Internal server Error process";
+		} finally {
+			response = new InsertAssignIdResp(errorMsg);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
 
 	@PostMapping(value = "/validate-mobilenum", produces = "application/json")
 	public ResponseEntity<GetBillAccNumByMobileNumResp> validateGetBillAccNumByMobileNum(@RequestBody GetBillAccNumByMobileNumReq request) {
@@ -420,5 +437,20 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-
+	
+	@PostMapping(value = "/upload-billacc-mobilenum", produces = "application/json")
+	public ResponseEntity<InsertAssignIdResp> uploadBillAccMobileNum(@RequestBody InsertAssignIdReq request) {
+		String errorMsg = null;
+		InsertAssignIdResp response = null;
+		try {
+			response = criteriaMasterService.uploadBillAccMobileNum(request);
+			errorMsg = response.getErrorMsg();
+		} catch (Exception e) {
+			log.error("Exception insertAssign : {}", e.getMessage(), e);
+			errorMsg = "insertAssign Internal server Error process";
+		} finally {
+			response = new InsertAssignIdResp(errorMsg);
+		}
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 }

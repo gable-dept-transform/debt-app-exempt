@@ -2,8 +2,6 @@ package th.co.ais.mimo.debt.exempt.service;
 
 import java.util.List;
 
-import org.springframework.data.repository.query.Param;
-
 import th.co.ais.mimo.debt.exempt.dto.CommonDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.DistrictDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.GetRefAssignDto;
@@ -25,8 +23,7 @@ public interface DMSEM004CriteriaMasterService {
 
 	List<DMSEM004CriteriaMasterBean> searchData(String modeId, Long criteriaId, String description) throws Exception;
 
-	String updateInfo(String lastUpdateBy, String blacklistDatFlag, String blacklistDatFrom, String blacklistDatTo,
-			String modeId, Long criteriaId, String criteriaType) throws Exception;
+	String updateInfo(String lastUpdateBy, String blacklistDatFlag, String blacklistDatFrom, String blacklistDatTo, String modeId, Long criteriaId, String criteriaType) throws Exception;
 
 	String deleteInfo(String modeId, Long criteriaId) throws Exception;
 
@@ -64,7 +61,12 @@ public interface DMSEM004CriteriaMasterService {
 
 	List<GetRefAssignDto> getRefAssignId(String assignId) throws Exception;
 
-	InsertAssignIdResp insertCriteriaMaster(InsertAssignIdReq req) throws Exception;
+	InsertAssignIdResp insertOrUpdateCriteriaMaster(InsertAssignIdReq req) throws Exception;
 
 	GetBillAccNumByMobileNumResp validateGetBillAccNumByMobileNum(GetBillAccNumByMobileNumReq req) throws Exception;
+
+	InsertAssignIdResp insertRefAssign(InsertAssignIdReq req) throws Exception;
+
+	InsertAssignIdResp uploadBillAccMobileNum(InsertAssignIdReq request) throws Exception;
+
 }
