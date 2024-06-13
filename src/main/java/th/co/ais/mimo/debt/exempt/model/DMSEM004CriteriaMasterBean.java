@@ -119,5 +119,8 @@ public class DMSEM004CriteriaMasterBean implements Serializable {
 	private String bundlingFlag;
 	private String caAmountFlag;
 	private BigDecimal caAmount;
+	private String assignTypeDesc;
+	private String orderLevelDesc;
+	private String actionReasonListDesc;
 
 }
