@@ -15,7 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 import th.co.ais.mimo.debt.exempt.constant.AppConstant;
 import th.co.ais.mimo.debt.exempt.dao.ReportDMREM001Dao;
 import th.co.ais.mimo.debt.exempt.dto.GenReportSeqDto;
-import th.co.ais.mimo.debt.exempt.entity.*;
+import th.co.ais.mimo.debt.exempt.entity.DccCalendarTransaction;
+import th.co.ais.mimo.debt.exempt.entity.DccCalendarTransactionId;
+import th.co.ais.mimo.debt.exempt.entity.DccReportExemptCriteria;
+import th.co.ais.mimo.debt.exempt.entity.DccReportExemptCriteriaId;
 import th.co.ais.mimo.debt.exempt.exception.ExemptException;
 import th.co.ais.mimo.debt.exempt.model.DataDMREM001;
 import th.co.ais.mimo.debt.exempt.model.DeleteReportDMREM001Request;
@@ -25,7 +28,7 @@ import th.co.ais.mimo.debt.exempt.repo.DccCalendarTransactionRepository;
 import th.co.ais.mimo.debt.exempt.repo.DccDMREM001TmpRepository;
 import th.co.ais.mimo.debt.exempt.repo.DccPrivacyLogRepository;
 import th.co.ais.mimo.debt.exempt.repo.DccReportExemptCriteriaRepository;
-import th.co.ais.mimo.debt.exempt.service.CommonService;
+import th.co.ais.mimo.debt.exempt.service.impl.CommonService;
 @Service
 @Transactional
 public class ReportDMREM001Service {

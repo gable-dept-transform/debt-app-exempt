@@ -1,18 +1,34 @@
 package th.co.ais.mimo.debt.exempt.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import th.co.ais.mimo.debt.exempt.dto.*;
-import th.co.ais.mimo.debt.exempt.exception.ExemptException;
-import th.co.ais.mimo.debt.exempt.model.*;
-import th.co.ais.mimo.debt.exempt.service.CommonService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.List;
+import th.co.ais.mimo.debt.exempt.dto.CommonCheckListDto;
+import th.co.ais.mimo.debt.exempt.dto.CommonDropdownListDto;
+import th.co.ais.mimo.debt.exempt.dto.CpLocationDto;
+import th.co.ais.mimo.debt.exempt.dto.DccExemptCateDetailDto;
+import th.co.ais.mimo.debt.exempt.dto.DccExemptCateMasterDto;
+import th.co.ais.mimo.debt.exempt.exception.ExemptException;
+import th.co.ais.mimo.debt.exempt.model.AscLocationListResponse;
+import th.co.ais.mimo.debt.exempt.model.CommonCheckListResponse;
+import th.co.ais.mimo.debt.exempt.model.CommonDropDownResponse;
+import th.co.ais.mimo.debt.exempt.model.ExemptCateDetailResponse;
+import th.co.ais.mimo.debt.exempt.model.ExemptCateMasterResponse;
+import th.co.ais.mimo.debt.exempt.model.LocationListResponse;
+import th.co.ais.mimo.debt.exempt.model.ReservePackResponse;
+import th.co.ais.mimo.debt.exempt.service.impl.CommonService;
 
 
 @RestController
