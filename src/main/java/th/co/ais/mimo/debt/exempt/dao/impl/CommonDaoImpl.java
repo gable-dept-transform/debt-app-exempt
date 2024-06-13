@@ -69,4 +69,16 @@ public class CommonDaoImpl implements CommonDao {
         }
         return null;
     }
+
+    @Override
+    public String getReservePack() throws ExemptException {
+        String sql = "select dccu_dbutil.get_exempt_reserved_pack reserved_pack from dual";
+        Query query = entityManager.createNativeQuery(sql);
+
+        List<String> list = query.getResultList();
+        if(list != null && !list.isEmpty()){
+            return list.get(0);
+        }
+        return null;
+    }
 }
