@@ -43,6 +43,8 @@ public class AppConstant {
     public static final String REFTYPE_CAT_SUBCAT = "Cat & SubCat";
     public static final String REFTYPE_CAT_SUBCAT_ALL_FLG = "Cat & SubCat ALL FLG";
     public static final String REFTYPE_MONTH_PER = "Month Per";
+    public static final String X_LOCATION = "x-location";
+    public static final String X_USER_ID = "x-user-id";
 
 	public static final String ADD_EXEMPT_WARNING_LOW_LEVEL_FOUND = "WARN_LOW_LEVEL_EXEMPT_FOUND";
 //	public static final String ADD_EXEMPT_WARNING_LOW_LEVEL_BA_FOUND = "WARN_LOW_LEVEL_BA_EXEMPT_FOUND";
