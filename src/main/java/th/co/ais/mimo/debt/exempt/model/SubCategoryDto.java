@@ -4,4 +4,5 @@ public interface SubCategoryDto {
 	
 	String getName();
 	String getVal();
+	String getDisplay();
 }

@@ -155,7 +155,7 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
 			+ " order by lov_name " , nativeQuery = true)
 	List<CategoryDto> getCategory() throws Exception;
 
-	@Query(value = " select sm.lov_name AS name,sm.display_val AS val "
+	@Query(value = " select sm.lov_name AS name,sm.display_val AS display, s.lov_name || '/' || sm.lov_name AS val "
 			+ " from sff_lov_master s,sff_lov_master sm  "
 			+ " where s.row_id = sm.par_row_id  "
 			+ " and s.lov_type = 'ACCOUNT_CATEGORY' "
