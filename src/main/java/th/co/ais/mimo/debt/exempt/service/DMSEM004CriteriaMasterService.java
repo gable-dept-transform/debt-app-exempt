@@ -13,7 +13,6 @@ import th.co.ais.mimo.debt.exempt.model.CategoryDto;
 import th.co.ais.mimo.debt.exempt.model.CollectionSegmentDto;
 import th.co.ais.mimo.debt.exempt.model.CommonDropdownDto;
 import th.co.ais.mimo.debt.exempt.model.DMSEM004CriteriaMasterBean;
-import th.co.ais.mimo.debt.exempt.model.InsertAssignDto;
 import th.co.ais.mimo.debt.exempt.model.GetBillAccNumByMobileNumReq;
 import th.co.ais.mimo.debt.exempt.model.GetBillAccNumByMobileNumResp;
 import th.co.ais.mimo.debt.exempt.model.InsertAssignIdReq;
@@ -61,8 +60,6 @@ public interface DMSEM004CriteriaMasterService {
 	List<CommonDropdownDto> getCompanyByCode(String companyCode) throws Exception;
 
 	List<GetRefAssignDto> getRefAssignId(String assignId) throws Exception;
-	
-	String insetRefAssignId(InsertAssignDto assignDto) throws Exception;
 
 	InsertAssignIdResp insertOrUpdateCriteriaMaster(InsertAssignIdReq req) throws Exception;
 
