@@ -110,11 +110,10 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
 			+ " order by keyword_value ", nativeQuery = true)
 	List<CommonDropdownDto> getBastatus() throws Exception;
 
-	@Query(value = " select DISTINCT(keyword_desc) AS keywordDesc, keyword_value AS keywordValue, last_update_by AS lastUpdateBy, "
-			+ " last_update_dtm AS lastUpdateDtm ,SECTION_NAME AS sectionName ,KEYWORD AS keyword"
-			+ " from dcc_global_parameter " + " where section_name = 'CRITERIA' " + " and keyword = 'MOBILE_STATUS' "
-			+ " order by keyword_value ", nativeQuery = true)
-	List<CommonDropdownDto> getMobilestatus() throws Exception;
+	@Query(value = "select  distinct keyword_desc AS keywordDesc , keyword_value AS keywordValue from dcc_global_parameter "
+			+ "where section_name = 'MO_STATUS_OF_BA_STAT' and keyword = :baStatus " 
+			+ "order by keyword_value", nativeQuery = true)
+	List<CommonDropdownDto> getMobilestatus(@Param("baStatus")String baStatus) throws Exception;
 
 	@Query(value = " select DISTINCT(keyword_desc) AS keywordDesc, keyword_value AS keywordValue, last_update_by AS lastUpdateBy, "
 			+ " last_update_dtm AS lastUpdateDtm ,SECTION_NAME AS sectionName ,KEYWORD AS keyword"

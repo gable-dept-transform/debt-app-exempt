@@ -245,12 +245,12 @@ public class DMSEM004CriteriaMasterController {
 	}
 
 	@GetMapping(value = "/mobile-status")
-	public ResponseEntity<CommonDropDownResp> getMobileStatus() throws Exception {
+	public ResponseEntity<CommonDropDownResp> getMobileStatus(@RequestParam(name = "baStatus") String baStatus) throws Exception {
 		String errorMsg = null;
 		List<CommonDropdownDto> listDto = null;
 		CommonDropDownResp response = null;
 		try {
-			listDto = criteriaMasterService.getMobilestatus();
+			listDto = criteriaMasterService.getMobilestatus(baStatus);
 		} catch (Exception e) {
 			log.error("Exception getMobileStatus : {}", e.getMessage(), e);
 			errorMsg = "getMobileStatus Internal server Error process";

@@ -197,10 +197,10 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 	}
 
 	@Override
-	public List<CommonDropdownDto> getMobilestatus() throws Exception {
+	public List<CommonDropdownDto> getMobilestatus(String baStatus) throws Exception {
 		List<CommonDropdownDto> list = new ArrayList<>();
 		try {
-			list = globalParameterRepo.getMobilestatus();
+			list = globalParameterRepo.getMobilestatus(baStatus);
 		} catch (Exception e) {
 			throw e;
 		}

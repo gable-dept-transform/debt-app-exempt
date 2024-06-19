@@ -42,7 +42,7 @@ public interface DMSEM004CriteriaMasterService {
 
 	List<CommonDropdownDto> getBastatus() throws Exception;
 
-	List<CommonDropdownDto> getMobilestatus() throws Exception;
+	List<CommonDropdownDto> getMobilestatus(String baStatus) throws Exception;
 
 	List<CommonDropdownDto> getModule() throws Exception;
 
