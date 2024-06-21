@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import th.co.ais.mimo.debt.exempt.constant.AppConstant;
 import th.co.ais.mimo.debt.exempt.dto.CommonCheckListDto;
 import th.co.ais.mimo.debt.exempt.dto.CommonDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.CpLocationDto;
@@ -155,7 +156,7 @@ public class CommonController {
     @GetMapping(value = "/mode/{module}/{level}")
     public ResponseEntity<CommonDropDownResponse> getMode(@PathVariable(name="module") String module
             ,@PathVariable(name="level") String level
-            ,@RequestHeader(name = "x-location",required = false) Integer location)  {
+            ,@RequestHeader(name = AppConstant.X_LOCATION,required = false) Integer location)  {
         CommonDropDownResponse response = new CommonDropDownResponse();
         String userLocationId = location == null ? "" : location.toString();
         List<CommonDropdownListDto> resultList = null;
@@ -531,7 +532,7 @@ public class CommonController {
 
 
     @GetMapping(value = "/asc-location-list")
-    public ResponseEntity<AscLocationListResponse> getASCLocationList(@RequestHeader("x-userId") String username)  {
+    public ResponseEntity<AscLocationListResponse> getASCLocationList(@RequestHeader(AppConstant.X_LOCATION) String username)  {
         AscLocationListResponse response = new AscLocationListResponse();
         Integer result = null;
         String errorMsg = null;
@@ -554,7 +555,8 @@ public class CommonController {
     }
 
     @GetMapping(value = "/location-list")
-    public ResponseEntity<LocationListResponse> getLocationList(@RequestParam(name = "filterLocation") boolean filterLocation, @RequestHeader("x-location-id") Integer locationId)  {
+    public ResponseEntity<LocationListResponse> getLocationList(@RequestParam(name = "filterLocation") boolean filterLocation,
+                                                                @RequestHeader(name = AppConstant.X_LOCATION,required = false) Integer locationId)  {
         LocationListResponse response = new LocationListResponse();
         List<CpLocationDto> result = new ArrayList<CpLocationDto>();
         String errorMsg = null;
