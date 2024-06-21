@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import th.co.ais.mimo.debt.exempt.constant.AppConstant;
 import th.co.ais.mimo.debt.exempt.dto.ExemptDetailDto;
 import th.co.ais.mimo.debt.exempt.dto.SearchTreatmentDto;
 import th.co.ais.mimo.debt.exempt.exception.ExemptException;
@@ -144,8 +145,8 @@ public class DMSEM002SetTreatmentExemptController {
 
 	@PostMapping(value = "/add-exempt",produces = "application/json")
 	public ResponseEntity<AddExemptResponse> addExempt(@RequestBody AddExemptRequest request,
-													   @RequestHeader(name = "x-user-id") String userId,
-													   @RequestHeader(name = "x-location") Integer location){
+													   @RequestHeader(name = AppConstant.X_USER_ID) String userId,
+													   @RequestHeader(name = AppConstant.X_LOCATION,required = false) Integer location){
 		try {
 			AddExemptResponse response = this.dmsem002SetTreatmentExemptService.insertExempt(request,location,userId);
 			return ResponseEntity.ok().body(response);
@@ -173,7 +174,7 @@ public class DMSEM002SetTreatmentExemptController {
 	@PostMapping(value = "/update-exempt",produces = "application/json")
 	public ResponseEntity<UpdateExemptResponse> updateExempt(@RequestBody UpdateExemptRequest request,
 															 @RequestHeader(name = "x-user-id") String userId,
-															 @RequestHeader(name = "x-location") Integer location){
+															 @RequestHeader(name = "x-location",required = false) Integer location){
 		try {
 			UpdateExemptResponse response = this.dmsem002SetTreatmentExemptService.updateExempt(request,location,userId);
 			return ResponseEntity.ok().body(response);
@@ -189,7 +190,7 @@ public class DMSEM002SetTreatmentExemptController {
 	@PostMapping(value = "/delete-exempt",produces = "application/json")
 	public ResponseEntity<DeleteExemptResponse> deleteExempt(@RequestBody DeleteExemptRequest request,
 															 @RequestHeader(name = "x-user-id") String userId,
-															 @RequestHeader(name = "x-location") Integer location){
+															 @RequestHeader(name = "x-location",required = false) Integer location){
 		try {
 			DeleteExemptResponse response = this.dmsem002SetTreatmentExemptService.deleteExempt(request,location,userId);
 			return ResponseEntity.ok().body(response);

@@ -26,7 +26,7 @@ public class DccPrivacyLogController {
 
     @PostMapping(value = "/insert-log")
     public ResponseEntity<PrivacyLogInsertResponse> insertLog(@RequestHeader(name = AppConstant.X_LOCATION,required = false) Integer location,
-                                                              @RequestHeader(name = AppConstant.X_USER_ID) String username,
+                                                              @RequestHeader(name = AppConstant.X_USER_ID,required = false) String username,
                                                               RequestEntity<PrivacyLogInsertRequest> request)  {
         PrivacyLogInsertRequest insertReq = request.getBody();
         PrivacyLogInsertResponse response = new PrivacyLogInsertResponse();
