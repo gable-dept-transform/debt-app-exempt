@@ -55,7 +55,7 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
 			@Param("sectionName") String sectionName) throws Exception;
 
 	@Query(value = "  SELECT distinct keyword_desc AS label, keyword_value AS val "
-			+ " FROM dcc_global_parameter WHERE SECTION_NAME  = :sectionName AND KEYWORD = :keyWord ", nativeQuery = true)
+			+ " FROM dcc_global_parameter WHERE SECTION_NAME  = :sectionName AND KEYWORD = :keyWord ORDER BY keyword_value ASC", nativeQuery = true)
 	List<CommonDropdownListDto> getRegionInfoCaseDropdown(@Param("sectionName")String sectionName, @Param("keyWord")String keyWord) throws Exception;
 
 	@Query(value = "  SELECT DISTINCT(L.LOV_NAME) AS val, L.DISPLAY_VAL AS label , L.LOV_VAL1 AS lovVal1 "
