@@ -142,7 +142,11 @@ public class ReportDMREM001ServiceImpl implements ReportDMREM001Dao {
             }
 
             if (AppConstant.FLAG_Y.equals(request.getFvBlnACSLocation())) {
-                query.setParameter("userLoctionCodeList", request.getAcsLocationList().get(0));
+                if (request.getAcsLocationList().isEmpty()) {
+                    query.setParameter("userLoctionCodeList", null);
+                } else {
+                    query.setParameter("userLoctionCodeList", request.getAcsLocationList().get(0));
+                }
             }
 
             result = SqlUtils.parseResult(query.getResultList(), DataDMREM001.class);
@@ -179,7 +183,8 @@ public class ReportDMREM001ServiceImpl implements ReportDMREM001Dao {
                 .mobileStatusList(request.getMobileStatusList())
                 .locationList(request.getLocationList())
                 .processDate(request.getProcessDate() != null ? request.getProcessDate().getTime() : null)
-                .effectiveDateFrom(request.getEffectiveDateFrom() != null ? request.getEffectiveDateFrom().getTime() : null)
+                .effectiveDateFrom(
+                        request.getEffectiveDateFrom() != null ? request.getEffectiveDateFrom().getTime() : null)
                 .effectiveDateTo(request.getEffectiveDateTo() != null ? request.getEffectiveDateTo().getTime() : null)
                 .endDateFrom(request.getEndDateFrom() != null ? request.getEndDateFrom().getTime() : null)
                 .endDateTo(request.getEndDateTo() != null ? request.getEndDateTo().getTime() : null)
@@ -195,7 +200,8 @@ public class ReportDMREM001ServiceImpl implements ReportDMREM001Dao {
                 .baDebtMnyTo(new BigDecimal(0))
                 .amountFrom(request.getAmountFrom())
                 .amountTo(request.getAmountTo())
-                .cateSubCateList(AppConstant.FLAG_Y.equals(request.getSelectAllCate()) ? "ALL" : request.getCatSubCateList())
+                .cateSubCateList(
+                        AppConstant.FLAG_Y.equals(request.getSelectAllCate()) ? "ALL" : request.getCatSubCateList())
                 .monthPeriod(request.getMonthPeriod())
                 .durationOver(request.getDurationOver())
                 .criteriaBy(request.getUsername())

@@ -15,5 +15,5 @@ public interface AscLocationRelationRepository extends JpaRepository<AscLocation
             " {h-schema}ACS_LOCATION_RELATION D, {h-schema}CP_LOCATION_MASTER E" +
             " where A.USER_ID = B.USER_ID AND B.GROUP_ID = C.GROUP_ID " +
             " AND C.GROUP_ID = D.GROUP_ID AND D.LOCATION_ID = E.LOCATION_ID AND UPPER(A.USER_ID) = UPPER(:userName) ", nativeQuery = true)
-    public List<Integer> getAscLocationList(@Param("userName") String userName);
+    public Integer getAscLocationList(@Param("userName") String userName);
 }

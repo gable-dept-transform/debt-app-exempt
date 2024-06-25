@@ -59,7 +59,8 @@ public class ReportDMREM001Controller {
 
     @PostMapping(value = "/save-or-update-info")
     public ResponseEntity<SaveORUpdateDMREM001Response> saveOrUpdate(
-            RequestEntity<SaveORUpdateDMREM001Request> request,  @RequestHeader(name = AppConstant.X_ID) String username) throws Exception {
+            RequestEntity<SaveORUpdateDMREM001Request> request, @RequestHeader(name = AppConstant.X_USER_ID) String username)
+            throws Exception {
         SaveORUpdateDMREM001Response response = new SaveORUpdateDMREM001Response();
         DataDMREM001 resultModel = new DataDMREM001();
         String errorMsg = null;
@@ -83,11 +84,13 @@ public class ReportDMREM001Controller {
 
     @PostMapping(value = "/delete-report")
     public ResponseEntity<DeleteReportDMREM001Response> deleteInformation(
-            RequestEntity<DeleteReportDMREM001Request> request) throws Exception {
+            RequestEntity<DeleteReportDMREM001Request> request, @RequestHeader(name = AppConstant.X_USER_ID) String username)
+            throws Exception {
         DeleteReportDMREM001Response response = new DeleteReportDMREM001Response();
         String errorMsg = null;
         try {
             if (request != null) {
+                request.getBody().setUsername(username);
                 reportDMREM001Service.deleteReportInformation(request.getBody());
             } else {
                 errorMsg = "Delete Report : request data not found";

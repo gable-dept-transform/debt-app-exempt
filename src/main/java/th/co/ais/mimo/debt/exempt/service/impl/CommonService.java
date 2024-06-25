@@ -268,7 +268,7 @@ public class CommonService {
     }
 
     public Integer getASCLocationList(String username) throws Exception {
-        return ascLocationRelationRepository.getAscLocationList(username).get(0);
+        return ascLocationRelationRepository.getAscLocationList(username);
     }
 
     public List<CpLocationDto> getLocationList(Integer locationId) throws Exception {

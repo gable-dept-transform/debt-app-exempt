@@ -532,7 +532,7 @@ public class CommonController {
 
 
     @GetMapping(value = "/asc-location-list")
-    public ResponseEntity<AscLocationListResponse> getASCLocationList(@RequestHeader(AppConstant.X_LOCATION) String username)  {
+    public ResponseEntity<AscLocationListResponse> getASCLocationList(@RequestHeader(AppConstant.X_USER_ID) String username)  {
         AscLocationListResponse response = new AscLocationListResponse();
         Integer result = null;
         String errorMsg = null;
