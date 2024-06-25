@@ -207,14 +207,8 @@ public class ReportDMREM001Service {
                 }
 
                 if (AppConstant.REPORT_STATUS_WT.equals(dccReportExemptCriteria.getReportStatus())) {
-                    // List<DccReportExemptCriteria> delete =
-                    // dccReportExemptCriteriaRepository.deleteReportExemptCriteria(request.getReportId(),
-                    // request.getReportSeq());
-
                     dccReportExemptCriteriaRepository.deleteById(DccReportExemptCriteriaId.builder()
                             .reportId(request.getReportId()).reportSeq(request.getReportSeq()).build());
-
-                    // System.out.print("delete" + delete);
 
                     dccCalendarTransactionRepository.deleteCalendarTransaction("EM", 0, new Date(),
                             request.getReportId(), request.getReportSeq());
