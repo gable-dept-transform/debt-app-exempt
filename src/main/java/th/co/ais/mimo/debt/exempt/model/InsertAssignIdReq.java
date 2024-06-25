@@ -1,6 +1,7 @@
 package th.co.ais.mimo.debt.exempt.model;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -46,8 +47,7 @@ public class InsertAssignIdReq {
 	private Long serviceAgeTo;
 	private String firstArDatFrom;
 	private String firstArDatTo;
-	private String baInactiveDatFrom;
-	private String baInactiveDatTo;
+		
 	private String statusReasonList;
 	private String actionReasonList;
 	private String negoFlag;
@@ -63,8 +63,7 @@ public class InsertAssignIdReq {
 	private Long maxCall;
 	private Long maxRedial;
 	private String templateId;
-	private String checkDatFrom;
-	private String checkDatTo;
+
 	private String invoiceBackDat;
 	private Long invoiceInterval;
 	private String autoAssignFlag;
@@ -96,10 +95,8 @@ public class InsertAssignIdReq {
 	private String reasonCodeList;
 	private String confirmDat;
 	private String processStatus;
-	private String dfDatFrom;
-	private String dfDatTo;
-	private String caInactiveDatFrom;
-	private String caInactiveDatTo;
+
+
 	private String callType;
 	private String assignJob;
 	private String provinceList;
@@ -118,9 +115,17 @@ public class InsertAssignIdReq {
 	private String exemptReason;
 	private String bundlingFlag;
 
-	private String effectiveDate;
-	private String effectiveEndDate;
-	private String processDate;
+	
+	private Date caInactiveDatFrom;
+	private Date caInactiveDatTo;
+	private Date baInactiveDatFrom;
+	private Date baInactiveDatTo;
+	private Date checkDatFrom;
+	private Date checkDatTo;
+	private Date dfDatFrom;
+	private Date dfDatTo;
+	private Date processDate;
+
 	private boolean selectEfficetiveDate;
 	private boolean selectDuration;
 

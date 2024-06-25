@@ -1,6 +1,7 @@
 package th.co.ais.mimo.debt.exempt.dao.impl;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,8 +23,6 @@ import th.co.ais.mimo.debt.exempt.model.InsertAssignIdReq;
 import th.co.ais.mimo.debt.exempt.repo.DMSEM004CriteriaMasterRepo;
 import th.co.ais.mimo.debt.exempt.utils.SqlUtils;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Repository
@@ -213,6 +212,9 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 		try {
 			DccCriteriaMaster criteriaMaster = new DccCriteriaMaster();
 			DccCriteriaMasterId criteriaMasterId = new DccCriteriaMasterId();
+			
+			SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
+            String proocessDate = outputFormat.format(req.getProcessDate());
 
 			criteriaMasterId.setModeId(req.getModeId());
 			criteriaMasterId.setCriteriaId(newCriteriaId);
@@ -232,30 +234,30 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 			criteriaMaster.setBaStatusList(req.getBaStatusList());
 			criteriaMaster.setArMnyFrom(req.getArMnyFrom());
 			criteriaMaster.setArMnyTo(req.getArMnyTo());
-			criteriaMaster.setBaInactiveDatFrom(convertStringToDate(req.getBaInactiveDatFrom()));
-			criteriaMaster.setBaInactiveDatTo(convertStringToDate(req.getBaInactiveDatTo()));
+			criteriaMaster.setBaInactiveDatFrom(req.getBaInactiveDatFrom());
+			criteriaMaster.setBaInactiveDatTo(req.getBaInactiveDatTo());
 			criteriaMaster.setActionReasonList(req.getActionReasonList());
 			criteriaMaster.setAssignDuration(req.getAssignDuration());
 			criteriaMaster.setAgentType(req.getAgentType());
 			criteriaMaster.setAssignType(req.getAssignType());
 			criteriaMaster.setAssignJob(req.getAssignJob());
 			criteriaMaster.setCallType(req.getCallType());
-			criteriaMaster.setCheckDatFrom(convertStringToDate(req.getCheckDatFrom()));
-			criteriaMaster.setCheckDatTo(convertStringToDate(req.getCheckDatTo()));
-			criteriaMaster.setRunAt(req.getProcessDate());
-			criteriaMaster.setRunStartDat(convertStringToDate(req.getEffectiveDate()));
-			criteriaMaster.setRunEndDat(convertStringToDate(req.getEffectiveEndDate()));
+			criteriaMaster.setCheckDatFrom(req.getCheckDatFrom());
+			criteriaMaster.setCheckDatTo(req.getCheckDatTo());
+			criteriaMaster.setRunAt(proocessDate);
+			criteriaMaster.setRunStartDat(req.getDfDatFrom());
+			criteriaMaster.setRunEndDat(req.getDfDatTo());
 			criteriaMaster.setAutoAssignFlag(req.getAutoAssignFlag());
 			criteriaMaster.setLastUpdateBy(req.getLastUpdateBy());
 			criteriaMaster.setOrderLevel(req.getOrderLevel());
 			criteriaMaster.setBlacklistType(req.getBlacklistType());
 			criteriaMaster.setBlacklistSubtype(req.getBlacklistSubtype());
 			criteriaMaster.setProvinceList(req.getProvinceList());
-			criteriaMaster.setDfDatFrom(convertStringToDate(req.getDfDatFrom()));
-			criteriaMaster.setDfDatTo(convertStringToDate(req.getDfDatTo()));
+			criteriaMaster.setDfDatFrom(req.getDfDatFrom());
+			criteriaMaster.setDfDatTo(req.getDfDatTo());
 			criteriaMaster.setCreateBy(req.getCreateBy());
-			criteriaMaster.setCaInactiveDatFrom(convertStringToDate(req.getCaInactiveDatFrom()));
-			criteriaMaster.setCaInactiveDatTo(convertStringToDate(req.getCaInactiveDatTo()));
+			criteriaMaster.setCaInactiveDatFrom(req.getCaInactiveDatFrom());
+			criteriaMaster.setCaInactiveDatTo(req.getCaInactiveDatTo());
 			criteriaMaster.setLastUpdateDtm(new Date());
 			criteriaMaster.setCompanyTypeList("ALL");
 			criteriaMaster.setNegoFlag(req.getNegoFlag());
@@ -266,22 +268,48 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 		}
 	}
 
-	private Date convertStringToDate(String dateStr) throws ParseException {
-		if (dateStr == null || dateStr.isEmpty()) {
-			return null;
-		}
-		SimpleDateFormat formatter = new SimpleDateFormat("DD/MM/YYYY");
-		return formatter.parse(dateStr);
-	}
-
 	@Override
 	public void updateCriteriaMaster(InsertAssignIdReq req) throws Exception {
 		try {
 			StringBuffer sql = new StringBuffer();
 			sql = updateCriteriaMasterQuerySql(sql, req.isSelectEfficetiveDate(), req.isSelectDuration());
 			Query query = entityManager.createNativeQuery(sql.toString(), Tuple.class);
-			query = updateCriteriaMasterQueryParam(query, req.getCriteriaDescription(), req.getCompanyCode(), req.getCollectionSegmentList(), req.getBillCycleList(), req.getRegionList(), req.getMobileStatusList(), req.getCateSubcateList(), req.getBaStatusList(), req.getArMnyFrom(), req.getArMnyTo(), req.getBaInactiveDatFrom(), req.getBaInactiveDatTo(), req.getActionReasonList(), req.getAssignDuration(), req.getAgentType(), req.getAssignType(), req.getAssignJob(), req.getCheckDatFrom(), req.getCheckDatTo(), req.getModeId(), req.getCriteriaId(), req.getCriteriaType(), req.isSelectEfficetiveDate(), req.isSelectDuration(), req.getDfDatFrom(), req.getDfDatTo(), req.getProcessDate(), req.getCaInactiveDatFrom(), req.getCaInactiveDatTo(), req.getProvinceList(), req.getBlacklistType(),
-					req.getBlacklistSubtype(), req.getOrderType(), req.getOrderLevel(), req.getAutoAssignFlag());
+			query = updateCriteriaMasterQueryParam(query, 
+					req.getCriteriaDescription(), 
+					req.getCompanyCode(),
+					req.getCollectionSegmentList(), 
+					req.getBillCycleList(), 
+					req.getRegionList(),
+					req.getMobileStatusList(),
+					req.getCateSubcateList(),
+					req.getBaStatusList(),
+					req.getArMnyFrom(),
+					req.getArMnyTo(), 
+					req.getBaInactiveDatFrom(),
+					req.getBaInactiveDatTo(), 
+					req.getActionReasonList(), 
+					req.getAssignDuration(),
+					req.getAgentType(), 
+					req.getAssignType(), 
+					req.getAssignJob(), 
+					req.getCheckDatFrom(), 
+					req.getCheckDatTo(),
+					req.getModeId(), 
+					req.getCriteriaId(),
+					req.getCriteriaType(),
+					req.isSelectEfficetiveDate(),
+					req.isSelectDuration(),
+					req.getDfDatFrom(),
+					req.getDfDatTo(),
+					req.getProcessDate(), 
+					req.getCaInactiveDatFrom(),
+					req.getCaInactiveDatTo(),
+					req.getProvinceList(), 
+					req.getBlacklistType(),
+					req.getBlacklistSubtype(), 
+					req.getOrderType(),
+					req.getOrderLevel(), 
+					req.getAutoAssignFlag());
 			query.executeUpdate();
 		} catch (Exception e) {
 			log.error("Exception insertCriteriaMaster : {}", e.getMessage(), e);
@@ -309,12 +337,12 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 			sql.append("ar_mny_from = :arMnyFrom, ");
 			sql.append("ar_mny_to = :arMnyTo, ");
 
-			sql.append("ba_inactive_dat_from = TO_DATE(:baInactiveDatFrom,'DD/MM/YYYY'), ");
-			sql.append("ba_inactive_dat_to = TO_DATE(:baInactiveDatTo,'DD/MM/YYYY'), ");
-			sql.append("check_dat_from = TO_DATE(:checkDatFrom,'DD/MM/YYYY'), ");
-			sql.append("check_dat_to = TO_DATE(:checkDatTo,'DD/MM/YYYY'), ");
-			sql.append("CA_INACTIVE_DAT_FROM = TO_DATE(:caInactiveDatFrom,'DD/MM/YYYY'), ");
-			sql.append("CA_INACTIVE_DAT_TO = TO_DATE(:caInactiveDatTo,'DD/MM/YYYY'), ");
+			sql.append("ba_inactive_dat_from = :baInactiveDatFrom, ");
+			sql.append("ba_inactive_dat_to = :baInactiveDatTo, ");
+			sql.append("check_dat_from = :checkDatFrom, ");
+			sql.append("check_dat_to = :checkDatTo, ");
+			sql.append("CA_INACTIVE_DAT_FROM = :caInactiveDatFrom, ");
+			sql.append("CA_INACTIVE_DAT_TO = :caInactiveDatTo, ");
 
 			sql.append("order_type = :orderType, ");
 			sql.append("assign_type = :assignType, ");
@@ -322,13 +350,13 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 			sql.append("assign_job = :assignJob, ");
 			sql.append("action_reason_list = :actionReasonList, ");
 			if (selectEfficetiveDate) {
-				sql.append("df_dat_from = TO_DATE(:dfDatFrom,'DD/MM/YYYY'), ");
-				sql.append("df_dat_to = TO_DATE(:dfDatTo,'DD/MM/YYYY'),");
+				sql.append("df_dat_from = :dfDatFrom, ");
+				sql.append("df_dat_to = :dfDatTo,");
 			}
 			if (selectDuration) {
 				sql.append("assign_duration = :assignDuration, ");
 			}
-			sql.append("run_at = :runAt, ");
+			sql.append("run_at = TO_CHAR(:runAt, 'dd/mm/yyyy'), ");
 			sql.append("auto_assign_flag = :autoAssignFlag ");
 
 			sql.append("WHERE mode_id = :modeId ");
@@ -338,7 +366,12 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 		return sql;
 	}
 
-	private Query updateCriteriaMasterQueryParam(Query query, String criteriaDescription, String companyCode, String collectionSegmentList, String billCycleList, String regionList, String mobileStatusList, String cateSubcateList, String baStatusList, BigDecimal arMnyFrom, BigDecimal arMnyTo, String baInactiveDatFrom, String baInactiveDatTo, String actionReasonList, Long assignDuration, String agentType, String assignType, String assignJob, String checkDatFrom, String checkDatTo, String modeId, Long criteriaId, String criteriaType, boolean selectEfficetiveDate, boolean selectDuration, String dfDatFrom, String dfDatTo, String runAt, String caInactiveDatFrom, String caInactiveDatTo, String provinceList, String blacklistType, String blacklistSubtype, String orderType, String orderLevel,
+	private Query updateCriteriaMasterQueryParam(Query query, String criteriaDescription, String companyCode, String collectionSegmentList, 
+			String billCycleList, String regionList, String mobileStatusList, String cateSubcateList, String baStatusList, BigDecimal arMnyFrom, BigDecimal arMnyTo,
+			Date baInactiveDatFrom, Date baInactiveDatTo, String actionReasonList, Long assignDuration, String agentType, String assignType, String assignJob, 
+			Date checkDatFrom, Date checkDatTo, String modeId, Long criteriaId, String criteriaType, boolean selectEfficetiveDate, boolean selectDuration,
+			Date dfDatFrom, Date dfDatTo, Date runAt, Date caInactiveDatFrom, Date caInactiveDatTo, String provinceList, String blacklistType,
+			String blacklistSubtype, String orderType, String orderLevel,
 			String autoAssignFlag) throws Exception {
 		try {
 			if (query != null) {
@@ -379,7 +412,7 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 					query.setParameter("assignDuration", assignDuration);
 				}
 				query.setParameter("runAt", runAt);
-				query.setParameter("AUTO_ASSIGN_FLAG", autoAssignFlag);
+				query.setParameter("autoAssignFlag", autoAssignFlag);
 
 				query.setParameter("modeId", modeId);
 				query.setParameter("criteriaId", criteriaId);
