@@ -55,7 +55,7 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
 			@Param("sectionName") String sectionName) throws Exception;
 
 	@Query(value = "  SELECT distinct keyword_desc AS label, keyword_value AS val "
-			+ " FROM dcc_global_parameter WHERE SECTION_NAME  = :sectionName AND KEYWORD = :keyWord ", nativeQuery = true)
+			+ " FROM dcc_global_parameter WHERE SECTION_NAME  = :sectionName AND KEYWORD = :keyWord ORDER BY keyword_value ASC", nativeQuery = true)
 	List<CommonDropdownListDto> getRegionInfoCaseDropdown(@Param("sectionName")String sectionName, @Param("keyWord")String keyWord) throws Exception;
 
 	@Query(value = "  SELECT DISTINCT(L.LOV_NAME) AS val, L.DISPLAY_VAL AS label , L.LOV_VAL1 AS lovVal1 "
@@ -110,11 +110,10 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
 			+ " order by keyword_value ", nativeQuery = true)
 	List<CommonDropdownDto> getBastatus() throws Exception;
 
-	@Query(value = " select DISTINCT(keyword_desc) AS keywordDesc, keyword_value AS keywordValue, last_update_by AS lastUpdateBy, "
-			+ " last_update_dtm AS lastUpdateDtm ,SECTION_NAME AS sectionName ,KEYWORD AS keyword"
-			+ " from dcc_global_parameter " + " where section_name = 'CRITERIA' " + " and keyword = 'MOBILE_STATUS' "
-			+ " order by keyword_value ", nativeQuery = true)
-	List<CommonDropdownDto> getMobilestatus() throws Exception;
+	@Query(value = "select  distinct keyword_desc AS keywordDesc , keyword_value AS keywordValue from dcc_global_parameter "
+			+ "where section_name = 'MO_STATUS_OF_BA_STAT' and keyword = :baStatus " 
+			+ "order by keyword_value", nativeQuery = true)
+	List<CommonDropdownDto> getMobilestatus(@Param("baStatus")String baStatus) throws Exception;
 
 	@Query(value = " select DISTINCT(keyword_desc) AS keywordDesc, keyword_value AS keywordValue, last_update_by AS lastUpdateBy, "
 			+ " last_update_dtm AS lastUpdateDtm ,SECTION_NAME AS sectionName ,KEYWORD AS keyword"
@@ -145,7 +144,7 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
 
 	@Query(value = " select reason_code AS reasonCode, reason_type AS reasonType, reason_subtype AS reasonSubtype, reason_description AS reasonDescription, last_update_by AS lastUpdateBy, "
 			+ " last_update_dtm AS lastUpdateDtm from dcc_reason "
-			+ " where reason_type = 'WATCHLIST' and reason_subtype like 'WATCHLIST_REASON' order by reason_type, reason_code " , nativeQuery = true)
+			+ " where reason_type = 'EXEMPT_ADD' and reason_subtype like 'EXEMPT_ADD' order by reason_type, reason_code " , nativeQuery = true)
 	List<AddReasonDto> getReason() throws Exception;
 
 	@Query(value = " select lov_name AS name, s.display_val AS val "
@@ -155,7 +154,7 @@ public interface DccGlobalParameterRepo extends JpaRepository<DccGlobalParameter
 			+ " order by lov_name " , nativeQuery = true)
 	List<CategoryDto> getCategory() throws Exception;
 
-	@Query(value = " select sm.lov_name AS name,sm.display_val AS val "
+	@Query(value = " select sm.lov_name AS name,sm.display_val AS display, s.lov_name || '/' || sm.lov_name AS val "
 			+ " from sff_lov_master s,sff_lov_master sm  "
 			+ " where s.row_id = sm.par_row_id  "
 			+ " and s.lov_type = 'ACCOUNT_CATEGORY' "

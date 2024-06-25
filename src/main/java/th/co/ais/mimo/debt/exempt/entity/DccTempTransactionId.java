@@ -21,7 +21,7 @@ public class DccTempTransactionId implements Serializable {
 	private String modeId;
 
 	@Column(name = "PREASSIGN_ID")
-	private String preassignId;
+	private String preAssignId;
 
 	@Column(name = "BILLING_ACC_NUM")
 	private String billingAccNum;

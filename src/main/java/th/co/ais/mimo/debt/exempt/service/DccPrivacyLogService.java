@@ -25,7 +25,7 @@ public class DccPrivacyLogService {
 
             privacyLogDao.insertPrivacyLog(InsertPrivacyLogRequest.builder()
                     .username(username)
-                    .locationCode(String.valueOf(locationCode))
+                    .locationCode(locationCode == null ? null : String.valueOf(locationCode))
                     .referenceType(request.getRefType())
                     .referenceValue(request.getRefValue())
                     .functionName(request.getFunctionName())

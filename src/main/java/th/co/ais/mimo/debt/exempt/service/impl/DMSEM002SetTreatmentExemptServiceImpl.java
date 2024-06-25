@@ -684,7 +684,7 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
                 .soNbr(null)
                 .sentBosFlag(null)
                 .sentIntefaceFlag(sentInterfaceFlag)
-                .updateLocation(location)
+//                .updateLocation(location)
                 .updateReason(null)
                 .build();
 
