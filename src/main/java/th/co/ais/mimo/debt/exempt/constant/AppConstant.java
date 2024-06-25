@@ -58,4 +58,6 @@ public class AppConstant {
 	public static final String DELETE_EXEMPT_ERROR_RECORD_NOT_FOUND = "ERROR_RECORD_NOT_FOUND";
 	public static final String UPDATE_EXEMPT_ERROR_RECORD_NOT_FOUND = "ERROR_RECORD_NOT_FOUND";
 
+    public static final String X_ID = "x-user-id";
+
 }

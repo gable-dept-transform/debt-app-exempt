@@ -10,9 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import th.co.ais.mimo.debt.exempt.constant.AppConstant;
 import th.co.ais.mimo.debt.exempt.exception.ExemptException;
 import th.co.ais.mimo.debt.exempt.model.DataDMREM001;
 import th.co.ais.mimo.debt.exempt.model.DeleteReportDMREM001Request;
@@ -57,12 +59,13 @@ public class ReportDMREM001Controller {
 
     @PostMapping(value = "/save-or-update-info")
     public ResponseEntity<SaveORUpdateDMREM001Response> saveOrUpdate(
-            RequestEntity<SaveORUpdateDMREM001Request> request) throws Exception {
+            RequestEntity<SaveORUpdateDMREM001Request> request,  @RequestHeader(name = AppConstant.X_ID) String username) throws Exception {
         SaveORUpdateDMREM001Response response = new SaveORUpdateDMREM001Response();
         DataDMREM001 resultModel = new DataDMREM001();
         String errorMsg = null;
         try {
             if (request != null) {
+                request.getBody().setUsername(username);
                 resultModel = reportDMREM001Service.saveOrUpdateInfo(request.getBody());
             } else {
                 errorMsg = "Save OR Update : request data not found";
