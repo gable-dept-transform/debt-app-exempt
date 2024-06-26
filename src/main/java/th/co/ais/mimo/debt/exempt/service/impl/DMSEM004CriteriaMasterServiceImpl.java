@@ -1,8 +1,6 @@
 package th.co.ais.mimo.debt.exempt.service.impl;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -351,7 +349,7 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 		DccCriteriaHistory entity = new DccCriteriaHistory();
 		entity.setId(id);
 		entity.setCriteriaId(newCriteriaId);
-		entity.setConfirmDat(convertStringToDate(req.getProcessDate()));
+		entity.setConfirmDat(req.getProcessDate());
 		entity.setOrderType(req.getOrderLevel());
 		entity.setReasonCodeList(req.getReasonCodeList());
 		entity.setBlacklistSeq(0L);
@@ -382,8 +380,8 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 		entity.setServiceAgeTo(0L);
 		entity.setFirstArDatFrom(new Date());
 		entity.setFirstArDatTo(new Date());
-		entity.setBaInactiveDatFrom(convertStringToDate(req.getBaInactiveDatFrom()));
-		entity.setBaInactiveDatTo(convertStringToDate(req.getBaInactiveDatTo()));
+		entity.setBaInactiveDatFrom(req.getBaInactiveDatFrom());
+		entity.setBaInactiveDatTo(req.getBaInactiveDatTo());
 		entity.setStatusReasonList(null);
 		entity.setActionReasonList(req.getActionReasonList());
 		entity.setNegoFlag("S");
@@ -399,8 +397,8 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 		entity.setMaxCall(0L);
 		entity.setMaxRedial(0L);
 		entity.setTemplateId(null);
-		entity.setCheckDatFrom(convertStringToDate(req.getCheckDatFrom()));
-		entity.setCheckDatTo(convertStringToDate(req.getCheckDatTo()));
+		entity.setCheckDatFrom(req.getCheckDatFrom());
+		entity.setCheckDatTo(req.getCheckDatTo());
 		entity.setInvoiceBackDat(null);
 		entity.setInvoiceInterval(0L);
 		entity.setAutoAssignFlag(req.getAutoAssignFlag());
@@ -425,8 +423,8 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 		entity.setLetterDat(null);
 		entity.setLetterAddressType(null);
 		entity.setLetterLevel(null);
-		entity.setDfDatFrom(convertStringToDate(req.getDfDatFrom()));
-		entity.setDfDatTo(convertStringToDate(req.getDfDatTo()));
+		entity.setDfDatFrom(req.getDfDatFrom());
+		entity.setDfDatTo(req.getDfDatTo());
 		entity.setBlacklistType(req.getBlacklistType());
 		entity.setBlacklistSubtype(req.getBlacklistSubtype());
 		entity.setAssignId(null);
@@ -435,8 +433,8 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 		entity.setBlacklistDatFlag(null);
 		entity.setBlacklistDatFrom(new Date());
 		entity.setBlacklistDatTo(new Date());
-		entity.setCaInactiveDatFrom(convertStringToDate(req.getCaInactiveDatFrom()));
-		entity.setCaInactiveDatTo(convertStringToDate(req.getCaInactiveDatTo()));
+		entity.setCaInactiveDatFrom(req.getCaInactiveDatFrom());
+		entity.setCaInactiveDatTo(req.getCaInactiveDatTo());
 		entity.setAssignJob(req.getAssignJob());
 		entity.setCreditTermFlag(null);
 		entity.setThaiLetterFlag('Y');
@@ -463,14 +461,6 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 		entity.setCaAmount(BigDecimal.ZERO);
 		entity.setNegoFlag(req.getNegoFlag());
 		dccCriteriaHistoryRepository.save(entity);
-	}
-
-	private Date convertStringToDate(String dateStr) throws ParseException {
-		if (dateStr == null || dateStr.isEmpty()) {
-			return null;
-		}
-		SimpleDateFormat formatter = new SimpleDateFormat("DD/MM/YYYY");
-		return formatter.parse(dateStr);
 	}
 
 	@Override
@@ -530,9 +520,9 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 				msgError = "ArMnyFrom is invalid";
 			} else if (req.getArMnyTo() == null) {
 				msgError = "ArMnyTo is invalid";
-			} else if (StringUtils.isBlank(req.getBaInactiveDatFrom())) {
+			} else if (req.getBaInactiveDatFrom() == null) {
 				msgError = "BaInactiveDatFrom is invalid";
-			} else if (StringUtils.isBlank(req.getBaInactiveDatTo())) {
+			} else if (req.getBaInactiveDatTo() == null) {
 				msgError = "BaInactiveDatTo is invalid";
 			} else if (StringUtils.isBlank(req.getActionReasonList())) {
 				msgError = "ActionReasonList is invalid";
@@ -542,11 +532,11 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 				msgError = "AssignType is invalid";
 			} else if (StringUtils.isBlank(req.getAssignJob())) {
 				msgError = "AssignJob is invalid";
-			} else if (StringUtils.isBlank(req.getCheckDatFrom())) {
+			} else if (req.getCheckDatFrom() == null) {
 				msgError = "CheckDatFrom is invalid";
-			} else if (StringUtils.isBlank(req.getCheckDatTo())) {
+			} else if (req.getCheckDatTo() == null) {
 				msgError = "CheckDatTo is invalid";
-			} else if (StringUtils.isBlank(req.getProcessDate())) {
+			} else if (req.getProcessDate() == null) {
 				msgError = "ProcessDate is invalid";
 			} else if (StringUtils.isBlank(req.getAutoAssignFlag())) {
 				msgError = "AutoAssignFlag is invalid";
@@ -560,22 +550,18 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 				msgError = "BlacklistSubtype is invalid";
 			} else if (StringUtils.isBlank(req.getProvinceList())) {
 				msgError = "ProvinceList is invalid";
-			}  else if (StringUtils.isBlank(req.getCreateBy())) {
+			} else if (StringUtils.isBlank(req.getCreateBy())) {
 				msgError = "CreateBy is invalid";
-			} else if (StringUtils.isBlank(req.getCaInactiveDatFrom())) {
+			} else if (req.getCaInactiveDatFrom() == null) {
 				msgError = "CaInactiveDatFrom is invalid";
-			} else if (StringUtils.isBlank(req.getCaInactiveDatTo())) {
+			} else if (req.getCaInactiveDatTo() == null) {
 				msgError = "CaInactiveDatTo is invalid";
 			}
 
 			if (req.isSelectEfficetiveDate()) {
-				if (StringUtils.isBlank(req.getEffectiveDate())) {
-					msgError = "EffectiveDate is invalid";
-				} else if (StringUtils.isBlank(req.getEffectiveEndDate())) {
-					msgError = "EffectiveEndDate is invalid";
-				} else if (StringUtils.isBlank(req.getDfDatFrom())) {
+				if (req.getDfDatFrom() == null) {
 					msgError = "DfDatFrom is invalid";
-				} else if (StringUtils.isBlank(req.getDfDatTo())) {
+				} else if (req.getDfDatTo() == null) {
 					msgError = "DfDatTo is invalid";
 				}
 			}
