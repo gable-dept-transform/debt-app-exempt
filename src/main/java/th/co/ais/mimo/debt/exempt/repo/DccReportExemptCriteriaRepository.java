@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -25,6 +26,7 @@ public interface DccReportExemptCriteriaRepository
         // List<DccReportExemptCriteria> deleteReportExemptCriteria(@Param("reportId") String reportId,
         //                 @Param("reportSeq") String reportSeq) throws Exception;
 
+        @Modifying
         @Query(value = " Update {h-schema}DCC_REPORT_EM_CRITERIA " +
                         "set LAST_UPDATE_BY = :lastUpdateBy, last_update_dtm = sysdate, " +
                         " debt_age_from = null, report_status = :reportStatus, " +
