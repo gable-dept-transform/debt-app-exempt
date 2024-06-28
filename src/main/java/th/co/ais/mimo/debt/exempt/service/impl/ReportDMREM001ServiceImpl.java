@@ -82,10 +82,6 @@ public class ReportDMREM001ServiceImpl implements ReportDMREM001Dao {
             sql.append("LEFT JOIN DCC_GLOBAL_PARAMETER g ON r.report_status = g.KEYWORD ");
             sql.append("WHERE 1=1 AND g.SECTION_NAME = 'REPORT_STATUS' ");
 
-            if (AppConstant.FLAG_Y.equals(request.getFvBlnACSLocation())) {
-                sql.append(" AND r.criteria_location IN (:userLoctionCodeList) ");
-            }
-
             if (StringUtils.isNotBlank(request.getReportId())) {
                 sql.append("AND r.REPORT_ID = :reportId ");
             }
@@ -139,14 +135,6 @@ public class ReportDMREM001ServiceImpl implements ReportDMREM001Dao {
             if (request.getProcessDateFrom() != null && request.getProcessDateTo() != null) {
                 query.setParameter("processDateFrom", request.getProcessDateFrom());
                 query.setParameter("processDateTo", request.getProcessDateTo());
-            }
-
-            if (AppConstant.FLAG_Y.equals(request.getFvBlnACSLocation())) {
-                if (request.getAcsLocationList().isEmpty()) {
-                    query.setParameter("userLoctionCodeList", null);
-                } else {
-                    query.setParameter("userLoctionCodeList", request.getAcsLocationList().get(0));
-                }
             }
 
             result = SqlUtils.parseResult(query.getResultList(), DataDMREM001.class);

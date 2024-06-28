@@ -21,6 +21,4 @@ public class SearchReportDataDMREM001Request {
     private Calendar criteriaDateTo;
     private Calendar processDateFrom;
     private Calendar processDateTo;
-    private String fvBlnACSLocation;
-    private List<Integer> acsLocationList;
 }
