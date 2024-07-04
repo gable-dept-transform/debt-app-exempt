@@ -212,9 +212,9 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 		try {
 			DccCriteriaMaster criteriaMaster = new DccCriteriaMaster();
 			DccCriteriaMasterId criteriaMasterId = new DccCriteriaMasterId();
-			
+
 			SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy");
-            String proocessDate = outputFormat.format(req.getProcessDate());
+			String proocessDate = outputFormat.format(req.getProcessDate());
 
 			criteriaMasterId.setModeId(req.getModeId());
 			criteriaMasterId.setCriteriaId(newCriteriaId);
@@ -274,42 +274,8 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 			StringBuffer sql = new StringBuffer();
 			sql = updateCriteriaMasterQuerySql(sql, req.isSelectEfficetiveDate(), req.isSelectDuration());
 			Query query = entityManager.createNativeQuery(sql.toString(), Tuple.class);
-			query = updateCriteriaMasterQueryParam(query, 
-					req.getCriteriaDescription(), 
-					req.getCompanyCode(),
-					req.getCollectionSegmentList(), 
-					req.getBillCycleList(), 
-					req.getRegionList(),
-					req.getMobileStatusList(),
-					req.getCateSubcateList(),
-					req.getBaStatusList(),
-					req.getArMnyFrom(),
-					req.getArMnyTo(), 
-					req.getBaInactiveDatFrom(),
-					req.getBaInactiveDatTo(), 
-					req.getActionReasonList(), 
-					req.getAssignDuration(),
-					req.getAgentType(), 
-					req.getAssignType(), 
-					req.getAssignJob(), 
-					req.getCheckDatFrom(), 
-					req.getCheckDatTo(),
-					req.getModeId(), 
-					req.getCriteriaId(),
-					req.getCriteriaType(),
-					req.isSelectEfficetiveDate(),
-					req.isSelectDuration(),
-					req.getDfDatFrom(),
-					req.getDfDatTo(),
-					req.getProcessDate(), 
-					req.getCaInactiveDatFrom(),
-					req.getCaInactiveDatTo(),
-					req.getProvinceList(), 
-					req.getBlacklistType(),
-					req.getBlacklistSubtype(), 
-					req.getOrderType(),
-					req.getOrderLevel(), 
-					req.getAutoAssignFlag());
+			query = updateCriteriaMasterQueryParam(query, req.getCriteriaDescription(), req.getCompanyCode(), req.getCollectionSegmentList(), req.getBillCycleList(), req.getRegionList(), req.getMobileStatusList(), req.getCateSubcateList(), req.getBaStatusList(), req.getArMnyFrom(), req.getArMnyTo(), req.getBaInactiveDatFrom(), req.getBaInactiveDatTo(), req.getActionReasonList(), req.getAssignDuration(), req.getAgentType(), req.getAssignType(), req.getAssignJob(), req.getCheckDatFrom(), req.getCheckDatTo(), req.getModeId(), req.getCriteriaId(), req.getCriteriaType(), req.isSelectEfficetiveDate(), req.isSelectDuration(), req.getDfDatFrom(), req.getDfDatTo(), req.getProcessDate(), req.getCaInactiveDatFrom(), req.getCaInactiveDatTo(), req.getProvinceList(), req.getBlacklistType(),
+					req.getBlacklistSubtype(), req.getOrderType(), req.getOrderLevel(), req.getAutoAssignFlag());
 			query.executeUpdate();
 		} catch (Exception e) {
 			log.error("Exception insertCriteriaMaster : {}", e.getMessage(), e);
@@ -349,13 +315,13 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 			sql.append("order_level = :orderLevel, ");
 			sql.append("assign_job = :assignJob, ");
 			sql.append("action_reason_list = :actionReasonList, ");
-			if (selectEfficetiveDate) {
-				sql.append("df_dat_from = :dfDatFrom, ");
-				sql.append("df_dat_to = :dfDatTo,");
-			}
-			if (selectDuration) {
-				sql.append("assign_duration = :assignDuration, ");
-			}
+			//			if (selectEfficetiveDate) {
+			sql.append("df_dat_from = :dfDatFrom, ");
+			sql.append("df_dat_to = :dfDatTo,");
+			//			}
+			//			if (selectDuration) {
+			sql.append("assign_duration = :assignDuration, ");
+			//			}
 			sql.append("run_at = TO_CHAR(:runAt, 'dd/mm/yyyy'), ");
 			sql.append("auto_assign_flag = :autoAssignFlag ");
 
@@ -366,13 +332,8 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 		return sql;
 	}
 
-	private Query updateCriteriaMasterQueryParam(Query query, String criteriaDescription, String companyCode, String collectionSegmentList, 
-			String billCycleList, String regionList, String mobileStatusList, String cateSubcateList, String baStatusList, BigDecimal arMnyFrom, BigDecimal arMnyTo,
-			Date baInactiveDatFrom, Date baInactiveDatTo, String actionReasonList, Long assignDuration, String agentType, String assignType, String assignJob, 
-			Date checkDatFrom, Date checkDatTo, String modeId, Long criteriaId, String criteriaType, boolean selectEfficetiveDate, boolean selectDuration,
-			Date dfDatFrom, Date dfDatTo, Date runAt, Date caInactiveDatFrom, Date caInactiveDatTo, String provinceList, String blacklistType,
-			String blacklistSubtype, String orderType, String orderLevel,
-			String autoAssignFlag) throws Exception {
+	private Query updateCriteriaMasterQueryParam(Query query, String criteriaDescription, String companyCode, String collectionSegmentList, String billCycleList, String regionList, String mobileStatusList, String cateSubcateList, String baStatusList, BigDecimal arMnyFrom, BigDecimal arMnyTo, Date baInactiveDatFrom, Date baInactiveDatTo, String actionReasonList, Long assignDuration, String agentType, String assignType, String assignJob, Date checkDatFrom, Date checkDatTo, String modeId, Long criteriaId, String criteriaType, boolean selectEfficetiveDate, boolean selectDuration, Date dfDatFrom, Date dfDatTo, Date runAt, Date caInactiveDatFrom, Date caInactiveDatTo, String provinceList, String blacklistType, String blacklistSubtype, String orderType, String orderLevel, String autoAssignFlag)
+			throws Exception {
 		try {
 			if (query != null) {
 				query.setParameter("criteriaDescription", criteriaDescription);
@@ -404,13 +365,13 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 				query.setParameter("orderLevel", orderLevel);
 				query.setParameter("actionReasonList", actionReasonList);
 
-				if (selectEfficetiveDate) {
-					query.setParameter("dfDatFrom", dfDatFrom);
-					query.setParameter("dfDatTo", dfDatTo);
-				}
-				if (selectDuration) {
-					query.setParameter("assignDuration", assignDuration);
-				}
+				//				if (selectEfficetiveDate) {
+				query.setParameter("dfDatFrom", dfDatFrom);
+				query.setParameter("dfDatTo", dfDatTo);
+				//				}
+				//				if (selectDuration) {
+				query.setParameter("assignDuration", assignDuration);
+				//				}
 				query.setParameter("runAt", runAt);
 				query.setParameter("autoAssignFlag", autoAssignFlag);
 
