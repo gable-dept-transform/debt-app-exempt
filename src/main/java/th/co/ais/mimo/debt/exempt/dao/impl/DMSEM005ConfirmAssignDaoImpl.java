@@ -309,13 +309,13 @@ public class DMSEM005ConfirmAssignDaoImpl implements DMSEM005ConfirmAssignDao {
 
 	private void insertIntoTransactionBacklog(DMSEM005UpdateExemptInfoRequest request, Date preAssignDate) {
 		StringBuffer sql = new StringBuffer();
-		sql.append("INSERT INTO dcc_transaction_backlog (mode_id, preassign_id, preassign_dat, assign_id, ").append(
-				"assign_dat, input_reason, company_code, billing_acc_num, mobile_num, cust_acc_num, region_code, ")
-				.append("last_update_by, last_update_dtm) ")
-				.append("SELECT mode_id, preassign_id, :preAssignDate, null, null, :inputReason, company_code, ")
-				.append("billing_acc_num, mobile_num, cust_acc_num, region_code, :userName, sysdate ")
-				.append("FROM dcc_temp_transaction ")
-				.append("WHERE mode_id = :modeId AND preassign_id = :preAssignId AND region_code != 'ERR'");
+		sql.append("INSERT INTO dcc_transaction_backlog (mode_id, preassign_id, preassign_dat, assign_id, ");
+		sql.append("assign_dat, input_reason, company_code, billing_acc_num, mobile_num, cust_acc_num, region_code, ");
+		sql.append("last_update_by, last_update_dtm) ");
+		sql.append("SELECT mode_id, preassign_id, :preAssignDate, '0000000000', null, :inputReason, company_code, ");
+		sql.append("billing_acc_num, mobile_num, cust_acc_num, region_code, :userName, sysdate ");
+		sql.append("FROM dcc_temp_transaction ");
+		sql.append("WHERE mode_id = :modeId AND preassign_id = :preAssignId AND region_code != 'ERR'");
 
 		Query query = entityManager.createNativeQuery(sql.toString());
 		query.setParameter("preAssignDate", preAssignDate);
