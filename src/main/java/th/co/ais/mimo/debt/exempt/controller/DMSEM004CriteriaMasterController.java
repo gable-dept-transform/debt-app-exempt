@@ -13,10 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import th.co.ais.mimo.debt.exempt.constant.AppConstant;
 import th.co.ais.mimo.debt.exempt.dto.CommonDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.DistrictDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.GetRefAssignDto;
@@ -71,8 +73,7 @@ public class DMSEM004CriteriaMasterController {
 		DMSEM004SearchDataResp response = DMSEM004SearchDataResp.builder().build();
 		try {
 			if (!StringUtils.isEmpty(request.getModeId())) {
-				criteriaMasterDto = criteriaMasterService.searchData(request.getModeId(), request.getCriteriaId(),
-						request.getDescription());
+				criteriaMasterDto = criteriaMasterService.searchData(request.getModeId(), request.getCriteriaId(), request.getDescription());
 				if (CollectionUtils.isEmpty(criteriaMasterDto)) {
 					errorMsg = "Data not found";
 				}
@@ -89,19 +90,16 @@ public class DMSEM004CriteriaMasterController {
 	}
 
 	@PostMapping(value = "/delete-info", produces = "application/json")
-	public ResponseEntity<DMSEM004UpdateInfoResp> updateInformation(@RequestBody DMSEM004UpdateInfoReq request) {
+	public ResponseEntity<DMSEM004UpdateInfoResp> updateInformation(@RequestBody DMSEM004UpdateInfoReq request, @RequestHeader(name = AppConstant.X_USER_ID) String username) {
 		String errorMsg = null;
 		DMSEM004UpdateInfoResp response = DMSEM004UpdateInfoResp.builder().build();
 		try {
+			request.setLastUpdateBy(username);
 			Date currentDate = new Date();
-			String dateForm = DateUtils.toStringEngDateSimpleFormat(request.getBlacklistDatFrom(),
-					DateUtils.DEFAULT_DATETIME_PATTERN_DATE_SLASH_YYYY_MM_DD);
-			String dateTo = DateUtils.toStringEngDateSimpleFormat(request.getBlacklistDatTo(),
-					DateUtils.DEFAULT_DATETIME_PATTERN_DATE_SLASH_YYYY_MM_DD);
+			String dateForm = DateUtils.toStringEngDateSimpleFormat(request.getBlacklistDatFrom(), DateUtils.DEFAULT_DATETIME_PATTERN_DATE_SLASH_YYYY_MM_DD);
+			String dateTo = DateUtils.toStringEngDateSimpleFormat(request.getBlacklistDatTo(), DateUtils.DEFAULT_DATETIME_PATTERN_DATE_SLASH_YYYY_MM_DD);
 			if (currentDate.after(request.getRunAt())) {
-				errorMsg = this.criteriaMasterService.updateInfo(request.getLastUpdateBy(),
-						request.getBlacklistDatFlag(), dateForm, dateTo, request.getModeId(),
-						Long.valueOf(request.getCriteriaId()), request.getCriteriaType());
+				errorMsg = this.criteriaMasterService.updateInfo(request.getLastUpdateBy(), request.getBlacklistDatFlag(), dateForm, dateTo, request.getModeId(), Long.valueOf(request.getCriteriaId()), request.getCriteriaType());
 			} else {
 				errorMsg = this.criteriaMasterService.deleteInfo(request.getModeId(), request.getCriteriaId());
 			}
@@ -389,10 +387,11 @@ public class DMSEM004CriteriaMasterController {
 	}
 
 	@PostMapping(value = "/insert-update-criteria", produces = "application/json")
-	public ResponseEntity<InsertAssignIdResp> insertOrUpdateCriteriaMaster(@RequestBody InsertAssignIdReq request) {
+	public ResponseEntity<InsertAssignIdResp> insertOrUpdateCriteriaMaster(@RequestBody InsertAssignIdReq request, @RequestHeader(name = AppConstant.X_USER_ID) String username) {
 		String errorMsg = null;
 		InsertAssignIdResp response = null;
 		try {
+			request.setUsername(username);
 			response = criteriaMasterService.insertOrUpdateCriteriaMaster(request);
 			errorMsg = response.getErrorMsg();
 		} catch (Exception e) {
@@ -403,12 +402,13 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@PostMapping(value = "/insert-ref-assign", produces = "application/json")
-	public ResponseEntity<InsertAssignIdResp> insertRefAssign(@RequestBody InsertAssignIdReq request) {
+	public ResponseEntity<InsertAssignIdResp> insertRefAssign(@RequestBody InsertAssignIdReq request, @RequestHeader(name = AppConstant.X_USER_ID) String username) {
 		String errorMsg = null;
 		InsertAssignIdResp response = null;
 		try {
+			request.setUsername(username);
 			response = criteriaMasterService.insertRefAssign(request);
 			errorMsg = response.getErrorMsg();
 		} catch (Exception e) {
@@ -419,7 +419,6 @@ public class DMSEM004CriteriaMasterController {
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-
 
 	@PostMapping(value = "/validate-mobilenum", produces = "application/json")
 	public ResponseEntity<GetBillAccNumByMobileNumResp> validateGetBillAccNumByMobileNum(@RequestBody GetBillAccNumByMobileNumReq request) {
@@ -433,16 +432,17 @@ public class DMSEM004CriteriaMasterController {
 			errorMsg = "insertAssign Internal server Error process";
 			response = new GetBillAccNumByMobileNumResp(null, errorMsg);
 		} finally {
-//			response = new GetBillAccNumByMobileNumResp(response, errorMsg);
+			//			response = new GetBillAccNumByMobileNumResp(response, errorMsg);
 		}
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@PostMapping(value = "/upload-billacc-mobilenum", produces = "application/json")
-	public ResponseEntity<InsertAssignIdResp> uploadBillAccMobileNum(@RequestBody InsertAssignIdReq request) {
+	public ResponseEntity<InsertAssignIdResp> uploadBillAccMobileNum(@RequestBody InsertAssignIdReq request, @RequestHeader(name = AppConstant.X_USER_ID) String username) {
 		String errorMsg = null;
 		InsertAssignIdResp response = null;
 		try {
+			request.setUsername(username);
 			response = criteriaMasterService.uploadBillAccMobileNum(request);
 			errorMsg = response.getErrorMsg();
 		} catch (Exception e) {
