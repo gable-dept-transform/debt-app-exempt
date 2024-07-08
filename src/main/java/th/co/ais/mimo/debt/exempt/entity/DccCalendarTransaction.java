@@ -47,4 +47,13 @@ public class DccCalendarTransaction implements Serializable {
 
     @Column(name = "LAST_UPDATE_DTM")
     private Date lastUpdateDate;
+    
+    @Column(name = "EXECUTE_DTM")
+    private Date executeDtm;
+    
+    @Column(name = "PAUSE_FLAG")
+    private String pauseFlag;
+    
+    @Column(name = "AUTO_JOB_FLAG")
+    private String autoJobFlag;
 }

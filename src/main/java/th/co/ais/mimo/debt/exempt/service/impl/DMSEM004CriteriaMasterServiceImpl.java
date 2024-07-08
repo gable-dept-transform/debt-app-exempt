@@ -20,6 +20,8 @@ import th.co.ais.mimo.debt.exempt.dto.GetRefAssignDto;
 import th.co.ais.mimo.debt.exempt.dto.ProvinceDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.SubDistrictDropdownListDto;
 import th.co.ais.mimo.debt.exempt.dto.ZipCodeDropdownListDto;
+import th.co.ais.mimo.debt.exempt.entity.DccCalendarTransaction;
+import th.co.ais.mimo.debt.exempt.entity.DccCalendarTransactionId;
 import th.co.ais.mimo.debt.exempt.entity.DccCriteriaHistory;
 import th.co.ais.mimo.debt.exempt.entity.DccCriteriaHistoryId;
 import th.co.ais.mimo.debt.exempt.entity.DccTempTransaction;
@@ -44,6 +46,7 @@ import th.co.ais.mimo.debt.exempt.repo.DccCriteriaHistoryRepository;
 import th.co.ais.mimo.debt.exempt.repo.DccGlobalParameterRepo;
 import th.co.ais.mimo.debt.exempt.repo.DccTempTransactionRepository;
 import th.co.ais.mimo.debt.exempt.service.DMSEM004CriteriaMasterService;
+import th.co.ais.mimo.debt.exempt.repo.DccCalendarTransactionRepository;
 
 @Service
 @Transactional
@@ -68,6 +71,9 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 
 	@Autowired
 	DccCriteriaHistoryRepository dccCriteriaHistoryRepository;
+
+	@Autowired
+	DccCalendarTransactionRepository dccCalendarTransactionRepository;
 
 	public List<DMSEM004CriteriaMasterBean> searchData(String modeId, Long criteriaId, String description) throws Exception {
 		return criteriaMasterDao.searchData(modeId, criteriaId, description);
@@ -313,6 +319,7 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 					Long newCriteriaId = maxCriteriaId + 1;
 					System.out.println("newCriteriaId : " + newCriteriaId);
 					criteriaMasterDao.insertCriteriaMaster(req, newCriteriaId);
+					insertDccCalendarTransaction(req, newCriteriaId);
 				}
 			}
 		} catch (Exception e) {
@@ -330,6 +337,7 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 				Long maxCriteriaId = criteriaMasterRepo.getMaxDccCriteriaId(req.getModeId());
 				Long newCriteriaId = maxCriteriaId + 1;
 				criteriaMasterDao.insertCriteriaMaster(req, newCriteriaId);
+				insertDccCalendarTransaction(req, newCriteriaId);
 
 				long preAssignId = criteriaMasterRepo.getMaxPreAssignId();
 				long newPreAssignId = preAssignId + 1;
@@ -350,7 +358,7 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 		entity.setId(id);
 		entity.setCriteriaId(newCriteriaId);
 		entity.setConfirmDat(req.getProcessDate());
-		entity.setOrderType(req.getOrderLevel());
+		entity.setOrderType(req.getOrderType());
 		entity.setReasonCodeList(req.getReasonCodeList());
 		entity.setBlacklistSeq(0L);
 		entity.setValueSegmentList(null);
@@ -402,7 +410,7 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 		entity.setInvoiceBackDat(null);
 		entity.setInvoiceInterval(0L);
 		entity.setAutoAssignFlag(req.getAutoAssignFlag());
-		entity.setLastUpdateBy(req.getLastUpdateBy());
+		entity.setLastUpdateBy(req.getUsername());
 		entity.setLastUpdateDtm(new Date());
 		entity.setOrderLevel(req.getOrderLevel());
 		entity.setCollectionSegmentAllFlag(req.getCollectionSegmentList().equals("ALL") ? "Y" : "N");
@@ -447,7 +455,7 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 		entity.setFixCompanyTypeFlag(null);
 		entity.setDeviceDiscountFrom(BigDecimal.ZERO);
 		entity.setDeviceDiscountTo(BigDecimal.ZERO);
-		entity.setCreateBy(null);
+		entity.setCreateBy(req.getUsername());
 		entity.setGenDetailRptFlag(null);
 		entity.setBillSystemList(null);
 		entity.setAutoSmsFlag('N');
@@ -540,8 +548,6 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 				msgError = "ProcessDate is invalid";
 			} else if (StringUtils.isBlank(req.getAutoAssignFlag())) {
 				msgError = "AutoAssignFlag is invalid";
-			} else if (StringUtils.isBlank(req.getLastUpdateBy())) {
-				msgError = "LastUpdateBy is invalid";
 			} else if (StringUtils.isBlank(req.getOrderLevel())) {
 				msgError = "OrderLevel is invalid";
 			} else if (StringUtils.isBlank(req.getBlacklistType())) {
@@ -550,8 +556,6 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 				msgError = "BlacklistSubtype is invalid";
 			} else if (StringUtils.isBlank(req.getProvinceList())) {
 				msgError = "ProvinceList is invalid";
-			} else if (StringUtils.isBlank(req.getCreateBy())) {
-				msgError = "CreateBy is invalid";
 			} else if (req.getCaInactiveDatFrom() == null) {
 				msgError = "CaInactiveDatFrom is invalid";
 			} else if (req.getCaInactiveDatTo() == null) {
@@ -609,7 +613,7 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 					tempTransaction.setBillCycle(req.getBillCycleList());
 					tempTransaction.setRegionCode(req.getRegionList());
 					tempTransaction.setBaStatus(req.getBaStatusList());
-					tempTransaction.setLastUpdateBy(req.getLastUpdateBy());
+					tempTransaction.setLastUpdateBy(req.getUsername());
 					tempTransaction.setProvinceCode(req.getProvinceList());
 					tempTransaction.setZipCode(req.getAgentType());
 					tempTransaction.setStatusReason(req.getStatusReasonList());
@@ -619,6 +623,7 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 					listSave.add(tempTransaction);
 				}
 				dccTempTransactionRepository.saveAll(listSave);
+				insertDccCalendarTransaction(req, newCriteriaId);
 
 				criteriaMasterRepo.dccLoadTextExempt(req.getModeId(), Long.toString(newPreAssignId));
 				//				CALL PLUGIN.DCCP_LOAD_TEXT_EXEMPT(:V_PS_MODE_ID, :V_PS_PREASSIGN_ID);
@@ -628,5 +633,34 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 			response.setErrorMsg(e.getMessage());
 		}
 		return response;
+	}
+
+	private void insertDccCalendarTransaction(InsertAssignIdReq req, Long newCriteriaId) throws Exception {
+
+		int seq = dccCalendarTransactionRepository.getDccCalendarTranNextval();
+		String jobType = req.getAutoAssignFlag().equals("Y") ? "ASSIGN" : "QUERY";
+
+		int criteriaId = newCriteriaId.intValue();
+		DccCalendarTransactionId id = new DccCalendarTransactionId();
+		id.setModeId(req.getModeId());
+		id.setCriteriaId(criteriaId);
+		id.setRunDate(req.getProcessDate());
+		id.setJobType(jobType);
+		id.setSetSeq(seq);
+
+		DccCalendarTransaction request = new DccCalendarTransaction();
+		request.setId(id);
+		request.setPreJobId(null);
+		request.setJobId(null);
+		request.setRunResultFlag("N");
+		request.setRunResultDesc("NOTHING");
+		request.setPauseFlag("N");
+		request.setLastUpdateBy(req.getUsername());
+		request.setLastUpdateDate(new Date());
+		request.setJobDescription(req.getCriteriaDescription());
+		request.setAutoJobFlag(req.getAutoAssignFlag());
+		request.setPriorityNo(0);
+
+		dccCalendarTransactionRepository.save(request);
 	}
 }

@@ -38,4 +38,7 @@ public interface DccCalendarTransactionRepository extends JpaRepository<DccCalen
         void deleteCalendarTransaction(@Param("modeId") String modeId,
                         @Param("criteriaId") Integer criteriaId, @Param("runDate") Date runDate,
                         @Param("jobType") String jobType, @Param("setSeq") String setSeq);
+        
+        @Query(nativeQuery = true, value = "select {h-schema}dcc_calendar_tran_seq.nextval from dual")
+        int getDccCalendarTranNextval();
 }
