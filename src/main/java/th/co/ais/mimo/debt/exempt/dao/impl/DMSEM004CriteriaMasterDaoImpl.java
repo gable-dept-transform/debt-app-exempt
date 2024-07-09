@@ -268,7 +268,7 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 	public void updateCriteriaMaster(InsertAssignIdReq req) throws Exception {
 		try {
 			StringBuffer sql = new StringBuffer();
-			sql = updateCriteriaMasterQuerySql(sql, req.isSelectEfficetiveDate(), req.isSelectDuration());
+			sql = updateCriteriaMasterQuerySql(sql);
 			Query query = entityManager.createNativeQuery(sql.toString(), Tuple.class);
 			query = updateCriteriaMasterQueryParam(query, req);
 			query.executeUpdate();
@@ -278,7 +278,7 @@ public class DMSEM004CriteriaMasterDaoImpl implements DMSEM004CriteriaMasterDao 
 		}
 	}
 
-	private StringBuffer updateCriteriaMasterQuerySql(StringBuffer sql, boolean selectEfficetiveDate, boolean selectDuration) throws Exception {
+	private StringBuffer updateCriteriaMasterQuerySql(StringBuffer sql) throws Exception {
 		if (sql != null) {
 
 			sql.append("UPDATE dcc_criteria_master SET ");
