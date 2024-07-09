@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import th.co.ais.mimo.debt.exempt.constant.AppConstant;
 import th.co.ais.mimo.debt.exempt.dto.ExemptDetailDto;
+import th.co.ais.mimo.debt.exempt.dto.LoadTextRequestDto;
 import th.co.ais.mimo.debt.exempt.dto.SearchTreatmentDto;
 import th.co.ais.mimo.debt.exempt.exception.ExemptException;
 import th.co.ais.mimo.debt.exempt.model.*;
@@ -40,7 +41,7 @@ public class DMSEM002SetTreatmentExemptController {
 			if(!StringUtils.isEmpty(request.getSearchType())) {
 				response.setResultList(this.dmsem002SetTreatmentExemptService.searchData(request));
 				if(!response.getResultList().isEmpty()){
-					response.setResultDetailList(dmsem002SetTreatmentExemptService.searchExemptDetail(request.getSearchType(),request.getParamValue()));
+					response.setResultDetailList(dmsem002SetTreatmentExemptService.searchExemptDetail(request.getSearchType(),request.getParamValue(),request.getSelectedBaNum()));
 				}
 
 			}else{
@@ -66,28 +67,29 @@ public class DMSEM002SetTreatmentExemptController {
 		SearchLoadTextResponse response = SearchLoadTextResponse.builder().build();
 		try {
 			if(!StringUtils.isEmpty(request.getSearchType())) {
-				if(request.getParamValue() != null) {
+				if(request.getParamList() != null) {
 					List<SearchTreatmentDto> resultList = new ArrayList<>();
 					List<ExemptDetailDto> exemptDetailDtoList = new ArrayList<>();
 					List<String> errorList = new ArrayList<>();
-					for (String param: request.getParamValue())
+					for (LoadTextRequestDto param: request.getParamList())
 					{
 						total++;
 						SearchRequest searchRequest = new SearchRequest();
 						searchRequest.setSearchType(request.getSearchType());
-						searchRequest.setParamValue(param);
+						searchRequest.setParamValue(param.getParamValue());
+						searchRequest.setSelectedBaNum(param.getBaNum());
 
 						List<SearchTreatmentDto> list =  this.dmsem002SetTreatmentExemptService.searchData(searchRequest);
 						resultList.addAll(list);
 						//response.getResultList().addAll(list);
 						if (!list.isEmpty()) {
 							totalSuccess++;
-							List<ExemptDetailDto> listDetail = dmsem002SetTreatmentExemptService.searchExemptDetail(searchRequest.getSearchType(), searchRequest.getParamValue());
+							List<ExemptDetailDto> listDetail = dmsem002SetTreatmentExemptService.searchExemptDetail(searchRequest.getSearchType(), searchRequest.getParamValue(),null);
 //							response.getResultDetailList().addAll(listDetail);
 							exemptDetailDtoList.addAll(listDetail);
 						}else{
 							totalFail++;
-							errorList.add(param);
+							errorList.add(param.getParamValue());
 						}
 
 					}
@@ -115,7 +117,7 @@ public class DMSEM002SetTreatmentExemptController {
 	@PostMapping(value = "/search-exempt",produces = "application/json")
 	public ResponseEntity<SearchResponse> searchExemptDetail(@RequestBody SearchRequest request){
         try {
-            List<ExemptDetailDto> list =  this.dmsem002SetTreatmentExemptService.searchExemptDetail(request.getSearchType(), request.getParamValue());
+            List<ExemptDetailDto> list =  this.dmsem002SetTreatmentExemptService.searchExemptDetail(request.getSearchType(), request.getParamValue(), request.getSelectedBaNum());
 
 			return ResponseEntity.ok().body(SearchResponse.builder().resultDetailList(list).build());
         } catch (ExemptException e) {
@@ -129,8 +131,9 @@ public class DMSEM002SetTreatmentExemptController {
 	public ResponseEntity<SearchResponse> searchLoadTextExemptDetail(@RequestBody SearchLoadTextRequest request){
 		try {
 			List<ExemptDetailDto> resultList = new ArrayList<>();
-			for(String param: request.getParamValue()) {
-				List<ExemptDetailDto> list = this.dmsem002SetTreatmentExemptService.searchExemptDetail(request.getSearchType(), param);
+//			for(String param: request.getParamValue()) {
+			for(LoadTextRequestDto param: request.getParamList()) {
+				List<ExemptDetailDto> list = this.dmsem002SetTreatmentExemptService.searchExemptDetail(request.getSearchType(), param.getParamValue(), param.getBaNum());
 				resultList.addAll(list);
 			}
 

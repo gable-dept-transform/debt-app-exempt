@@ -10,7 +10,7 @@ import java.util.List;
 public interface DMSEM002SetTreatmentExemptService {
     List<SearchTreatmentDto> searchData(SearchRequest request) throws ExemptException;
 
-    List<ExemptDetailDto> searchExemptDetail(String searchType,String vaule)throws ExemptException;
+    List<ExemptDetailDto> searchExemptDetail(String searchType,String vaule,String billingAccountNum)throws ExemptException;
 
     public AddExemptResponse insertExempt(AddExemptRequest addExemptRequest, Integer location, String insertBy)throws ExemptException;
 

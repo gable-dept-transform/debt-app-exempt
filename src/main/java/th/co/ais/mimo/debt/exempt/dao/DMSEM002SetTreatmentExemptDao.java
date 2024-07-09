@@ -11,7 +11,7 @@ public interface DMSEM002SetTreatmentExemptDao {
 
     public List<SearchTreatmentDto> searchData(SearchRequest request) throws ExemptException;
 
-    public List<ExemptDetailDto> searchExemptDetail(String searchType, String vaule) throws ExemptException;
+    public List<ExemptDetailDto> searchExemptDetail(String searchType, String vaule,String billingAccountNum) throws ExemptException;
 
     public String getDCBOSSeq() throws ExemptException;
 }

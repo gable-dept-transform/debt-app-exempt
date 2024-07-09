@@ -13,4 +13,5 @@ public class SearchRequest {
 
     private String paramValue;
     private String searchType;
+    private String selectedBaNum;
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.Query;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -200,9 +201,16 @@ public class DMSEM002SetTreatmentExemptDaoImpl implements DMSEM002SetTreatmentEx
                         "           and a.accnt_type_cd = 'Billing'   " +
                         "           order by cust_stat_cd asc,source_type desc,x_status_date desc ) ba,  " +
                         "         account ca  " +
-                        "      where ba.master_ou_id = ca.par_row_id)  " +
-                        "     where rn = 1 ";
+                        "      where ba.master_ou_id = ca.par_row_id " ;
+                if(StringUtils.isNotEmpty(request.getSelectedBaNum())){
+                    sql += " and ba.ou_num = :billingAccountNum ";
+                    mapParam.put("billingAccountNum",request.getSelectedBaNum());
+                }
+                sql+=        "  )  ";
+                sql+=        "     where rn = 1 ";
+
                 mapParam.put("paramValue",request.getParamValue());
+
                 Query query = entityManager.createNativeQuery(sql, "searchTreatmentMobileDtoMapping");
                 if (!mapParam.isEmpty()) {
                     mapParam.forEach(query::setParameter);
@@ -222,7 +230,7 @@ public class DMSEM002SetTreatmentExemptDaoImpl implements DMSEM002SetTreatmentEx
     }
 
     @Override
-    public List<ExemptDetailDto> searchExemptDetail(String searchType, String vaule) throws ExemptException {
+    public List<ExemptDetailDto> searchExemptDetail(String searchType, String vaule,String billingAccountNum) throws ExemptException {
         try{
             String sql = "";
             HashMap<String, Object> mapParam = new HashMap<>();
@@ -301,8 +309,11 @@ public class DMSEM002SetTreatmentExemptDaoImpl implements DMSEM002SetTreatmentEx
                 return query.getResultList();
             }else if(SEARCH_TYPE_MO.equalsIgnoreCase(searchType)){
                 mapParam.put("recv_service_num",vaule);
-                sql = "--D_LstDCExempt m\n" +
-                        "SELECT a.*,row_number() over (order BY exempt_level desc, module_code, mode_id, cust_acc_num, billing_acc_num, mobile_num, no_of_exempt) rownumber FROM ( \n" +
+                if(StringUtils.isNotEmpty(billingAccountNum)){
+                    mapParam.put("billingAccountNum",billingAccountNum);
+                }
+                //"--D_LstDCExempt m\n" +
+                sql =   "SELECT a.*,row_number() over (order BY exempt_level desc, module_code, mode_id, cust_acc_num, billing_acc_num, mobile_num, no_of_exempt) rownumber FROM ( \n" +
                         "select cust_acc_num, billing_acc_num, \n" +
                         "   mobile_num, module_code, mode_id, exempt_level,\n" +
                         "   (select b.x_con_full_name from billing_profile b  where b.ou_num = billing_acc_num ) billing_acc_name, \n" +
@@ -315,13 +326,16 @@ public class DMSEM002SetTreatmentExemptDaoImpl implements DMSEM002SetTreatmentEx
                         "   update_location, last_update_by, to_char(last_update_dtm,'DD/MM/YYYY HH24:Mi:SS') last_update_date, \n" +
                         "   no_of_exempt, sent_interface_flag \n" +
                         "   from   dcc_exempt  e\n" +
-                        "   where --cust_acc_num = '32000070195995'\n" +
-                        "   \tcust_acc_num in ( select ou_num  from  account \n" +
+                        "   where \n" +
+                        "   cust_acc_num in ( select ou_num  from  account \n" +
                         " where  par_row_id in ( select ba.master_ou_id  \n" +
                         " from   account ba, account_has_mobile mo   \n" +
                         " where  mo.service_num = :recv_service_num \n" +
-                        " and mo.bill_accnt_num=ba.ou_num \n" +
-                        " and  ba.accnt_type_cd='Billing' \n" +
+                        " and mo.bill_accnt_num=ba.ou_num \n" ;
+                if(StringUtils.isNotEmpty(billingAccountNum)){
+                    sql += " and mo.bill_accnt_num=:billingAccountNum \n";
+                }
+                sql+=        " and  ba.accnt_type_cd='Billing' \n" +
                         "         and mo.service_num = e.mobile_num) \n" +
                         " and  accnt_type_cd='Customer' ) \n" +
                         " and exempt_level ='CA' \n" +
@@ -342,8 +356,12 @@ public class DMSEM002SetTreatmentExemptDaoImpl implements DMSEM002SetTreatmentEx
                         " from   dcc_exempt  e \n" +
                         "  where billing_acc_num in ( select bill_accnt_num \n" +
                         " from account_has_mobile \n" +
-                        "where service_num = :recv_service_num) \n" +
-                        "and exempt_level ='BA' \n" +
+                        "where service_num = :recv_service_num ";
+                if(StringUtils.isNotEmpty(billingAccountNum)){
+                    sql += " and bill_accnt_num=:billingAccountNum \n";
+                }
+                sql += ")\n";
+                sql +=        "and exempt_level ='BA' \n" +
 
                         " UNION \n" +
 
@@ -359,8 +377,11 @@ public class DMSEM002SetTreatmentExemptDaoImpl implements DMSEM002SetTreatmentEx
                         " update_location, last_update_by, to_char(last_update_dtm,'DD/MM/YYYY HH24:Mi:SS') last_update_date, \n" +
                         " no_of_exempt, sent_interface_flag \n" +
                         " from   dcc_exempt  e\n" +
-                        " where mobile_num = :recv_service_num --'8919893721' --\n" +
-                        " and exempt_level ='MO'\n" +
+                        " where mobile_num = :recv_service_num \n" ;
+                if(StringUtils.isNotEmpty(billingAccountNum)){
+                    sql += " and billing_acc_num =:billingAccountNum \n";
+                }
+                sql+=        " and exempt_level ='MO'\n" +
                         " \n" +
                         ")a";
                 Query query = entityManager.createNativeQuery(sql, "searchExemptDetailDtoMapping");
@@ -392,6 +413,22 @@ public class DMSEM002SetTreatmentExemptDaoImpl implements DMSEM002SetTreatmentEx
             throw new ExemptException(AppConstant.FAIL, e.getMessage());
         }
         return null;
+    }
+
+    public List getBillingAccountFromMobile(String mobileNo) throws ExemptException{
+        String sql = """
+                select a.bill_accnt_num,b.name,a.status_cd\s
+                from account_has_mobile a,account b\s
+                where a.service_num = :mobileNo\s
+                and a.bill_accnt_num = b.ou_num\s
+                """;
+        try{
+            Query query = entityManager.createNativeQuery(sql);
+            return  query.getResultList();
+        }catch (PersistenceException | IllegalArgumentException e){
+            log.error("error occured when search exempt detail ",e);
+            throw new ExemptException(AppConstant.FAIL, e.getMessage());
+        }
     }
 
 }

@@ -84,8 +84,8 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
     }
 
     @Override
-    public List<ExemptDetailDto> searchExemptDetail(String searchType, String value) throws ExemptException {
-        return dmsem002SetTreatmentExemptDao.searchExemptDetail(searchType,value);
+    public List<ExemptDetailDto> searchExemptDetail(String searchType, String value,String billingAccountNum) throws ExemptException {
+        return dmsem002SetTreatmentExemptDao.searchExemptDetail(searchType,value,billingAccountNum);
     }
 
     @Override
