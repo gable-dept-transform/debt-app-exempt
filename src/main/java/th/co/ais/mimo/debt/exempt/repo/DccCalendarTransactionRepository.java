@@ -43,7 +43,7 @@ public interface DccCalendarTransactionRepository extends JpaRepository<DccCalen
         int getDccCalendarTranNextval();
         
         @Modifying
-        @Query(value = "DELETE FROM dcc_calendar_transaction "
+        @Query(value = "DELETE FROM {h-schema}dcc_calendar_transaction "
         		+ "WHERE run_dat >= trunc(sysdate) AND execute_dtm IS NULL "
         		+ "AND prejob_id IS NULL AND (:pauseflag IS NULL OR pause_flag = :pauseflag) "
         		+ "AND mode_id = :modeId AND criteria_id = :criteriaId "
