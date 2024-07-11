@@ -351,7 +351,7 @@ public class ReportDMREM001Service {
             processDate.set(Calendar.MINUTE, 0);
             processDate.set(Calendar.SECOND, 0);
             processDate.set(Calendar.MILLISECOND, 0);
-            if (currentDate.compareTo(processDate) < 0) {
+            if (processDate.compareTo(currentDate) < 0) {
                 return "Process date must be greater than or equal to current date";
             }
         }
