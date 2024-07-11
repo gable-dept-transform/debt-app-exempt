@@ -89,6 +89,7 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
     }
 
     @Override
+    @Transactional(Transactional.TxType.REQUIRED)
     public AddExemptResponse insertExempt(AddExemptRequest addExemptRequest, Integer location, String addBy)throws ExemptException{
 
 
@@ -589,11 +590,14 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
     @Autowired
     DccExemptProcRepoImpl exemptProcRepo;
 
-    private void ffGetNegoExemSff(String custAccNo, String billingAccNo, String mobileNo, String mode, String startdate, String enddate, String exemptLevel) {
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public void ffGetNegoExemSff(String custAccNo, String billingAccNo, String mobileNo, String mode, String startdate, String enddate, String exemptLevel) {
 //                   PLUGIN.DCCFNG_EXEMPT_SFF_ASYNC('D_GetNGExemSFF',:ca,:ba,:mobile,:mode,to_date(:startdate,'YYYY/MM/DD'),to_date(:enddate,'YYYY/MM/DD'),:exempt_level);
         Date startDateType = DateUtils.getDateByFormatEnLocale(startdate,"YYYY/MM/DD");
         Date endDateType = DateUtils.getDateByFormatEnLocale(enddate,"YYYY/MM/DD");
-        exemptProcRepo.callDGetNGExemSFF(custAccNo,billingAccNo,mobileNo,mode,startDateType,endDateType,exemptLevel);
+        log.debug("callDGetNGExemSFF {} {} {} {} {} {} {}",custAccNo,billingAccNo,mobileNo,mode,startDateType,endDateType,exemptLevel);
+        String callDGetNGExemSFFOut = exemptProcRepo.callDGetNGExemSFF(custAccNo,billingAccNo,mobileNo,mode,startDateType,endDateType,exemptLevel);
+        log.debug("callDGetNGExemSFF response {} ",callDGetNGExemSFFOut);
     }
 
     @Override
