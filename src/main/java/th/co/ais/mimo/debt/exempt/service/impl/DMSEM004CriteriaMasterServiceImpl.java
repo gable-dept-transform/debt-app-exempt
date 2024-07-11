@@ -95,6 +95,7 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 		String errorMsg = null;
 		try {
 			criteriaMasterRepo.deleteCriteriaInfo(modeId, criteriaId);
+			dccCalendarTransactionRepository.deleteCalendarTransactionDM004(modeId, criteriaId, null);
 		} catch (Exception e) {
 			errorMsg = e.getMessage();
 		}
@@ -314,6 +315,8 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 			if (response.getErrorMsg() == null) {
 				if (req.getCriteriaId() != null) {
 					criteriaMasterDao.updateCriteriaMaster(req);
+					dccCalendarTransactionRepository.deleteCalendarTransactionDM004(req.getModeId(), req.getCriteriaId(), null);
+					insertDccCalendarTransaction(req, req.getCriteriaId());
 				} else {
 					Long maxCriteriaId = criteriaMasterRepo.getMaxDccCriteriaId(req.getModeId());
 					Long newCriteriaId = maxCriteriaId + 1;
