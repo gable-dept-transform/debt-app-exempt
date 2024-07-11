@@ -6,12 +6,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import th.co.ais.mimo.debt.exempt.entity.DccExemptModel;
+import th.co.ais.mimo.debt.exempt.entity.DccExemptModelId;
 
 import java.util.Date;
 import java.util.List;
 
 @Repository
-public interface DccExemptRepo extends JpaRepository<DccExemptModel,String> {
+public interface DccExemptRepo extends JpaRepository<DccExemptModel, DccExemptModelId> {
 
     @Query(value = "select count(1)\n" +
             " from dcc_exempt e \n" +

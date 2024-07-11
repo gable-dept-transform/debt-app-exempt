@@ -16,4 +16,6 @@ public class AddExemptCustAccDto {
     private String mobileStatus;
     // result to show when add complete
     private String result;
+
+    private String dupicateMode;
 }
