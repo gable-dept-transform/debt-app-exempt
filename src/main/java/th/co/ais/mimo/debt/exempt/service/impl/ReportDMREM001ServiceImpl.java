@@ -197,6 +197,8 @@ public class ReportDMREM001ServiceImpl implements ReportDMREM001Dao {
                 .criteriaLocation(request.getLocation())
                 .lastUpdateBy(request.getUsername())
                 .lastUpdateDtm(new Date())
+                .startDate(request.getProcessDate() != null ? request.getProcessDate().getTime() : null)
+                .stopDate(request.getProcessDate() != null ? request.getProcessDate().getTime() : null)
                 .build();
         return dccReportExemptCriteriaRepository.save(dccReportExemptCriteria);
 
