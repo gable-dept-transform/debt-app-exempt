@@ -12,21 +12,22 @@ import th.co.ais.mimo.debt.exempt.entity.DccCalendarTransaction;
 import th.co.ais.mimo.debt.exempt.entity.DccCalendarTransactionId;
 
 @Repository
-public interface DccCalendarTransactionRepository extends JpaRepository<DccCalendarTransaction, DccCalendarTransactionId> {
+public interface DccCalendarTransactionRepository
+                extends JpaRepository<DccCalendarTransaction, DccCalendarTransactionId> {
 
         @Modifying
         @Query(value = "UPDATE {h-schema}DCC_CALENDAR_TRANSACTION " +
-                        "	SET RUN_DAT = TO_DATE(:runDate,'YYYY/MM/DD') " +
-                        "	,PAUSE_FLAG = :pauseFlag, LAST_UPDATE_BY = :username" +
-                        "	,LAST_UPDATE_DTM=SYSDATE " +
-                        "       ,PRIORITY_NO = :priorityNo " +
+                        "	SET RUN_DAT = :runDate " +
+                        "	, PAUSE_FLAG = :pauseFlag, LAST_UPDATE_BY = :username" +
+                        "	, LAST_UPDATE_DTM = SYSDATE " +
+                        "       , PRIORITY_NO = :priorityNo " +
                         "	WHERE MODE_ID = :modeId AND CRITERIA_ID = :criteriaId " +
                         "       AND SET_SEQ = :setSeq AND JOB_TYPE = :jobType " +
-                        "       AND EXECUTE_DTM IS NULL", nativeQuery = true)
+                        "       AND EXECUTE_DTM IS NULL ", nativeQuery = true)
         void updateCalendarTransaction(@Param("runDate") Date runDate, @Param("pauseFlag") String pauseFlag,
                         @Param("username") String username, @Param("priorityNo") Integer priorityNo,
                         @Param("modeId") String modeId,
-                        @Param("criteriaId") Integer criteriaId, @Param("setSeq") String setSeq,
+                        @Param("criteriaId") Long criteriaId, @Param("setSeq") Long setSeq,
                         @Param("jobType") String jobType);
 
         @Modifying
@@ -38,16 +39,16 @@ public interface DccCalendarTransactionRepository extends JpaRepository<DccCalen
         void deleteCalendarTransaction(@Param("modeId") String modeId,
                         @Param("criteriaId") Integer criteriaId, @Param("runDate") Date runDate,
                         @Param("jobType") String jobType, @Param("setSeq") String setSeq);
-        
+
         @Query(nativeQuery = true, value = "select {h-schema}dcc_calendar_tran_seq.nextval from dual")
-        int getDccCalendarTranNextval();
-        
+        Long getDccCalendarTranNextval();
+
         @Modifying
         @Query(value = "DELETE FROM {h-schema}dcc_calendar_transaction "
-        		+ "WHERE run_dat >= trunc(sysdate) AND execute_dtm IS NULL "
-        		+ "AND prejob_id IS NULL AND (:pauseflag IS NULL OR pause_flag = :pauseflag) "
-        		+ "AND mode_id = :modeId AND criteria_id = :criteriaId "
-        		+ "AND job_type IN ( 'QUERY' , 'ASSIGN' )", nativeQuery = true)
+                        + "WHERE run_dat >= trunc(sysdate) AND execute_dtm IS NULL "
+                        + "AND prejob_id IS NULL AND (:pauseflag IS NULL OR pause_flag = :pauseflag) "
+                        + "AND mode_id = :modeId AND criteria_id = :criteriaId "
+                        + "AND job_type IN ( 'QUERY' , 'ASSIGN' )", nativeQuery = true)
         void deleteCalendarTransactionDM004(@Param("modeId") String modeId,
-                        @Param("criteriaId") Long criteriaId,@Param("pauseflag") String pauseflag);
+                        @Param("criteriaId") Long criteriaId, @Param("pauseflag") String pauseflag);
 }

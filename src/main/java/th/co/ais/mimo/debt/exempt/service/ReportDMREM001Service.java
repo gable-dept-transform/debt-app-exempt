@@ -1,6 +1,7 @@
 package th.co.ais.mimo.debt.exempt.service;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +30,7 @@ import th.co.ais.mimo.debt.exempt.repo.DccDMREM001TmpRepository;
 import th.co.ais.mimo.debt.exempt.repo.DccPrivacyLogRepository;
 import th.co.ais.mimo.debt.exempt.repo.DccReportExemptCriteriaRepository;
 import th.co.ais.mimo.debt.exempt.service.impl.CommonService;
+
 @Service
 @Transactional
 public class ReportDMREM001Service {
@@ -113,10 +115,10 @@ public class ReportDMREM001Service {
 
                     insertReportCalendarTransaction(
                             "EM",
-                            0,
+                            0L,
                             dccReportExemptCriteria.getProcessDate(),
                             dccReportExemptCriteria.getId().getReportId(),
-                            Integer.parseInt(dccReportExemptCriteria.getId().getReportSeq()),
+                            Long.valueOf(dccReportExemptCriteria.getId().getReportSeq()),
                             dccReportExemptCriteria.getId().getReportSeq(),
                             dccReportExemptCriteria.getId().getReportSeq(),
                             "N",
@@ -132,7 +134,7 @@ public class ReportDMREM001Service {
 
                     dccCalendarTransactionRepository.updateCalendarTransaction(dccReportExemptCriteria.getProcessDate(),
                             "N", dccReportExemptCriteria.getLastUpdateBy(), 0,
-                            "EM", 0, dccReportExemptCriteria.getId().getReportSeq(),
+                            "EM", 0L, Long.valueOf(dccReportExemptCriteria.getId().getReportSeq()),
                             dccReportExemptCriteria.getId().getReportId());
 
                     // Insert DCC Privacy Log
@@ -222,7 +224,7 @@ public class ReportDMREM001Service {
 
                     dccCalendarTransactionRepository.updateCalendarTransaction(new Date(),
                             AppConstant.FLAG_Y, dccReportExemptCriteria.getLastUpdateBy(), 0,
-                            "EM", 0, dccReportExemptCriteria.getId().getReportSeq(),
+                            "EM", 0L, Long.valueOf(dccReportExemptCriteria.getId().getReportSeq()),
                             dccReportExemptCriteria.getId().getReportId());
                 }
             }
@@ -236,10 +238,10 @@ public class ReportDMREM001Service {
     }
 
     private DccCalendarTransaction insertReportCalendarTransaction(String modeId,
-            Integer criteriaId,
+            Long criteriaId,
             Date processDate,
             String jobType,
-            Integer setSeq,
+            Long setSeq,
             String prejobId,
             String jobId,
             String runResultFlag,
@@ -268,8 +270,6 @@ public class ReportDMREM001Service {
 
         return dccCalendarTransactionRepository.save(request);
     }
-
-
 
     private String validateSearchParameter(SearchReportDataDMREM001Request request) {
         String errorMsg = null;
@@ -376,7 +376,7 @@ public class ReportDMREM001Service {
         }
 
         // request.getExemptFormatList().matches(AppConstant.EXEMPT_FORMAT_DETAIL)
-        //         || 
+        // ||
 
         if (request.getExemptFormatList().matches(AppConstant.EXEMPT_FORMAT_SUMMARY)) {
             if (StringUtils.isEmpty(request.getGroupForSummary())) {

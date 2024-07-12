@@ -1,6 +1,7 @@
 package th.co.ais.mimo.debt.exempt.entity;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.Date;
 
 import jakarta.persistence.Column;
@@ -21,7 +22,7 @@ public class DccCalendarTransactionId implements Serializable {
     private String modeId;
 
     @Column(name = "CRITERIA_ID")
-    private Integer criteriaId;
+    private Long criteriaId;
 
     @Column(name = "RUN_DAT")
     private Date runDate;
@@ -30,5 +31,5 @@ public class DccCalendarTransactionId implements Serializable {
     private String jobType;
 
     @Column(name = "SET_SEQ")
-    private Integer setSeq;
+    private Long setSeq;
 }

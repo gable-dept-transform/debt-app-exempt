@@ -640,13 +640,12 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 
 	private void insertDccCalendarTransaction(InsertAssignIdReq req, Long newCriteriaId) throws Exception {
 
-		int seq = dccCalendarTransactionRepository.getDccCalendarTranNextval();
+		Long seq = dccCalendarTransactionRepository.getDccCalendarTranNextval();
 		String jobType = req.getAutoAssignFlag().equals("Y") ? "ASSIGN" : "QUERY";
 
-		int criteriaId = newCriteriaId.intValue();
 		DccCalendarTransactionId id = new DccCalendarTransactionId();
 		id.setModeId(req.getModeId());
-		id.setCriteriaId(criteriaId);
+		id.setCriteriaId(newCriteriaId);
 		id.setRunDate(req.getProcessDate());
 		id.setJobType(jobType);
 		id.setSetSeq(seq);
