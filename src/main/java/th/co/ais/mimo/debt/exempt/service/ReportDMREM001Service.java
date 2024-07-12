@@ -337,7 +337,7 @@ public class ReportDMREM001Service {
                 return "Query report ng criteria(report status) data not found";
             } else if (StringUtils.isEmpty(dccReportExemptCriteria.get(0).getReportStatus())) {
                 return "Query report ng criteria(report status) data not found ";
-            } else if (AppConstant.REPORT_STATUS_WT.equals(dccReportExemptCriteria.get(0).getReportStatus())) {
+            } else if (!AppConstant.REPORT_STATUS_WT.equals(dccReportExemptCriteria.get(0).getReportStatus())) {
                 return "Unable to edit because report status is not equal to WT";
             }
         } else if (AppConstant.FLAG_A.equals(request.getOperationMode())) {
