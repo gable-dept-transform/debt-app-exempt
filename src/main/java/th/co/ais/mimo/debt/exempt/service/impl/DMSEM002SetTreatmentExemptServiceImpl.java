@@ -1,11 +1,6 @@
 package th.co.ais.mimo.debt.exempt.service.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -89,6 +84,7 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
     }
 
     @Override
+    @Transactional(Transactional.TxType.REQUIRED)
     public AddExemptResponse insertExempt(AddExemptRequest addExemptRequest, Integer location, String addBy)throws ExemptException{
 
 
@@ -97,6 +93,7 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
         //2. D_InsDCExempt
         //3. D_InsDCExemptH
         String sentInterfaceFlag = EXEMPT_SENT_INTERFACE_FLAG_N;
+        boolean someSuccess = false;
         if(EXEMPT_BY_MODE.equals(addExemptRequest.getExemptBy())) {
 
             List<AddExemptCustAccDto> listCustAccDto = new ArrayList<>();
@@ -133,7 +130,8 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
             for (AddExemptCustAccDto custAccDto:listCustAccDto){
 
                 var mode = addExemptRequest.getExemptMode().split(",");
-
+                boolean successFlag = false;
+                List<String> duplicateMode = new ArrayList<>();
                 for (int i = 0; i < mode.length; i++) {
                     //validate
                     /*
@@ -150,44 +148,55 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
                         }
                     }
 
-                    //1. D_GetDCExemptH
-                    Long noOfExempt = dccExemptHistoryRepo.countNumberOfExempt(custAccDto.getCustAccNum(), addExemptRequest.getModule(), mode[i]);
-                    noOfExempt++;
-                    Long exemptSeq = noOfExempt;
+                    //check dup
+                    boolean dupExempt = checkDupicateExempt(addExemptRequest.getExemptLevel()
+                                                    , custAccDto.getCustAccNum()
+                                                    , custAccDto.getBillingAccNum()
+                                                    , custAccDto.getServiceNum()
+                                                    , mode[i]);
 
-                    addExempt(addExemptRequest.getExemptLevel(), custAccDto.getCustAccNum(), custAccDto.getBillingAccNum(),
-                            custAccDto.getServiceNum(),
-                            addExemptRequest.getModule(),
-                            mode[i],
-                            noOfExempt,
-                            addExemptRequest.getEndDate(),
-                            location,
-                            addExemptRequest.getReason(),
-                            addExemptRequest.getCateCode(),
-                            addExemptRequest.getEffectiveDate(),
-                            addBy,
-                            sentInterfaceFlag,
-                            null);
+                    if(!dupExempt) {
+                        //1. D_GetDCExemptH
+                        Long noOfExempt = dccExemptHistoryRepo.countNumberOfExempt(custAccDto.getCustAccNum(), addExemptRequest.getModule(), mode[i]);
+                        noOfExempt++;
+                        Long exemptSeq = noOfExempt;
 
-                    addExemptHistory(exemptSeq,
-                            noOfExempt,
-                            mode[i], custAccDto.getServiceNum(), custAccDto.getBillingAccNum(), custAccDto.getCustAccNum(), location, addExemptRequest.getReason(),
-                            addExemptRequest.getCateCode(),
-                            addExemptRequest.getEffectiveDate(),
-                            addExemptRequest.getExemptLevel(),
-                            addExemptRequest.getEndDate(),
-                            addBy,
-                            addExemptRequest.getModule(),
-                            sentInterfaceFlag,
-                            null,
-                            EXEMPT_ACTION_TYPE_ADD
-                            );
+                        addExempt(addExemptRequest.getExemptLevel(), custAccDto.getCustAccNum(), custAccDto.getBillingAccNum(),
+                                custAccDto.getServiceNum(),
+                                addExemptRequest.getModule(),
+                                mode[i],
+                                noOfExempt,
+                                addExemptRequest.getEndDate(),
+                                location,
+                                addExemptRequest.getReason(),
+                                addExemptRequest.getCateCode(),
+                                addExemptRequest.getEffectiveDate(),
+                                addBy,
+                                sentInterfaceFlag,
+                                null);
+
+                        addExemptHistory(exemptSeq,
+                                noOfExempt,
+                                mode[i], custAccDto.getServiceNum(), custAccDto.getBillingAccNum(), custAccDto.getCustAccNum(), location, addExemptRequest.getReason(),
+                                addExemptRequest.getCateCode(),
+                                addExemptRequest.getEffectiveDate(),
+                                addExemptRequest.getExemptLevel(),
+                                addExemptRequest.getEndDate(),
+                                addBy,
+                                addExemptRequest.getModule(),
+                                sentInterfaceFlag,
+                                null,
+                                EXEMPT_ACTION_TYPE_ADD
+                        );
+
+                        someSuccess = true;
+                        successFlag = true;
 
 //                    If CStr(marrNModule(IngSave)) = "CCS" And CStr(marrNMode_id(IngSave)) = "DC" Then
 //                    Call ffSaveDataBOS(CStr(marrGCust_acc_num(IngSave)), CStr(marrGBill_acc_num(IngSave)), CStr(marrGMobile_num(IngSave)), Format(CStr(marrNEffective(IngSave)), "YYYY/MM/DD"), Format(CStr(marrNEnd(IngSave)), "YYYY/MM/DD"), "0")
 //                    End If
 
-                    //cancel BOS by user requirement
+                        //cancel BOS by user requirement
 //                    if("CCS".equalsIgnoreCase(addExemptRequest.getModule()) && "DC".equalsIgnoreCase(mode[i])){
 //                        String checkExemptDCBOS = ffGetCheckExemptDCBOS();
 //                        ffSaveDataBOS(custAccDto.getBillingAccNum(), custAccDto.getServiceNum(), checkExemptDCBOS, addExemptRequest.getModule(), mode[i],"0",
@@ -198,10 +207,17 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
 //                                );
 //
 //                    }
+                    }else{
+                        duplicateMode.add(mode[i]);
+                    }
                 }
-
-                // add result
-                custAccDto.setResult("Complete: "+addExemptRequest.getExemptMode());
+                if(successFlag) {
+                    // add result
+                    custAccDto.setResult("Complete: " + addExemptRequest.getExemptMode());
+                }else{
+                    custAccDto.setResult("DUPLICATE");
+                    custAccDto.setDupicateMode(String.join(",", duplicateMode));
+                }
             }
         }else if(EXEMPT_BY_CATE.equals(addExemptRequest.getExemptBy())) {
             Map<String,List<String>> resultMap = new HashMap<>();
@@ -236,55 +252,66 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
                 for(AddExemptCustAccDto custAccDto:listCustAccDto){
 //                listCustAccDto.forEach(custAccDto -> {
 
-                    //1. D_GetDCExemptH
-                    Long noOfExempt = dccExemptHistoryRepo.countNumberOfExempt(custAccDto.getCustAccNum()
-                            , exemptCateDetailDto.getModuleCode()
-                            , exemptCateDetailDto.getModeId());
-                    noOfExempt++;
-                    Long exemptSeq = noOfExempt;
-
-                    addExempt(exemptCateDetailDto.getExemptLevel(),
+                    //check dup
+                    boolean dupExempt = checkDupicateExempt(exemptCateDetailDto.getExemptLevel(),
                             custAccDto.getCustAccNum(),
                             custAccDto.getBillingAccNum(),
                             custAccDto.getServiceNum(),
-                            exemptCateDetailDto.getModuleCode(),
-                            exemptCateDetailDto.getModeId(),
-                            noOfExempt,
-                            addExemptRequest.getEndDate(),
-                            location,
-                            addExemptRequest.getReason(),
-                            addExemptRequest.getCateCode(),
-                            addExemptRequest.getEffectiveDate(),
-                            addBy,
-                            sentInterfaceFlag,
-                            exemptCateDetailDto.getExpireDate());
+                            exemptCateDetailDto.getModeId());
+                    if(!dupExempt) {
+                        //1. D_GetDCExemptH
+                        Long noOfExempt = dccExemptHistoryRepo.countNumberOfExempt(custAccDto.getCustAccNum()
+                                , exemptCateDetailDto.getModuleCode()
+                                , exemptCateDetailDto.getModeId());
+                        noOfExempt++;
+                        Long exemptSeq = noOfExempt;
 
-                    addExemptHistory(exemptSeq,
-                            noOfExempt,
-                            exemptCateDetailDto.getModeId(),
-                            custAccDto.getServiceNum(),
-                            custAccDto.getBillingAccNum(),
-                            custAccDto.getCustAccNum(),
-                            location,
-                            addExemptRequest.getReason(),
-                            addExemptRequest.getCateCode(),
-                            addExemptRequest.getEffectiveDate(),
-                            exemptCateDetailDto.getExemptLevel(),
-                            addExemptRequest.getEndDate(),
-                            addBy,
-                            exemptCateDetailDto.getModuleCode(),
-                            sentInterfaceFlag,
-                            exemptCateDetailDto.getExpireDate(),
-                            EXEMPT_ACTION_TYPE_ADD
-                    );
+                        addExempt(exemptCateDetailDto.getExemptLevel(),
+                                custAccDto.getCustAccNum(),
+                                custAccDto.getBillingAccNum(),
+                                custAccDto.getServiceNum(),
+                                exemptCateDetailDto.getModuleCode(),
+                                exemptCateDetailDto.getModeId(),
+                                noOfExempt,
+                                addExemptRequest.getEndDate(),
+                                location,
+                                addExemptRequest.getReason(),
+                                addExemptRequest.getCateCode(),
+                                addExemptRequest.getEffectiveDate(),
+                                addBy,
+                                sentInterfaceFlag,
+                                exemptCateDetailDto.getExpireDate());
 
-                    String keyResult = custAccDto.getCustAccNum()+":"+custAccDto.getBillingAccNum()+":"+custAccDto.getServiceNum();
-                    if(resultMap.get(keyResult)==null){
-                        List<String> listMode = new ArrayList<>();
-                        listMode.add(exemptCateDetailDto.getModeId());
-                        resultMap.put(keyResult,listMode);
+                        addExemptHistory(exemptSeq,
+                                noOfExempt,
+                                exemptCateDetailDto.getModeId(),
+                                custAccDto.getServiceNum(),
+                                custAccDto.getBillingAccNum(),
+                                custAccDto.getCustAccNum(),
+                                location,
+                                addExemptRequest.getReason(),
+                                addExemptRequest.getCateCode(),
+                                addExemptRequest.getEffectiveDate(),
+                                exemptCateDetailDto.getExemptLevel(),
+                                addExemptRequest.getEndDate(),
+                                addBy,
+                                exemptCateDetailDto.getModuleCode(),
+                                sentInterfaceFlag,
+                                exemptCateDetailDto.getExpireDate(),
+                                EXEMPT_ACTION_TYPE_ADD
+                        );
+                        someSuccess = true;
+                        String keyResult = custAccDto.getCustAccNum()+":"+custAccDto.getBillingAccNum()+":"+custAccDto.getServiceNum();
+                        if(resultMap.get(keyResult)==null){
+                            List<String> listMode = new ArrayList<>();
+                            listMode.add(exemptCateDetailDto.getModeId());
+                            resultMap.put(keyResult,listMode);
+                        }else{
+                            resultMap.get(keyResult).add(exemptCateDetailDto.getModeId());
+                        }
                     }else{
-                        resultMap.get(keyResult).add(exemptCateDetailDto.getModeId());
+                        //set to
+                        custAccDto.setDupicateMode(exemptCateDetailDto.getModeId());
                     }
 
                     // cancel BOS by user requirement
@@ -317,7 +344,12 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
 
         }
 
-        AddExemptResponse response = AddExemptResponse.builder().responseCode(AppConstant.SUCCESS).build();
+        AddExemptResponse response = AddExemptResponse.builder().build(); //.responseCode(AppConstant.SUCCESS).build();
+        if(someSuccess){
+            response.setResponseCode(AppConstant.SUCCESS);
+        }else{
+            response.setResponseCode(AppConstant.EXEMPT_DUPLICATE);
+        }
         response.setCustAccNo(addExemptRequest.getCustAccNo());
         return response;
     }
@@ -589,11 +621,14 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
     @Autowired
     DccExemptProcRepoImpl exemptProcRepo;
 
-    private void ffGetNegoExemSff(String custAccNo, String billingAccNo, String mobileNo, String mode, String startdate, String enddate, String exemptLevel) {
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public void ffGetNegoExemSff(String custAccNo, String billingAccNo, String mobileNo, String mode, String startdate, String enddate, String exemptLevel) {
 //                   PLUGIN.DCCFNG_EXEMPT_SFF_ASYNC('D_GetNGExemSFF',:ca,:ba,:mobile,:mode,to_date(:startdate,'YYYY/MM/DD'),to_date(:enddate,'YYYY/MM/DD'),:exempt_level);
         Date startDateType = DateUtils.getDateByFormatEnLocale(startdate,"YYYY/MM/DD");
         Date endDateType = DateUtils.getDateByFormatEnLocale(enddate,"YYYY/MM/DD");
-        exemptProcRepo.callDGetNGExemSFF(custAccNo,billingAccNo,mobileNo,mode,startDateType,endDateType,exemptLevel);
+        log.debug("callDGetNGExemSFF {} {} {} {} {} {} {}",custAccNo,billingAccNo,mobileNo,mode,startDateType,endDateType,exemptLevel);
+        String callDGetNGExemSFFOut = exemptProcRepo.callDGetNGExemSFF(custAccNo,billingAccNo,mobileNo,mode,startDateType,endDateType,exemptLevel);
+        log.debug("callDGetNGExemSFF response {} ",callDGetNGExemSFFOut);
     }
 
     @Override
@@ -642,6 +677,28 @@ public class DMSEM002SetTreatmentExemptServiceImpl implements DMSEM002SetTreatme
         response.setSuccessList(successList);
 
         return response;
+    }
+
+    private boolean checkDupicateExempt(String exemptLevel,
+                                        String cusAccNo,
+                                        String billAccNo,
+                                        String serviceNo,
+                                        String mode){
+
+        DccExemptModelId dccExemptModelId = DccExemptModelId.builder()
+                .exemptLevel(exemptLevel)
+                .billingAccNum(billAccNo)
+                .modeId(mode)
+                .mobileNum(serviceNo)
+                .custAccNum(cusAccNo)
+                .build();
+
+        Optional<DccExemptModel> model = dccExemptRepo.findById(dccExemptModelId);
+        if(model != null && !model.isEmpty()) {
+            return true;
+        }else{
+            return false;
+        }
     }
 
     private void addExempt(String exemptLevel,
