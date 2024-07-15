@@ -222,7 +222,7 @@ public class ReportDMREM001Service {
                     dccDMREM001TmpRepository.deleteDccDMREM001TmpByReportIdandReportSeq(request.getReportId(),
                             request.getReportSeq());
 
-                    dccCalendarTransactionRepository.updateCalendarTransaction(new Date(),
+                    dccCalendarTransactionRepository.updateCalendarTransaction(dccReportExemptCriteria.getProcessDate(),
                             AppConstant.FLAG_Y, dccReportExemptCriteria.getLastUpdateBy(), 0,
                             "EM", 0L, Long.valueOf(dccReportExemptCriteria.getId().getReportSeq()),
                             dccReportExemptCriteria.getId().getReportId());
