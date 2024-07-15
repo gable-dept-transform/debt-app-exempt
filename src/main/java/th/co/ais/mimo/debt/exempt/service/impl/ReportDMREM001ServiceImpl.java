@@ -80,7 +80,7 @@ public class ReportDMREM001ServiceImpl implements ReportDMREM001Dao {
             sql.append("r.location_to as \"locationTo\" ");
             sql.append("FROM dcc_report_em_criteria r ");
             sql.append("LEFT JOIN DCC_GLOBAL_PARAMETER g ON r.report_status = g.KEYWORD ");
-            sql.append("WHERE 1=1 AND g.SECTION_NAME = 'REPORT_STATUS' ");
+            sql.append("WHERE 1=1 AND g.SECTION_NAME = 'REPORT_STATUS' AND r.report_status != 'DL'");
 
             if (StringUtils.isNotBlank(request.getReportId())) {
                 sql.append("AND r.REPORT_ID = :reportId ");
