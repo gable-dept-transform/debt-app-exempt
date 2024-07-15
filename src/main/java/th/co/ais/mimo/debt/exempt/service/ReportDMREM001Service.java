@@ -203,7 +203,7 @@ public class ReportDMREM001Service {
                 errorMsg = "Report Em Criteria Data not found";
                 throw new ExemptException("200", errorMsg);
             } else {
-                System.out.println(dccReportExemptCriteria.getReportStatus());
+                // System.out.println(dccReportExemptCriteria.getReportStatus());
                 if (dccReportExemptCriteria.getReportStatus() == null) {
                     dccReportExemptCriteria.setReportStatus(AppConstant.REPORT_STATUS_WT);
                 }
@@ -216,7 +216,7 @@ public class ReportDMREM001Service {
                             request.getReportId(), request.getReportSeq());
                 } else {
                     dccReportExemptCriteriaRepository.updateReportStatusByReportIdandReportSeq(request.getUsername(),
-                            AppConstant.REPORT_STATUS_DT, request.getReportId(),
+                            AppConstant.REPORT_STATUS_DL, request.getReportId(),
                             request.getReportSeq());
 
                     dccDMREM001TmpRepository.deleteDccDMREM001TmpByReportIdandReportSeq(request.getReportId(),

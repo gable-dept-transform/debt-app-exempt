@@ -16,7 +16,7 @@ public class AppConstant {
     public static final String FLAG_U = "U";
 
 	public static final String REPORT_STATUS_WT = "WT";
-    public static final String REPORT_STATUS_DT = "DT";
+    public static final String REPORT_STATUS_DL = "DL";
 	
     public static final String EXEMPT_FORMAT_DETAIL = "DETAIL";
     public static final String EXEMPT_FORMAT_SUMMARY = "SUMMARY";
