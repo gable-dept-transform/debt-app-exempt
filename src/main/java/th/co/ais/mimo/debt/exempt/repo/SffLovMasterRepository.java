@@ -20,7 +20,7 @@ public interface SffLovMasterRepository extends JpaRepository<SffLovMaster, Stri
 
         @Query(value = " select " +
                         "s.lov_name || ' / ' || sm.lov_name || ' : ' || sm.display_val AS label, " +
-                        "s.lov_name || ' / ' || sm.lov_name as name, " +
+                        "s.lov_name || '/' || sm.lov_name as name, " +
                         "sm.display_val val " +
                         "  FROM {h-schema}SFF_LOV_MASTER s, {h-schema}sff_lov_master sm  " +
                         "  where s.row_id = sm.par_row_id  " +
