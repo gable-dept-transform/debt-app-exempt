@@ -316,13 +316,24 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 				if (req.getCriteriaId() != null) {
 					criteriaMasterDao.updateCriteriaMaster(req);
 					dccCalendarTransactionRepository.deleteCalendarTransactionDM004(req.getModeId(), req.getCriteriaId(), null);
-					insertDccCalendarTransaction(req, req.getCriteriaId());
+					if (req.getAutoAssignFlag().equals("Y")) {
+						insertDccCalendarTransaction(req, req.getCriteriaId(), null, "QUERY", "Y");
+						insertDccCalendarTransaction(req, req.getCriteriaId(), null, "ASSIGN", "Y");
+					} else {
+						insertDccCalendarTransaction(req, req.getCriteriaId(), null, "QUERY", "N");
+					}
 				} else {
 					Long maxCriteriaId = criteriaMasterRepo.getMaxDccCriteriaId(req.getModeId());
 					Long newCriteriaId = maxCriteriaId + 1;
 					System.out.println("newCriteriaId : " + newCriteriaId);
 					criteriaMasterDao.insertCriteriaMaster(req, newCriteriaId);
-					insertDccCalendarTransaction(req, newCriteriaId);
+
+					if (req.getAutoAssignFlag().equals("Y")) {
+						insertDccCalendarTransaction(req, newCriteriaId, null, "QUERY", "Y");
+						insertDccCalendarTransaction(req, newCriteriaId, null, "ASSIGN", "Y");
+					} else {
+						insertDccCalendarTransaction(req, newCriteriaId, null, "QUERY", "N");
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -340,12 +351,19 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 				Long maxCriteriaId = criteriaMasterRepo.getMaxDccCriteriaId(req.getModeId());
 				Long newCriteriaId = maxCriteriaId + 1;
 				criteriaMasterDao.insertCriteriaMaster(req, newCriteriaId);
-				insertDccCalendarTransaction(req, newCriteriaId);
 
 				long preAssignId = criteriaMasterRepo.getMaxPreAssignId();
 				long newPreAssignId = preAssignId + 1;
 				System.out.println("newCriteriaId : " + newCriteriaId + " newPreAssignId : " + newPreAssignId);
 				insertDccCriteriaHistory(req, newCriteriaId, newPreAssignId);
+
+				if (req.getAutoAssignFlag().equals("Y")) {
+					insertDccCalendarTransaction(req, newCriteriaId, newPreAssignId, "QUERY", "Y");
+					insertDccCalendarTransaction(req, newCriteriaId, newPreAssignId, "ASSIGN", "Y");
+				} else {
+					insertDccCalendarTransaction(req, newCriteriaId, null, "QUERY", "N");
+				}
+
 				return response;
 
 			}
@@ -626,7 +644,13 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 					listSave.add(tempTransaction);
 				}
 				dccTempTransactionRepository.saveAll(listSave);
-				insertDccCalendarTransaction(req, newCriteriaId);
+
+				if (req.getAutoAssignFlag().equals("Y")) {
+					insertDccCalendarTransaction(req, newCriteriaId, newPreAssignId, "QUERY", "Y");
+					insertDccCalendarTransaction(req, newCriteriaId, newPreAssignId, "ASSIGN", "Y");
+				} else {
+					insertDccCalendarTransaction(req, newCriteriaId, null, "QUERY", "N");
+				}
 
 				criteriaMasterRepo.dccLoadTextExempt(req.getModeId(), Long.toString(newPreAssignId));
 				//				CALL PLUGIN.DCCP_LOAD_TEXT_EXEMPT(:V_PS_MODE_ID, :V_PS_PREASSIGN_ID);
@@ -638,10 +662,10 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 		return response;
 	}
 
-	private void insertDccCalendarTransaction(InsertAssignIdReq req, Long newCriteriaId) throws Exception {
+	private void insertDccCalendarTransaction(InsertAssignIdReq req, Long newCriteriaId, Long preAssginId, String jobType, String autoAssignFlag) throws Exception {
 
 		Long seq = dccCalendarTransactionRepository.getDccCalendarTranNextval();
-		String jobType = req.getAutoAssignFlag().equals("Y") ? "ASSIGN" : "QUERY";
+		//		String jobType = req.getAutoAssignFlag().equals("Y") ? "ASSIGN" : "QUERY";
 
 		DccCalendarTransactionId id = new DccCalendarTransactionId();
 		id.setModeId(req.getModeId());
@@ -652,7 +676,7 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 
 		DccCalendarTransaction request = new DccCalendarTransaction();
 		request.setId(id);
-		request.setPreJobId(null);
+		request.setPreJobId(preAssginId != null ? preAssginId.toString() : null);
 		request.setJobId(null);
 		request.setRunResultFlag("N");
 		request.setRunResultDesc("NOTHING");
@@ -660,9 +684,8 @@ public class DMSEM004CriteriaMasterServiceImpl implements DMSEM004CriteriaMaster
 		request.setLastUpdateBy(req.getUsername());
 		request.setLastUpdateDate(new Date());
 		request.setJobDescription(req.getCriteriaDescription());
-		request.setAutoJobFlag(req.getAutoAssignFlag());
+		request.setAutoJobFlag(autoAssignFlag);
 		request.setPriorityNo(0);
-
 		dccCalendarTransactionRepository.save(request);
 	}
 }
